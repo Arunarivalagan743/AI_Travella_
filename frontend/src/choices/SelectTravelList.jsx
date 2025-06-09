@@ -219,3 +219,7 @@ export const SelectTravelList = [
     budgetOptions: ["moderate", "luxury"]
 },
     ]
+    
+    // ...existing code...
+
+export const AI_PROMPT = 'Please provide a detailed travel itinerary for {travelType} in {location}. Include popular attractions, recommended accommodations based on the {budget} budget, local dining options, transportation suggestions, and any seasonal considerations for a {duration}-day trip. Also mention any unique cultural experiences or hidden gems that would enhance the {travelType} experience in this specific location. This itinerary is for {peopleMax}.';

@@ -1,13 +1,13 @@
-
-
 import React, { useEffect, useState } from 'react';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
-import { BudgetOptions, SelectTravelList } from '@/choices/SelectTravelList';
+import { AI_PROMPT, BudgetOptions, SelectTravelList } from '@/choices/SelectTravelList';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlane, FaMapMarkerAlt, FaCalendarAlt, FaWalking, FaSuitcase, FaPaperPlane } from 'react-icons/fa';
 import { RiMoneyDollarCircleLine, RiFlightTakeoffFill } from 'react-icons/ri';
 import { BiSolidChevronRight, BiRefresh } from 'react-icons/bi';
 import { MdLocationOn, MdOutlineSwipe, MdExplore, MdHotel } from 'react-icons/md';
+// Import the default export
+import AiSetup from '../ModelWork/AiSetup';
 
 function CreateTrip() {
   const [place, setPlace] = useState(null);
@@ -17,6 +17,10 @@ function CreateTrip() {
   const [isMobile, setIsMobile] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [travelAnimation, setTravelAnimation] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Move the hook to the component level so it doesn't recreate on every submit
+  const { generateTravelPlan, loading, error, travelData } = AiSetup();
 
   const isFormComplete = () => {
     return formData.place && 
@@ -37,10 +41,20 @@ function CreateTrip() {
   }, []);
 
   const handleInput = (name, value) => {
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    if (name === 'place') {
+      // Extract location name from the place object
+      const locationName = value?.label || value?.value?.description || "Unknown location";
+      setFormData({
+        ...formData,
+        place: value, // Keep the original place object
+        location: locationName // Add a separate location string property
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
     
     setTravelAnimation(true);
     setTimeout(() => setTravelAnimation(false), 1000);
@@ -60,18 +74,73 @@ function CreateTrip() {
     }, 800);
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    if (formData?.duration > 5) {
-      alert("You can only travel for a maximum of 5 days");
+    
+    // Check if all required fields are filled
+    if (!formData.location || !formData.duration || !formData.travelType || !formData.budget) {
+      alert("Please fill all the fields");
       return;
     }
     
-    setShowSuccess(true);
-    setTimeout(() => {
-      setShowSuccess(false);
+    // Check duration limit
+    if (formData.duration > 5) {
+      alert("You can only travel for a maximum of 5 days");
       resetForm();
-    }, 2500);
+      return;
+    }
+    
+    // Find the selected travel type to get the peopleMax
+    const selectedTravelType = SelectTravelList.find(item => item.id === formData.travelType);
+    const peopleMax = selectedTravelType ? selectedTravelType.peopleMax : "4-6 people";
+    
+    const FINAL_PROMPT = AI_PROMPT.replace('{location}', formData.location)
+                                 .replace('{duration}', formData.duration)
+                                 .replace('{travelType}', formData.travelType)
+                                 .replace('{budget}', formData.budget)
+                                 .replace('{peopleMax}', peopleMax);
+                                 
+    console.log("Final AI Prompt:", FINAL_PROMPT);
+    
+    try {
+      // Show loading state
+      setIsGenerating(true);
+      
+      // Prepare travel parameters for AI
+      const travelParams = {
+        location: formData.location,
+        duration: `${formData.duration} Days`,
+        for: peopleMax,
+        budgetType: formData.budget
+      };
+      
+      console.log("Calling generateTravelPlan with params:", travelParams);
+      
+      // Call the AI service
+      const result = await generateTravelPlan(travelParams);
+      console.log("Generated travel plan:", result);
+      
+      // Store the result in localStorage for later use
+      if (result) {
+        localStorage.setItem('lastTripPlan', JSON.stringify(result));
+      }
+      
+      // Show success message
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        resetForm();
+      }, 2500);
+      
+      // Navigate to results page (if you have routing set up)
+      // window.location.href = '/trip-results';
+      
+    } catch (error) {
+      console.error("Error generating trip:", error);
+      alert("Failed to generate your trip plan. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const containerVariants = {
@@ -146,7 +215,7 @@ function CreateTrip() {
     <AnimatePresence mode="wait">
       <motion.div 
         key={isRefreshing ? 'refreshing' : 'content'}
-        className={`p-6 mx-auto bg-white bg-opacity-95 backdrop-blur-sm  ${isMobile ? 'max-w-full' : 'max-w-4xl'} relative overflow-hidden`}
+        className={`p-6 mx-auto bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg ${isMobile ? 'max-w-full' : 'max-w-4xl'} relative overflow-hidden`}
         initial="hidden"
         animate="visible"
         exit={{ opacity: 0, y: -20 }}
@@ -192,7 +261,7 @@ function CreateTrip() {
               variants={itemVariants}
             >
               <div className="relative">
-                
+                <FaPlane className={`${isMobile ? 'text-2xl' : 'text-3xl'} text-emerald-600`} />
               </div>
               <h2 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent`}>
                 Your Dream Trip Awaits
@@ -205,7 +274,7 @@ function CreateTrip() {
                 variants={itemVariants}
               >
                 Let us help you craft the perfect getaway tailored to your preferences and style.
-                Complete the form below and we'll create a personalized itinerary just for you.
+                Complete all sections below and we'll create a personalized itinerary just for you.
               </motion.p>
             )}
 
@@ -225,7 +294,7 @@ function CreateTrip() {
                     />
                   ))}
                   <div className="ml-2 text-xs font-medium text-emerald-600">
-                    {activeSection + 1}/4
+                    {Math.min(activeSection + 1, 4)}/4
                   </div>
                 </div>
               ) : (
@@ -261,27 +330,16 @@ function CreateTrip() {
               )}
             </motion.div>
 
-            {isMobile && activeSection === 0 && (
-              <motion.div 
-                className="flex justify-center items-center text-gray-500 text-sm mb-3"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                <MdOutlineSwipe className="mr-1" /> Swipe after completing each step
-              </motion.div>
-            )}
-
+            {/* All sections visible at all times with conditional highlighted styling */}
             <motion.div 
-              className={`mb-5 bg-white p-6 ${isMobile ? 'rounded-2xl shadow-lg border-t-4' : 'rounded-xl shadow-md border-l-4'} border-emerald-600 transition-all duration-300`}
-              animate={activeSection >= 0 ? "visible" : "hidden"}
-              variants={isMobile ? mobileSectionVariants : sectionVariants}
+              className={`mb-5 bg-white p-6 ${isMobile ? 'rounded-2xl shadow-md' : 'rounded-xl shadow-md'} ${activeSection === 0 ? 'ring-2 ring-emerald-200' : ''}`}
+              variants={itemVariants}
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className={`${isMobile ? 'p-2 bg-emerald-100 rounded-full' : ''}`}>
-                  <FaMapMarkerAlt className={`${isMobile ? 'text-lg' : 'text-xl'} text-emerald-600`} />
+                  <FaMapMarkerAlt className={`${isMobile ? 'text-lg' : 'text-xl'} ${activeSection === 0 ? 'text-emerald-600' : 'text-gray-500'}`} />
                 </div>
-                <h3 className="font-semibold text-lg">Where would you like to go?</h3>
+                <h3 className={`font-semibold text-lg ${activeSection === 0 ? 'text-emerald-700' : 'text-gray-700'}`}>Where would you like to go?</h3>
               </div>
               <div className="transform transition-all hover:scale-101">
                 <GooglePlacesAutocomplete
@@ -298,8 +356,8 @@ function CreateTrip() {
                         ...provided,
                         padding: '4px',
                         borderRadius: '8px',
-                        border: '1px solid #e2e8f0',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                        border: `1px solid ${activeSection === 0 ? '#10b981' : '#e2e8f0'}`,
+                        boxShadow: activeSection === 0 ? '0 0 0 1px rgba(16, 185, 129, 0.2)' : '0 2px 4px rgba(0,0,0,0.05)',
                       }),
                       option: (provided) => ({
                         ...provided,
@@ -309,30 +367,34 @@ function CreateTrip() {
                   }}
                 />
               </div>
-              {place && (
-                <motion.div 
-                  className="flex items-center mt-2 text-emerald-700"
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <MdLocationOn className="mr-1" /> 
-                  <span className="text-sm">Destination selected</span>
-                </motion.div>
-              )}
+            
+
+            {place && (
+              <motion.div 
+                className="flex items-center mt-2 text-emerald-700"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <MdLocationOn className="mr-1" /> 
+                <span className="text-sm">
+                  {formData.location || "Destination selected"}
+                </span>
+              </motion.div>
+            )}
+
+
             </motion.div>
 
             <motion.div 
-              className={`mb-5 bg-white p-6 ${isMobile ? 'rounded-2xl shadow-lg border-t-4' : 'rounded-xl shadow-md border-l-4'} ${activeSection >= 1 ? 'border-emerald-600' : 'border-gray-200'} transition-all duration-300`}
-              animate={activeSection >= 1 ? "visible" : "hidden"}
-              variants={isMobile ? mobileSectionVariants : sectionVariants}
-              initial="hidden"
+              className={`mb-5 bg-white p-6 ${isMobile ? 'rounded-2xl shadow-md' : 'rounded-xl shadow-md'} ${activeSection === 1 ? 'ring-2 ring-emerald-200' : ''}`}
+              variants={itemVariants}
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className={`${isMobile ? 'p-2 bg-emerald-100 rounded-full' : ''}`}>
-                  <FaCalendarAlt className={`${isMobile ? 'text-lg' : 'text-xl'} text-emerald-600`} />
+                  <FaCalendarAlt className={`${isMobile ? 'text-lg' : 'text-xl'} ${activeSection === 1 ? 'text-emerald-600' : 'text-gray-500'}`} />
                 </div>
-                <h3 className="font-semibold text-lg">How long will you be traveling?</h3>
+                <h3 className={`font-semibold text-lg ${activeSection === 1 ? 'text-emerald-700' : 'text-gray-700'}`}>How long will you be traveling?</h3>
               </div>
               {isMobile ? (
                 <div className="flex flex-wrap gap-2 justify-between">
@@ -343,7 +405,9 @@ function CreateTrip() {
                       className={`flex-1 min-w-[65px] py-3 px-2 rounded-lg text-center ${
                         formData.duration === day 
                           ? 'bg-emerald-600 text-white' 
-                          : 'bg-gray-100 text-gray-700'
+                          : activeSection === 1 
+                            ? 'bg-emerald-50 text-gray-700'
+                            : 'bg-gray-100 text-gray-700'
                       } transition-all duration-300 relative overflow-hidden`}
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.95 }}
@@ -370,7 +434,7 @@ function CreateTrip() {
                     max="5"
                     placeholder="Number of days (1-5)"
                     onChange={(e) => handleInput('duration', Number(e.target.value))}
-                    className="border p-3 rounded-lg w-full focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all duration-300"
+                    className={`border p-3 rounded-lg w-full outline-none transition-all duration-300 ${activeSection === 1 ? 'focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 border-emerald-200' : 'border-gray-200 focus:border-gray-300'}`}
                     value={formData.duration || ''}
                   />
                   <div className="flex items-center gap-2 mt-2">
@@ -381,7 +445,9 @@ function CreateTrip() {
                         className={`px-3 py-1 rounded border ${
                           formData.duration === day 
                             ? 'bg-emerald-50 border-emerald-500 text-emerald-700' 
-                            : 'bg-gray-50 border-gray-200 text-gray-500'
+                            : activeSection === 1
+                              ? 'bg-emerald-50 border-gray-200 text-gray-600'
+                              : 'bg-gray-50 border-gray-200 text-gray-500'
                         }`}
                         whileHover={{ y: -2 }}
                         whileTap={{ scale: 0.95 }}
@@ -396,27 +462,31 @@ function CreateTrip() {
               )}
             </motion.div>
 
-            <motion.div 
-              className={`mb-5 bg-white p-6 ${isMobile ? 'rounded-2xl shadow-lg border-t-4' : 'rounded-xl shadow-md border-l-4'} ${activeSection >= 2 ? 'border-emerald-600' : 'border-gray-200'} transition-all duration-300`}
-              animate={activeSection >= 2 ? "visible" : "hidden"}
-              variants={isMobile ? mobileSectionVariants : sectionVariants}
-              initial="hidden"
+           <motion.div 
+              className={`mb-5 bg-white p-6 ${isMobile ? 'rounded-2xl shadow-md' : 'rounded-xl shadow-md'} ${activeSection === 2 ? 'ring-2 ring-emerald-200' : ''}`}
+              variants={itemVariants}
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className={`${isMobile ? 'p-2 bg-emerald-100 rounded-full' : ''}`}>
-                  <FaWalking className={`${isMobile ? 'text-lg' : 'text-xl'} text-emerald-600`} />
+                  <FaWalking className={`${isMobile ? 'text-lg' : 'text-xl'} ${activeSection === 2 ? 'text-emerald-600' : 'text-gray-500'}`} />
                 </div>
-                <h3 className="font-semibold text-lg">What type of adventure are you seeking?</h3>
+                <h3 className={`font-semibold text-lg ${activeSection === 2 ? 'text-emerald-700' : 'text-gray-700'}`}>What type of adventure are you seeking?</h3>
               </div>
               <div className={`grid ${isMobile ? 'grid-cols-1 gap-3' : 'md:grid-cols-2 gap-4'}`}>
                 {SelectTravelList.map((item, index) => (
                   <motion.div
                     key={index}
                     onClick={() => handleInput('travelType', item.id)}
-                    className={`border ${isMobile ? 'rounded-xl shadow-sm' : 'rounded-xl'} p-5 hover:shadow-md cursor-pointer transition-all duration-300 ${formData.travelType === item.id ? 'bg-emerald-50 border-emerald-500' : ''} relative overflow-hidden`}
+                    className={`border ${isMobile ? 'rounded-xl' : 'rounded-xl'} p-5 hover:shadow-md cursor-pointer transition-all duration-300 
+                      ${formData.travelType === item.id 
+                        ? 'bg-emerald-50 border-emerald-300' 
+                        : activeSection === 2
+                          ? 'bg-gray-50 border-gray-100'
+                          : 'border-gray-200'
+                      } relative overflow-hidden`}
                     whileHover={{ scale: isMobile ? 1.01 : 1.02, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}
                     whileTap={{ scale: 0.98 }}
-                    initial={{ opacity: 0, y: 15 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.3 }}
                   >
@@ -433,20 +503,45 @@ function CreateTrip() {
                       </motion.div>
                     )}
                     <div className="flex items-center gap-3 mb-1">
-                      <div className={`text-emerald-600 ${isMobile ? 'text-lg bg-emerald-50 p-2 rounded-full' : 'text-xl'}`}>
+                      <div className={`${isMobile ? 'text-lg p-2 rounded-full' : 'text-xl'} ${
+                        formData.travelType === item.id 
+                          ? 'text-emerald-600 bg-emerald-50' 
+                          : activeSection === 2
+                            ? 'text-emerald-500 bg-emerald-50'
+                            : 'text-gray-500 bg-gray-100'
+                      }`}>
                         {item.icon}
                       </div>
-                      <h4 className="font-medium text-lg">{item.title}</h4>
+                      <div>
+                        <h4 className="font-medium text-lg">{item.title}</h4>
+                        <div className="flex items-center text-xs text-emerald-700 mt-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                          <span>{item.peopleMax}</span>
+                        </div>
+                      </div>
                     </div>
                     {(!isMobile || formData.travelType === item.id) && (
-                      <motion.p 
-                        className="text-sm text-gray-600"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
+                      <motion.div 
+                        className="mt-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
                       >
-                        {item.description}
-                      </motion.p>
+                        <p className="text-sm text-gray-600">
+                          {item.description}
+                        </p>
+                        {formData.travelType === item.id && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {item.features.map((feature, i) => (
+                              <span key={i} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                {feature}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </motion.div>
                     )}
                   </motion.div>
                 ))}
@@ -454,31 +549,41 @@ function CreateTrip() {
             </motion.div>
 
             <motion.div 
-              className={`mb-5 bg-white p-6 ${isMobile ? 'rounded-2xl shadow-lg border-t-4' : 'rounded-xl shadow-md border-l-4'} ${activeSection >= 3 ? 'border-emerald-600' : 'border-gray-200'} transition-all duration-300`}
-              animate={activeSection >= 3 ? "visible" : "hidden"}
-              variants={isMobile ? mobileSectionVariants : sectionVariants}
-              initial="hidden"
+              className={`mb-5 bg-white p-6 ${isMobile ? 'rounded-2xl shadow-md' : 'rounded-xl shadow-md'} ${activeSection === 3 ? 'ring-2 ring-emerald-200' : ''}`}
+              variants={itemVariants}
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className={`${isMobile ? 'p-2 bg-emerald-100 rounded-full' : ''}`}>
-                  <RiMoneyDollarCircleLine className={`${isMobile ? 'text-lg' : 'text-xl'} text-emerald-600`} />
+                  <RiMoneyDollarCircleLine className={`${isMobile ? 'text-lg' : 'text-xl'} ${activeSection === 3 ? 'text-emerald-600' : 'text-gray-500'}`} />
                 </div>
-                <h3 className="font-semibold text-lg">What's your budget range?</h3>
+                <h3 className={`font-semibold text-lg ${activeSection === 3 ? 'text-emerald-700' : 'text-gray-700'}`}>What's your budget range?</h3>
               </div>
               <div className={`grid ${isMobile ? 'grid-cols-1 gap-3' : 'md:grid-cols-3 gap-4'}`}>
                 {BudgetOptions.map((item, index) => (
                   <motion.div
                     key={index}
                     onClick={() => handleInput('budget', item.id)}
-                    className={`border ${isMobile ? 'rounded-xl shadow-sm' : 'rounded-xl'} p-5 hover:shadow-md cursor-pointer transition-all duration-300 ${formData.budget === item.id ? 'bg-emerald-50 border-emerald-500' : ''}`}
+                    className={`border ${isMobile ? 'rounded-xl' : 'rounded-xl'} p-5 hover:shadow-md cursor-pointer transition-all duration-300 
+                      ${formData.budget === item.id 
+                        ? 'bg-emerald-50 border-emerald-300' 
+                        : activeSection === 3
+                          ? 'bg-gray-50 border-gray-100'
+                          : 'border-gray-200'
+                      }`}
                     whileHover={{ scale: isMobile ? 1.01 : 1.03, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}
                     whileTap={{ scale: 0.97 }}
-                    initial={{ opacity: 0, y: 15 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.3 }}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`text-emerald-600 ${isMobile ? 'text-lg bg-emerald-50 p-2 rounded-full' : 'text-xl'}`}>
+                      <div className={`${isMobile ? 'text-lg p-2 rounded-full' : 'text-xl'} ${
+                        formData.budget === item.id 
+                          ? 'text-emerald-600 bg-emerald-50' 
+                          : activeSection === 3
+                            ? 'text-emerald-500 bg-emerald-50'
+                            : 'text-gray-500 bg-gray-100'
+                      }`}>
                         {item.icon}
                       </div>
                       <div>
@@ -495,7 +600,7 @@ function CreateTrip() {
             <AnimatePresence>
               {isFormComplete() && (
                 <motion.div
-                  className={`mt-6 ${isMobile ? 'sticky bottom-4 z-20' : ''}`}
+                  className={`mt-8 ${isMobile ? 'sticky bottom-4 z-20' : ''}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
@@ -506,6 +611,7 @@ function CreateTrip() {
                     className={`bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-3 px-8 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${isMobile ? 'w-full' : 'md:w-auto'} relative overflow-hidden`}
                     whileHover={{ scale: 1.03, boxShadow: "0px 8px 15px rgba(16, 185, 129, 0.2)" }}
                     whileTap={{ scale: 0.97 }}
+                    disabled={isGenerating || loading}
                   >
                     <motion.div
                       className="absolute inset-0 bg-white opacity-20"
@@ -513,9 +619,25 @@ function CreateTrip() {
                       whileHover={{ x: "100%" }}
                       transition={{ duration: 1, ease: "easeInOut" }}
                     />
-                    <FaSuitcase className="mr-2" />
-                    <span>Generate My Trip</span>
-                    <BiSolidChevronRight className={`${isMobile ? 'text-2xl' : 'text-xl'}`} />
+                    {isGenerating || loading ? (
+                      <>
+                        <motion.div
+                          initial={{ rotate: 0 }}
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="mr-2"
+                        >
+                          <BiRefresh />
+                        </motion.div>
+                        <span>Generating Trip Plan...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaSuitcase className="mr-2" />
+                        <span>Generate My Trip</span>
+                        <BiSolidChevronRight className={`${isMobile ? 'text-2xl' : 'text-xl'}`} />
+                      </>
+                    )}
                   </motion.button>
                 </motion.div>
               )}
@@ -533,6 +655,31 @@ function CreateTrip() {
                   <FaPaperPlane className="text-xl animate-bounce" />
                   <span>Trip generated successfully!</span>
                   <span className="text-2xl ml-1">✈️</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Loading overlay when generating trip */}
+            <AnimatePresence>
+              {(isGenerating || loading) && (
+                <motion.div 
+                  className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <motion.div 
+                      initial={{ rotate: 0 }}
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="text-emerald-500 text-4xl mb-4 mx-auto"
+                    >
+                      <BiRefresh />
+                    </motion.div>
+                    <p className="text-emerald-700 font-medium">Creating your perfect trip itinerary...</p>
+                    <p className="text-gray-600 text-sm mt-2">This may take a minute</p>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
