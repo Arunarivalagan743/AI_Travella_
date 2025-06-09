@@ -13,8 +13,7 @@ const AiSetup = () => {
       // Initialize the API with your API key
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GEMINI_API_KEY);
       
-      // Use gemini-1.5-pro or gemini-1.0-pro instead of gemini-pro
-      // This change is based on the error message suggesting you need to check available models
+      // Use gemini-1.5-pro model
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
       const prompt = `Generate a detailed Travel Plan in JSON format for:
@@ -24,61 +23,63 @@ const AiSetup = () => {
 **For**: ${travelParams.for || 'A couple'}  
 **Budget Type**: ${travelParams.budgetType || 'Cheap/Budget-friendly'}  
 
+The response MUST be in VALID JSON format with no formatting errors. Use double quotes for all keys and string values.
+
 Include the following details:
 
 🔹 Hotels List (5 options):
-- HotelName
-- Hotel Address
-- Price (per night)
-- Hotel Image URL
-- Star Rating (1–5)
-- Amenities (Free WiFi, Pool, Breakfast, etc.)
-- Review Summary (short text)
+- "hotelName": "name of hotel",
+- "hotelAddress": "address",
+- "pricePerNight": "price range",
+- "hotelImageUrl": "url to stock image",
+- "starRating": number between 1-5,
+- "amenities": ["Free WiFi", "Pool", "Breakfast", etc.],
+- "reviewSummary": "short text"
 
 🔹 Itinerary (Day-wise plan for ${travelParams.duration || '3 days'}):
 For each day:
-- placeName
-- Description
-- Place Type (e.g., Adventure, Romantic, Food, Nightlife)
-- Entry Ticket Price (if any)
-- Opening & Closing Times
-- Rating
-- Best Time to Visit (Morning/Afternoon/Evening)
+- "placeName": "name",
+- "description": "short description",
+- "placeType": "Adventure/Romantic/Food/Nightlife",
+- "entryTicketPrice": "price if any or Free",
+- "openingTime": "time",
+- "closingTime": "time", 
+- "rating": number between 1-5,
+- "bestTimeToVisit": "Morning/Afternoon/Evening"
 
 🔹 Dining Recommendations (2 per day):
-- Restaurant Name
-- Type (Local, Fine Dining, Fast Food)
-- Cuisine
-- Price Range
-- Opening Hours
-- One-line review
+- "restaurantName": "name",
+- "type": "Local/Fine Dining/Fast Food",
+- "cuisine": "type of cuisine",
+- "priceRange": "$/$$/$$$/$$$$",
+- "openingHours": "hours",
+- "review": "one-line review"
 
 🔹 Transport Suggestions:
-- Local transport options (bus, taxi, metro, bike rental)
-- Estimated daily travel cost
-- Airport to hotel commute method
+- "localTransportOptions": ["bus", "taxi", "metro", "bike rental"],
+- "estimatedDailyCost": "cost estimate",
+- "airportToHotelTransport": "method"
 
 🔹 Weather Forecast:
-- Predicted weather for each day (e.g., Sunny, Rainy)
-- Average temperature (°C)
-- What to carry (sunglasses, umbrella, etc.)
+- "weatherPrediction": ["Sunny"/"Rainy"/etc. for each day],
+- "averageTemperature": "temperature in °C",
+- "whatToCarry": ["sunglasses", "umbrella", etc.]
 
 🔹 Safety Tips:
-- Any location-specific precautions
-- Emergency numbers
-- Safe hours to travel
+- "locationPrecautions": ["precaution1", "precaution2"],
+- "emergencyNumbers": ["number1", "number2"],
+- "safeHoursToTravel": "hours"
 
-📌 All information must be provided in **valid, structured JSON format**.
-
-Make sure to avoid using any non-Latin characters and ensure all JSON keys and values are properly quoted.`;
+Provide ONLY valid JSON with NO explanations or comments outside the JSON. Do not include markdown formatting like triple backticks. Format it properly with correct syntax.`;
 
       console.log("Sending request to Gemini API...");
       
-      // Configure the generation to help ensure proper JSON formatting
+      // Configure the generation for stricter JSON formatting
       const generationConfig = {
-        temperature: 0.2, // Lower temperature for more consistent JSON
-        topK: 40,
-        maxOutputTokens: 8192, // Ensure enough tokens for complete response
+        temperature: 0.1, // Very low temperature for consistent output
+        topK: 20,
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json", // Request JSON response format
       };
       
       // Generate content based on the prompt with configuration
@@ -88,72 +89,126 @@ Make sure to avoid using any non-Latin characters and ensure all JSON keys and v
       });
       
       const response = await result.response;
-      const text = response.text();
+      const text = response.text().trim();
       
       console.log("Received response from API");
       
-      // Find JSON content between backticks or just parse the response directly
-      let jsonData;
-      const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/```\n([\s\S]*?)\n```/);
+      // Handle different response formats
+      let jsonData = null;
       
-      if (jsonMatch && jsonMatch[1]) {
-        console.log("JSON found in response with backticks");
-        try {
-          jsonData = JSON.parse(jsonMatch[1]);
-        } catch (parseError) {
-          console.error("Failed to parse JSON from backticks:", parseError);
-          
-          // Try cleaning the JSON before giving up
+      // Try multiple approaches to extract valid JSON
+      const extractionMethods = [
+        // Method 1: Direct parsing
+        () => {
           try {
-            // Remove potential non-JSON characters and try again
-            const cleanedJson = jsonMatch[1].replace(/[\u0000-\u0019]+/g, "");
-            jsonData = JSON.parse(cleanedJson);
-            console.log("Successfully parsed cleaned JSON from backticks");
-          } catch (cleanError) {
-            console.error("Failed to parse cleaned JSON:", cleanError);
-            throw new Error("Could not parse JSON from the response");
+            return JSON.parse(text);
+          } catch (e) {
+            console.log("Direct parsing failed:", e.message);
+            return null;
           }
-        }
-      } else {
-        console.log("Attempting to parse entire response as JSON");
-        try {
-          // Try to parse the entire response as JSON
-          jsonData = JSON.parse(text);
-        } catch (parseError) {
-          console.error("Failed to parse entire response as JSON:", parseError);
-          
-          // Final attempt - try to find any JSON-like structure in the text
+        },
+        
+        // Method 2: Extract JSON from markdown code blocks
+        () => {
+          const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+          if (jsonMatch && jsonMatch[1]) {
+            try {
+              return JSON.parse(jsonMatch[1].trim());
+            } catch (e) {
+              console.log("Code block parsing failed:", e.message);
+              return null;
+            }
+          }
+          return null;
+        },
+        
+        // Method 3: Fix common JSON issues and try parsing
+        () => {
+          try {
+            // Replace single quotes with double quotes
+            let fixedText = text.replace(/'/g, '"');
+            
+            // Fix unquoted property names
+            fixedText = fixedText.replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3');
+            
+            // Ensure commas between array elements and object properties
+            fixedText = fixedText.replace(/}\s*{/g, '},{');
+            fixedText = fixedText.replace(/]\s*\[/g, '],[');
+            fixedText = fixedText.replace(/"\s*}/g, '"}');
+            
+            return JSON.parse(fixedText);
+          } catch (e) {
+            console.log("Fixed JSON parsing failed:", e.message);
+            return null;
+          }
+        },
+        
+        // Method 4: Find any JSON-like structure
+        () => {
           const possibleJson = text.match(/\{[\s\S]*\}/);
           if (possibleJson) {
             try {
-              const cleanedJson = possibleJson[0].replace(/[\u0000-\u0019]+/g, "");
-              jsonData = JSON.parse(cleanedJson);
-              console.log("Found JSON structure in response");
-            } catch (finalError) {
-              console.error("All JSON parsing attempts failed", finalError);
-              throw new Error("Could not extract valid JSON from the response");
+              return JSON.parse(possibleJson[0]);
+            } catch (e) {
+              console.log("JSON structure parsing failed:", e.message);
+              return null;
             }
-          } else {
-            throw new Error("Could not extract valid JSON from the response");
           }
+          return null;
+        }
+      ];
+      
+      // Try each method until one succeeds
+      for (const method of extractionMethods) {
+        jsonData = method();
+        if (jsonData) {
+          console.log("Successfully parsed JSON using extraction method");
+          break;
         }
       }
       
-      // Add fallback mechanism if all parsing attempts fail
+      // If all parsing methods failed, create a fallback response
       if (!jsonData) {
-        console.log("Creating a basic placeholder response since parsing failed");
+        console.log("All parsing methods failed. Creating fallback response.");
         jsonData = {
           travelPlan: {
             location: travelParams.location || "Unknown Location",
             duration: travelParams.duration || "3 Days",
-            error: "Could not generate detailed plan. Please try again later.",
-            rawResponse: text.substring(0, 500) + "..." // Store part of the raw response for debugging
-          }
+            for: travelParams.for || "Unknown Group",
+            budgetType: travelParams.budgetType || "Unknown Budget",
+            note: "Due to formatting issues, we couldn't generate a detailed plan. Please try again.",
+            hotels: [
+              {
+                hotelName: "Example Hotel",
+                hotelAddress: "City Center",
+                pricePerNight: "$$",
+                starRating: 3,
+                amenities: ["WiFi", "Breakfast"]
+              }
+            ],
+            itinerary: [
+              {
+                day: 1,
+                activities: [
+                  {
+                    placeName: "Local Attraction",
+                    description: "Popular tourist spot",
+                    entryTicketPrice: "Unknown"
+                  }
+                ]
+              }
+            ],
+            transportSuggestions: {
+              localTransportOptions: ["taxi", "bus"],
+              estimatedDailyCost: "Varies"
+            }
+          },
+          rawResponsePreview: text.substring(0, 300) + "..."
         };
       }
       
       setTravelData(jsonData);
-      return jsonData; // Return the data for immediate use
+      return jsonData;
     } catch (err) {
       console.error("Error generating travel plan:", err);
       setError("Failed to generate travel plan: " + (err.message || "Unknown error"));
@@ -169,7 +224,7 @@ Make sure to avoid using any non-Latin characters and ensure all JSON keys and v
       };
       
       setTravelData(errorData);
-      return errorData; // Return something the UI can work with
+      return errorData;
     } finally {
       setLoading(false);
     }
