@@ -7,6 +7,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import CreateTrip from './trip-maker/index.jsx'
 import { RouterProvider } from 'react-router-dom'
 import Header from './components/ui/custom/Header'
+import ViewTrip from './show_trip/trip_id';
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
   },{
     path: '/create-trip',
     element :<CreateTrip />
+  },
+  {
+    path: '/show-trip/:tripId',
+    element: <ViewTrip />
   }
 ])
 createRoot(document.getElementById('root')).render(
