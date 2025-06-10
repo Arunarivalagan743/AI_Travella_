@@ -1,224 +1,6 @@
 
-
-// import React, { useEffect, useState } from 'react';
-// import { 
-//   FaMapMarkerAlt, 
-//   FaCalendarAlt, 
-//   FaUsers, 
-//   FaDollarSign, 
-//   FaPlane, 
-//   FaHotel, 
-//   FaUtensils, 
-//   FaMapMarkedAlt,
-//   FaStar,
-//   FaClock,
-//   FaMoneyBillWave,
-//   FaThermometerHalf,
-//   FaSuitcase,
-//   FaTemperatureHigh,
-//   FaShieldAlt,
-//   FaAmbulance,
-//   FaBusAlt,
-//   FaSun
-// } from 'react-icons/fa';
-// import TripSummary from './TripSummary';
-// import HotelList from './HotelList';
-// import ItineraryPlaces from './ItineraryPlaces';
-// import DiningOptions from './DiningOption';
-// import { GetPlaceDetails,PHOTO_REF_URL } from '@/ModelWork/GlobalApi';
-// // const PHOTO_REF_URL ='https://places.googleapis.com/v1/{Name}/media?maxHeightPx=1200&maxWidthPx=1600&key='+import.meta.env.VITE_GOOGLE_PLACE_API_KEY;
-// function Information({ trip }) {
-//   const [activeTab, setActiveTab] = useState('overview');
-//   const [placePhotoUrl, setPlacePhotoUrl] = useState('');
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [tabChangeAnimation, setTabChangeAnimation] = useState(false);
-
-//   useEffect(() => {
-//     if (trip) {
-//       getPlacePhoto();
-//     }
-//   }, [trip]);
-
-//   // Add animation effect when changing tabs
-//   useEffect(() => {
-//     setTabChangeAnimation(true);
-//     const timer = setTimeout(() => {
-//       setTabChangeAnimation(false);
-//     }, 500);
-//     return () => clearTimeout(timer);
-//   }, [activeTab]);
-
-//   const getPlacePhoto = async () => {
-//     if (!trip?.userSelection?.place?.label) return;
-    
-//     setIsLoading(true);
-//     try {
-//       const data = {
-//         textQuery: trip.userSelection.place.label
-//       };
-      
-//       const response = await GetPlaceDetails(data);
-//       if (response?.data?.places?.[0]?.photos?.length > 0) {
-//         // Try to get a horizontal landscape photo if available
-//         const photoIndex = response.data.places[0].photos.length > 3 ? 3 : 0;
-//         const photoName = response.data.places[0].photos[photoIndex].name;
-//         const photoUrl = PHOTO_REF_URL.replace('{Name}', photoName);
-//         setPlacePhotoUrl(photoUrl);
-//         console.log("Place photo URL:", photoUrl);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching place photo:", error);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   if (!trip) return <div className="p-4 text-center">Loading trip information...</div>;
-
-//   // Use the place photo URL if available, otherwise fall back to default images
-//   const backgroundImage = placePhotoUrl || 
-//     trip.image || 
-//     trip?.tripData?.hotelsList?.[0]?.hotelImageUrl || 
-//     "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1121&q=80";
-
-//   const location = trip?.userSelection?.location || trip?.userSelection?.place?.label || "Destination";
-//   const budget = trip?.userSelection?.budget || "Not specified";
-//   const duration = trip?.userSelection?.duration || 0;
-//   const travelers = trip?.userSelection?.travelers || "Not specified";
-//   const travelType = trip?.userSelection?.travelType || "adventure";
-
-//   // Format travel type to capitalize first letter
-//   const formatTravelType = (type) => {
-//     if (!type) return "Trip";
-//     return type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1');
-//   };
-
-//   // Get weather information
-//   const weather = trip?.tripData?.weatherForecast || {};
-//   const temperature = weather?.averageTemperature || "Not available";
-//   const weatherCondition = weather?.weatherPrediction?.[0] || "Not available";
-
-//   return (
-//     <div className="relative pb-12">
-//       {/* Hero Image Section with improved margin */}
-//       <div className="relative w-full overflow-hidden mb-14 sm:mb-16 md:mb-20">
-//         {/* Image container with responsive height and improved transitions */}
-//         <div 
-//           className="relative h-64 sm:h-80 md:h-96 bg-cover bg-center rounded-xl overflow-hidden transform transition-all duration-700 hover:scale-[1.01]"
-//           style={{ 
-//             backgroundImage: `url(${backgroundImage})`,
-//             backgroundPosition: 'center 25%',
-//             boxShadow: '0 10px 30px -5px rgba(0,0,0,0.3)'
-//           }}
-//         >
-//           {isLoading && (
-//             <div className="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-50 backdrop-blur-sm">
-//               <div className="animate-pulse flex flex-col items-center">
-//                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 mb-2 animate-spin"></div>
-//                 <span className="text-emerald-700 text-sm font-medium">Loading image...</span>
-//               </div>
-//             </div>
-//           )}
-//           <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/30 to-black/70"></div>
-//         </div>
-
-//         {/* Content overlay - improved positioning and animations */}
-//         <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 text-white transform transition-all duration-500 hover:translate-y-[-2px]">
-//           <div className="max-w-4xl mx-auto">
-//             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 text-shadow-lg animate-fade-in">
-//               {location}
-//             </h1>
-//             <div className="flex flex-wrap gap-3 mb-4 md:mb-6 animate-slide-up">
-//               <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg flex items-center gap-1.5 transition-all duration-300 hover:shadow-emerald-300/50 hover:from-emerald-600 hover:to-emerald-700">
-//                 <FaSuitcase className="text-white/90" />
-//                 {formatTravelType(travelType)}
-//               </span>
-//               {weather?.weatherPrediction && (
-//                 <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg flex items-center gap-1.5 transition-all duration-300 hover:shadow-blue-300/50 hover:from-blue-600 hover:to-blue-700">
-//                   <FaSun className="text-yellow-300" />
-//                   <span>{weatherCondition}, {temperature}</span>
-//                 </span>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Navigation Tabs with improved positioning and styling */}
-//       <div className="bg-white rounded-t-xl shadow-md mx-4 md:mx-auto max-w-4xl -mt-24 sm:-mt-20 relative z-10 border border-gray-100">
-//         <div className="flex overflow-x-auto scrollbar-hide">
-//           {[
-//             { id: 'overview', label: 'Overview', icon: <FaMapMarkedAlt /> },
-//             { id: 'hotels', label: 'Hotels', icon: <FaHotel /> },
-//             { id: 'itinerary', label: 'Itinerary', icon: <FaCalendarAlt /> },
-//             { id: 'dining', label: 'Dining', icon: <FaUtensils /> }
-//           ].map(tab => (
-//             <button 
-//               key={tab.id}
-//               onClick={() => setActiveTab(tab.id)}
-//               className={`flex-1 py-4 px-6 text-center font-medium transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-2 
-//                 ${activeTab === tab.id ? 
-//                   'text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50/50' : 
-//                   'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50/30'}`}
-//             >
-//               <span className={`${activeTab === tab.id ? 'text-emerald-600' : 'text-gray-400'} transition-colors duration-300`}>
-//                 {tab.icon}
-//               </span>
-//               <span>{tab.label}</span>
-//             </button>
-//           ))}
-//         </div>
-//       </div>
-      
-//       {/* Content Section with improved animations */}
-//       <div className="bg-white rounded-b-xl p-6 sm:p-8 shadow-xl mx-4 md:mx-auto max-w-4xl relative z-10 min-h-[300px] border-t-0 border border-gray-100">
-//         <div className={`transition-all duration-500 ${tabChangeAnimation ? 'opacity-0 transform translate-y-4' : 'opacity-100 transform translate-y-0'}`}>
-//           {/* Overview Tab */}
-//           {activeTab === 'overview' && <TripSummary trip={trip} />}
-
-//           {/* Hotels Tab */}
-//           {activeTab === 'hotels' && <HotelList hotels={trip?.tripData?.hotelsList || []} />}
-
-//           {/* Itinerary Tab */}
-//           {activeTab === 'itinerary' && <ItineraryPlaces itinerary={trip?.tripData?.itinerary || []} />}
-
-//           {/* Dining Tab */}
-//           {activeTab === 'dining' && <DiningOptions restaurants={trip?.tripData?.diningRecommendations || []} />}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// // Add these animations to your global CSS or within a <style> tag
-// const style = document.createElement('style');
-// style.textContent = `
-//   @keyframes fade-in {
-//     from { opacity: 0; }
-//     to { opacity: 1; }
-//   }
-  
-//   @keyframes slide-up {
-//     from { transform: translateY(10px); opacity: 0; }
-//     to { transform: translateY(0); opacity: 1; }
-//   }
-  
-//   .animate-fade-in {
-//     animation: fade-in 0.8s ease-out forwards;
-//   }
-  
-//   .animate-slide-up {
-//     animation: slide-up 0.6s ease-out forwards;
-//   }
-  
-//   .text-shadow-lg {
-//     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-//   }
-// `;
-// document.head.appendChild(style);
-
-// export default Information;
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaMapMarkerAlt, 
   FaCalendarAlt, 
@@ -237,12 +19,15 @@ import {
   FaShieldAlt,
   FaAmbulance,
   FaBusAlt,
-  FaSun
+  FaSun,
+  FaChevronLeft,
+  FaChevronRight,
+  FaHandPointer
 } from 'react-icons/fa';
 import TripSummary from './TripSummary';
 import HotelList from './HotelList';
-import ItineraryPlaces from './ItineraryPlaces';
-import DiningOptions from './DiningOption';
+import ItineraryView from './ItineraryPlaces';
+
 import { GetPlaceDetails, PHOTO_REF_URL } from '@/ModelWork/GlobalApi';
 
 function Information({ trip }) {
@@ -251,6 +36,21 @@ function Information({ trip }) {
   const [isPhotoLoading, setIsPhotoLoading] = useState(true);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [tabChangeAnimation, setTabChangeAnimation] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
+  const [swipeDirection, setSwipeDirection] = useState(null);
+  const tabsRef = useRef(null);
+
+  // Array of tabs for easier manipulation
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: <FaMapMarkedAlt /> },
+    { id: 'hotels', label: 'Hotels', icon: <FaHotel /> },
+    { id: 'itinerary', label: 'Itinerary', icon: <FaCalendarAlt /> },
+   
+  ];
+
+  // Find the index of current active tab
+  const activeTabIndex = tabs.findIndex(tab => tab.id === activeTab);
 
   // Memoize the fallback image to avoid recalculation
   const fallbackImage = useMemo(() => {
@@ -261,6 +61,23 @@ function Information({ trip }) {
 
   // Final background image with immediate fallback
   const backgroundImage = placePhotoUrl || fallbackImage;
+
+  // Next and previous tab functions
+  const nextTab = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setSwipeDirection('left');
+    const nextIndex = (activeTabIndex + 1) % tabs.length;
+    setActiveTab(tabs[nextIndex].id);
+  };
+
+  const prevTab = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setSwipeDirection('right');
+    const prevIndex = activeTabIndex === 0 ? tabs.length - 1 : activeTabIndex - 1;
+    setActiveTab(tabs[prevIndex].id);
+  };
 
   useEffect(() => {
     if (trip?.userSelection?.place?.label) {
@@ -285,8 +102,29 @@ function Information({ trip }) {
     setTabChangeAnimation(true);
     const timer = setTimeout(() => {
       setTabChangeAnimation(false);
-    }, 500);
+      setIsTransitioning(false);
+    }, 700);
     return () => clearTimeout(timer);
+  }, [activeTab]);
+
+  // Show hand swipe hint on first load
+  useEffect(() => {
+    if (showSwipeHint) {
+      const timer = setTimeout(() => {
+        setShowSwipeHint(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSwipeHint]);
+
+  // Scroll the active tab into view
+  useEffect(() => {
+    if (tabsRef.current) {
+      const tabElement = tabsRef.current.querySelector(`.tab-${activeTab}`);
+      if (tabElement) {
+        tabElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
   }, [activeTab]);
 
   const getPlacePhoto = async () => {
@@ -348,105 +186,299 @@ function Information({ trip }) {
   const temperature = weather?.averageTemperature || "Not available";
   const weatherCondition = weather?.weatherPrediction?.[0] || "Not available";
 
+  // Animation variants
+  const contentVariants = {
+    hidden: (direction) => ({
+      x: direction === 'left' ? 100 : -100,
+      opacity: 0
+    }),
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 300, damping: 30 }
+    },
+    exit: (direction) => ({
+      x: direction === 'left' ? -100 : 100,
+      opacity: 0,
+      transition: { duration: 0.3 }
+    })
+  };
+
+  const heroImageVariants = {
+    initial: { scale: 1.1, opacity: 0.8 },
+    animate: { scale: 1, opacity: 1, transition: { duration: 1.2 } },
+    hover: { scale: 1.05, transition: { duration: 1.5 } }
+  };
+
   return (
     <div className="relative pb-12">
-      {/* Hero Image Section with improved margin */}
-      <div className="relative w-full overflow-hidden mb-14 sm:mb-16 md:mb-20">
+      {/* Hero Image Section with improved margin and animations */}
+      <motion.div 
+        className="relative w-full overflow-hidden mb-14 sm:mb-16 md:mb-20"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
         {/* Image container with responsive height and improved transitions */}
-        <div 
-          className={`relative h-64 sm:h-80 md:h-96 bg-cover bg-center rounded-xl overflow-hidden transform transition-all duration-700 hover:scale-[1.01] ${
-            isImageLoaded && placePhotoUrl ? 'opacity-100' : 'opacity-90'
-          }`}
+        <motion.div 
+          className={`relative h-64 sm:h-80 md:h-96 bg-cover bg-center rounded-xl overflow-hidden`}
           style={{ 
             backgroundImage: `url(${backgroundImage})`,
             backgroundPosition: 'center 25%',
             boxShadow: '0 10px 30px -5px rgba(0,0,0,0.3)'
           }}
+          variants={heroImageVariants}
+          initial="initial"
+          animate="animate"
+          whileHover="hover"
         >
           {/* Loading overlay - only show when actually loading from API */}
-          {isPhotoLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-30 backdrop-blur-sm">
-              <div className="flex flex-col items-center">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 mb-2 animate-spin"></div>
-                <span className="text-white text-sm font-medium">Loading destination image...</span>
-              </div>
-            </div>
-          )}
+          <AnimatePresence>
+            {isPhotoLoading && (
+              <motion.div 
+                className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-30 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <motion.div 
+                  className="flex flex-col items-center"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 mb-2 animate-spin"></div>
+                  <span className="text-white text-sm font-medium">Loading destination image...</span>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Success indicator for loaded API image */}
-          {!isPhotoLoading && placePhotoUrl && (
-            <div className="absolute top-4 right-4 bg-emerald-500 text-white px-2 py-1 rounded-full text-xs opacity-75 transition-opacity duration-300 hover:opacity-100">
-              Live Photo
-            </div>
-          )}
+          <AnimatePresence>
+            {!isPhotoLoading && placePhotoUrl && (
+              <motion.div 
+                className="absolute top-4 right-4 bg-emerald-500 text-white px-2 py-1 rounded-full text-xs"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 0.75, x: 0 }}
+                whileHover={{ opacity: 1, scale: 1.05 }}
+                transition={{ duration: 0.5 }}
+              >
+                Live Photo
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/30 to-black/70"></div>
-        </div>
+        </motion.div>
 
         {/* Content overlay - improved positioning and animations */}
-        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 text-white transform transition-all duration-500 hover:translate-y-[-2px]">
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 text-white">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 text-shadow-lg animate-fade-in">
+            <motion.h1 
+              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 text-shadow-lg"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
               {location}
-            </h1>
-            <div className="flex flex-wrap gap-3 mb-4 md:mb-6 animate-slide-up">
-              <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg flex items-center gap-1.5 transition-all duration-300 hover:shadow-emerald-300/50 hover:from-emerald-600 hover:to-emerald-700">
+            </motion.h1>
+            <motion.div 
+              className="flex flex-wrap gap-3 mb-4 md:mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              <motion.span 
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg flex items-center gap-1.5"
+                whileHover={{ 
+                  scale: 1.05, 
+                  boxShadow: "0 8px 20px -5px rgba(16, 185, 129, 0.5)",
+                  background: "linear-gradient(to right, #059669, #047857)" 
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
                 <FaSuitcase className="text-white/90" />
                 {formatTravelType(travelType)}
-              </span>
+              </motion.span>
               {weather?.weatherPrediction && (
-                <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg flex items-center gap-1.5 transition-all duration-300 hover:shadow-blue-300/50 hover:from-blue-600 hover:to-blue-700">
+                <motion.span 
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg flex items-center gap-1.5"
+                  whileHover={{ 
+                    scale: 1.05, 
+                    boxShadow: "0 8px 20px -5px rgba(59, 130, 246, 0.5)",
+                    background: "linear-gradient(to right, #3b82f6, #2563eb)" 
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
                   <FaSun className="text-yellow-300" />
                   <span>{weatherCondition}, {temperature}</span>
-                </span>
+                </motion.span>
               )}
-            </div>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Navigation Tabs with improved positioning and styling */}
-      <div className="bg-white rounded-t-xl shadow-md mx-4 md:mx-auto max-w-4xl -mt-24 sm:-mt-20 relative z-10 border border-gray-100">
-        <div className="flex overflow-x-auto scrollbar-hide">
-          {[
-            { id: 'overview', label: 'Overview', icon: <FaMapMarkedAlt /> },
-            { id: 'hotels', label: 'Hotels', icon: <FaHotel /> },
-            { id: 'itinerary', label: 'Itinerary', icon: <FaCalendarAlt /> },
-            { id: 'dining', label: 'Dining', icon: <FaUtensils /> }
-          ].map(tab => (
-            <button 
+      <motion.div 
+        className="bg-white rounded-t-xl shadow-md mx-4 md:mx-auto max-w-4xl -mt-24 sm:-mt-20 relative z-10 border border-gray-100"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
+        <div className="flex overflow-x-auto scrollbar-hide relative" ref={tabsRef}>
+          {tabs.map((tab) => (
+            <motion.button 
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-4 px-6 text-center font-medium transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-2 
-                ${activeTab === tab.id ? 
-                  'text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50/50' : 
-                  'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50/30'}`}
+              onClick={() => {
+                if (tab.id !== activeTab) {
+                  setIsTransitioning(true);
+                  setSwipeDirection(tabs.findIndex(t => t.id === tab.id) > activeTabIndex ? 'left' : 'right');
+                  setActiveTab(tab.id);
+                }
+              }}
+              className={`tab-${tab.id} flex-1 py-4 px-6 text-center font-medium transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-2 ${
+                activeTab === tab.id ? 
+                'text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50/50' : 
+                'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50/30'
+              }`}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <span className={`${activeTab === tab.id ? 'text-emerald-600' : 'text-gray-400'} transition-colors duration-300`}>
+              <motion.span 
+                className={`${activeTab === tab.id ? 'text-emerald-600' : 'text-gray-400'} transition-colors duration-300`}
+                animate={{ 
+                  scale: activeTab === tab.id ? [1, 1.2, 1] : 1,
+                  rotate: activeTab === tab.id ? [0, -10, 10, 0] : 0
+                }}
+                transition={{ duration: 0.5 }}
+              >
                 {tab.icon}
-              </span>
+              </motion.span>
               <span>{tab.label}</span>
-            </button>
+            </motion.button>
           ))}
         </div>
-      </div>
+        
+        {/* Left & right navigation arrows */}
+        <motion.button
+          className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 p-1.5 rounded-r-lg shadow-sm border-r border-t border-b border-gray-100 text-gray-500 hover:text-emerald-600 hidden sm:flex"
+          onClick={prevTab}
+          disabled={isTransitioning}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 0.7, x: 0 }}
+          whileHover={{ opacity: 1, x: 2 }}
+        >
+          <FaChevronLeft size={16} />
+        </motion.button>
+        
+        <motion.button
+          className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 p-1.5 rounded-l-lg shadow-sm border-l border-t border-b border-gray-100 text-gray-500 hover:text-emerald-600 hidden sm:flex"
+          onClick={nextTab}
+          disabled={isTransitioning}
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 0.7, x: 0 }}
+          whileHover={{ opacity: 1, x: -2 }}
+        >
+          <FaChevronRight size={16} />
+        </motion.button>
+      </motion.div>
       
       {/* Content Section with improved animations */}
-      <div className="bg-white rounded-b-xl p-6 sm:p-8 shadow-xl mx-4 md:mx-auto max-w-4xl relative z-10 min-h-[300px] border-t-0 border border-gray-100">
-        <div className={`transition-all duration-500 ${tabChangeAnimation ? 'opacity-0 transform translate-y-4' : 'opacity-100 transform translate-y-0'}`}>
-          {/* Overview Tab */}
-          {activeTab === 'overview' && <TripSummary trip={trip} />}
+      <motion.div 
+        className="bg-white rounded-b-xl p-6 sm:p-8 shadow-xl mx-4 md:mx-auto max-w-4xl relative z-10 min-h-[400px] border-t-0 border border-gray-100 overflow-hidden"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+      >
+        {/* Swipe hint animation */}
+        <AnimatePresence>
+          {showSwipeHint && (
+            <motion.div 
+              className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none bg-black/10 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.div 
+                className="bg-black/70 text-white px-4 py-2 rounded-full flex items-center gap-2"
+                animate={{ 
+                  x: [0, -30, 30, 0], 
+                  opacity: [0.9, 0.6, 0.6, 0.9] 
+                }}
+                transition={{ 
+                  repeat: 2, 
+                  duration: 2,
+                  repeatType: "reverse"  
+                }}
+              >
+                <FaHandPointer className="text-lg" />
+                <span className="text-sm font-medium">Swipe to explore tabs</span>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        <AnimatePresence custom={swipeDirection} mode="wait">
+          <motion.div
+            key={activeTab}
+            custom={swipeDirection}
+            variants={contentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="min-h-[400px]"
+          >
+            {/* Tab Content */}
+            {activeTab === 'overview' && <TripSummary trip={trip} />}
+            {activeTab === 'hotels' && <HotelList hotels={trip?.tripData?.hotelsList || []} />}
+            {activeTab === 'itinerary' && <ItineraryView itineraryData={trip.tripData?.itinerary || []} />}
+          
+          </motion.div>
+        </AnimatePresence>
 
-          {/* Hotels Tab */}
-          {activeTab === 'hotels' && <HotelList hotels={trip?.tripData?.hotelsList || []} />}
-
-          {/* Itinerary Tab */}
-          {activeTab === 'itinerary' && <ItineraryPlaces itinerary={trip?.tripData?.itinerary || []} />}
-
-          {/* Dining Tab */}
-          {activeTab === 'dining' && <DiningOptions restaurants={trip?.tripData?.diningRecommendations || []} />}
+        {/* Pagination Dots - Enhanced */}
+        <div className="flex justify-center gap-2 mt-8">
+          {tabs.map((tab, index) => (
+            <motion.button
+              key={index}
+              onClick={() => {
+                setIsTransitioning(true);
+                setSwipeDirection(index > activeTabIndex ? 'left' : 'right');
+                setActiveTab(tab.id);
+              }}
+              className="relative h-2 rounded-full transition-all"
+              animate={{ 
+                width: activeTab === tab.id ? "1.5rem" : "0.5rem",
+                backgroundColor: activeTab === tab.id ? "#10b981" : "#d1d5db" 
+              }}
+              transition={{ duration: 0.3 }}
+              whileHover={{ 
+                scale: 1.1,
+                backgroundColor: activeTab === tab.id ? "#10b981" : "#9ca3af"
+              }}
+            >
+              {activeTab === tab.id && (
+                <motion.div 
+                  className="absolute inset-0 rounded-full bg-emerald-300"
+                  initial={{ opacity: 0, scale: 1 }}
+                  animate={{ 
+                    opacity: [0, 0.5, 0],
+                    scale: [1, 1.5, 1.8],
+                  }}
+                  transition={{ 
+                    duration: 1.5, 
+                    repeat: Infinity,
+                  }}
+                />
+              )}
+            </motion.button>
+          ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -474,6 +506,16 @@ style.textContent = `
   
   .text-shadow-lg {
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Hide scrollbar but allow scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
   }
 `;
 document.head.appendChild(style);

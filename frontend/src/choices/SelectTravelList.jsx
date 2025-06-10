@@ -410,4 +410,4 @@ export const SelectTravelList = [
     ];
 
 // Updated AI_PROMPT to use the exact budget amount and number of travelers
-export const AI_PROMPT = 'Please provide a detailed travel itinerary for {travelType} in {location}. Include popular attractions, recommended accommodations based on a budget of ${budget}, local dining options, transportation suggestions, and any seasonal considerations for a {duration}-day trip. This itinerary is for {travelers} travelers. Also mention any unique cultural experiences or hidden gems that would enhance the {travelType} experience in this specific location.';
+export const AI_PROMPT = 'Please provide a detailed travel itinerary for {travelType} in {location}. Include popular attractions, recommended accommodations based on a budget of ${budget},transportation suggestions, and any seasonal considerations for a {duration}-day trip. This itinerary is for {travelers} travelers. Also mention any unique cultural experiences or hidden gems that would enhance the {travelType} experience in this specific location.';

@@ -8,8 +8,8 @@ import {
   FaSwimmingPool,
   FaUtensils,
   FaDumbbell,
+  FaMapMarkerAlt,
 } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
 import { GetPlaceDetails, PHOTO_REF_URL } from '../../ModelWork/GlobalApi';
 
 function HotelList({ hotels }) {
@@ -34,7 +34,6 @@ function HotelList({ hotels }) {
           languageCode: "en"
         };
         
-        console.log("Fetching details for:", hotel.hotelName);
         const response = await GetPlaceDetails(searchData);
         
         if (response.data && response.data.places && response.data.places.length > 0) {
@@ -44,7 +43,6 @@ function HotelList({ hotels }) {
           let photoUrl = null;
           if (place.photos && place.photos.length > 0) {
             photoUrl = PHOTO_REF_URL.replace('{Name}', place.photos[0].name);
-            console.log("Photo URL generated:", photoUrl);
           }
           
           setHotelDetails(prev => ({
@@ -71,6 +69,7 @@ function HotelList({ hotels }) {
         }
       });
     }
+    // eslint-disable-next-line
   }, [hotels]);
 
   const renderStars = (rating) => {
@@ -119,21 +118,14 @@ function HotelList({ hotels }) {
           {hotels.map((hotel, index) => (
             <div
               key={index}
-              className="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+              className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition-all duration-300"
             >
               <div className="p-3 sm:p-4 lg:p-5">
                 {/* Header section - responsive layout */}
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
                   <div className="flex-1 min-w-0">
-                    <Link
-                      to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                        hotel.hotelAddress
-                      )}${hotelDetails[hotel.hotelName]?.placeId ? `&query_place_id=${hotelDetails[hotel.hotelName].placeId}` : ''}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline block"
-                    >
-                      <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div>
                         <h3 className="font-bold text-base sm:text-lg lg:text-xl text-gray-800 line-clamp-2">
                           {hotelDetails[hotel.hotelName]?.displayName || hotel.hotelName}
                         </h3>
@@ -141,7 +133,18 @@ function HotelList({ hotels }) {
                           {hotel.hotelAddress}
                         </p>
                       </div>
-                    </Link>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                          hotel.hotelAddress
+                        )}${hotelDetails[hotel.hotelName]?.placeId ? `&query_place_id=${hotelDetails[hotel.hotelName].placeId}` : ''}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 text-emerald-600 hover:text-emerald-800 transition-colors duration-200"
+                        title="View on map"
+                      >
+                        <FaMapMarkerAlt className="text-lg" />
+                      </a>
+                    </div>
                   </div>
                   
                   {/* Price and rating section */}
@@ -183,13 +186,14 @@ function HotelList({ hotels }) {
                 )}
 
                 {/* Hotel image */}
-                <Link
-                  to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.hotelAddress)}${
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.hotelAddress)}${
                     hotelDetails[hotel.hotelName]?.placeId ? `&query_place_id=${hotelDetails[hotel.hotelName].placeId}` : ''
                   }`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block mt-4 rounded-lg overflow-hidden h-32 sm:h-40 lg:h-48 transform transition duration-300 hover:scale-[1.02] hover:shadow-lg"
+                  title="View on map"
                 >
                   <img
                     src={
@@ -207,7 +211,7 @@ function HotelList({ hotels }) {
                         'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8aG90ZWx8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60';
                     }}
                   />
-                </Link>
+                </a>
               </div>
             </div>
           ))}

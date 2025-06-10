@@ -47,13 +47,7 @@ For each day:
 - "rating": number between 1-5,
 - "bestTimeToVisit": "Morning/Afternoon/Evening"
 
-🔹 Dining Recommendations (2 per day):
-- "restaurantName": "name",
-- "type": "Local/Fine Dining/Fast Food",
-- "cuisine": "type of cuisine",
-- "priceRange": "$/$$/$$$/$$$$",
-- "openingHours": "hours",
-- "review": "one-line review"
+
 
 🔹 Transport Suggestions:
 - "localTransportOptions": ["bus", "taxi", "metro", "bike rental"],

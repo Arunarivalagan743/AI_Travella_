@@ -29,6 +29,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../ModelWork/firebaseConfig.js';
 import { useNavigate, useNavigation } from 'react-router-dom';
 
+import { useAuth } from '../context/AuthContext'; // <-- Use context for auth
 function CreateTrip() {
   const [place, setPlace] = useState(null);
   const [formData, setFormData] = useState({});
@@ -41,30 +42,26 @@ function CreateTrip() {
   const [openDialog, setOpenDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
-  
+
+  const { user, login } = useAuth(); // <-- Use context
   const { generateTravelPlan, loading: aiLoading, error, travelData } = AiSetup();
   const navigate = useNavigate();
-  const login = useGoogleLogin({
+
+  const googleLogin = useGoogleLogin({
     onSuccess: (response) => {
-      console.log("Login successful:", response);
-      localStorage.setItem('user', JSON.stringify(response));
       setOpenDialog(false);
-      
       GetUserProfile(response);
-      
       if (isFormComplete()) {
         handleFormSubmit();
       }
     },
     onError: (error) => {
-      console.error("Login failed:", error);
       setErrorMessage("Login failed. Please try again.");
     }
   });
-  
+
   const GetUserProfile = async (tokenInfo) => {
     if (!tokenInfo?.access_token) return;
-    
     try {
       const response = await axios.get(`https://www.googleapis.com/oauth2/v2/userinfo`, {
         headers: {
@@ -72,11 +69,9 @@ function CreateTrip() {
           Accept: 'application/json'
         }
       });
-      
-      console.log("User profile data:", response.data);
-      localStorage.setItem('userProfile', JSON.stringify(response.data));
+      login(response.data); // <-- Use context login
     } catch (error) {
-      console.error("Error fetching user profile:", error);
+      setErrorMessage("Error fetching user profile.");
     }
   };
 
@@ -92,10 +87,8 @@ function CreateTrip() {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
-    
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
@@ -113,10 +106,8 @@ function CreateTrip() {
         [name]: value
       });
     }
-    
     setTravelAnimation(true);
     setTimeout(() => setTravelAnimation(false), 1000);
-    
     if (name === 'place') setActiveSection(1);
     else if (name === 'duration') setActiveSection(2);
     else if (name === 'travelType') setActiveSection(3);
@@ -137,38 +128,24 @@ function CreateTrip() {
     try {
       setIsSaving(true);
       setErrorMessage(null);
-      
-      // Check if user is logged in
-      const userString = localStorage.getItem('user');
-      if (!userString) {
-        console.error("No user found in localStorage");
+      if (!user) {
+        setErrorMessage("User not authenticated");
         throw new Error("User not authenticated");
       }
-      
-      const user = JSON.parse(userString);
-      const userProfileString = localStorage.getItem('userProfile');
-      const userProfile = userProfileString ? JSON.parse(userProfileString) : null;
-      
       // Generate a unique document ID
       const docId = Date.now().toString();
-      
-      // Prepare trip data with sanitized inputs
+      // Prepare trip data
       const tripDocument = {
-        userSelection: JSON.parse(JSON.stringify(formData)), // Deep clone to remove any undefined values
+        userSelection: JSON.parse(JSON.stringify(formData)),
         tripData: tripData,
-        userEmail: (userProfile?.email || user?.email || "anonymous@example.com"),
+        userEmail: user.email || "anonymous@example.com",
         id: docId,
         createdAt: new Date().toISOString()
       };
-      
-      console.log("Attempting to save trip with ID:", docId);
-      
       await setDoc(doc(db, "alltrips", docId), tripDocument);
       navigate(`/show-trip/${docId}`);
       return docId;
-
     } catch (error) {
-      console.error("Error saving trip:", error);
       setErrorMessage("Failed to save your trip. Please try again later.");
       throw error;
     } finally {
@@ -181,51 +158,27 @@ function CreateTrip() {
       setErrorMessage("Please fill all the fields");
       return;
     }
-    
     if (formData.duration > 5) {
       setErrorMessage("You can only travel for a maximum of 5 days");
       resetForm();
       return;
     }
-    
     setErrorMessage(null);
-    
     try {
       setIsGenerating(true);
-      
-      const selectedTravelType = SelectTravelList.find(item => item.id === formData.travelType);
-      
-      const FINAL_PROMPT = AI_PROMPT.replace('{location}', formData.location)
-                                   .replace('{duration}', formData.duration)
-                                   .replace('{travelType}', formData.travelType)
-                                   .replace('{budget}', formData.budget)
-                                   .replace('{travelers}', formData.travelers);
-                                   
-      console.log("Final AI Prompt:", FINAL_PROMPT);
-      
       const travelParams = {
         location: formData.location,
         duration: `${formData.duration} Days`,
         for: `${formData.travelers} travelers`,
         budgetAmount: formData.budget
       };
-      
-      console.log("Calling generateTravelPlan with params:", travelParams);
-      
       const result = await generateTravelPlan(travelParams);
-      console.log("Generated travel plan:", result);
-      
       if (result) {
-        localStorage.setItem('lastTripPlan', JSON.stringify(result));
-        
         try {
-          // Save trip to database - handling separately so AI result isn't lost if save fails
           await SaveAiTrip(result);
         } catch (saveError) {
-          console.error("Error saving trip, but AI generation was successful:", saveError);
           // Continue with success flow despite save error
         }
-        
         setShowSuccess(true);
         setTimeout(() => {
           setShowSuccess(false);
@@ -233,24 +186,23 @@ function CreateTrip() {
         }, 2500);
       }
     } catch (error) {
-      console.error("Error generating trip:", error);
       setErrorMessage("Failed to generate your trip plan. Please try again.");
     } finally {
       setIsGenerating(false);
     }
   };
 
+  // Use context user for auth check
   const onSubmit = async (e) => {
     e.preventDefault();
-    const user = localStorage.getItem('user');
-    
     if (!user) {
-      setOpenDialog(true);
+      setErrorMessage("Please sign in from the header to generate your trip");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    
     handleFormSubmit();
   };
+
 
   // Animation and UI constants - no changes needed
    const containerVariants = {
@@ -746,245 +698,64 @@ function CreateTrip() {
             </motion.div>
 
             {/* Submit Button with updated loading state */}
-            <AnimatePresence>
-              {isFormComplete() && (
-                <motion.div
-                  className={`mt-8 ${isMobile ? 'sticky bottom-4 z-20' : ''}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  <motion.button
-                    onClick={onSubmit}
-                    className={`bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-3 px-8 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${isMobile ? 'w-full' : 'md:w-auto'} relative overflow-hidden ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
-                    whileHover={isLoading ? {} : { scale: 1.03, boxShadow: "0px 8px 15px rgba(16, 185, 129, 0.2)" }}
-                    whileTap={isLoading ? {} : { scale: 0.97 }}
-                    disabled={isLoading}
-                  >
-                 <motion.div
-                      className="absolute inset-0 bg-white opacity-20"
-                      initial={{ x: "-100%" }}
-                      whileHover={{ x: "100%" }}
-                      transition={{ duration: 1, ease: "easeInOut" }}
-                    />
-                    {isLoading ? (
-                      <>
-                        <motion.div
-                          initial={{ rotate: 0 }}
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="mr-2"
-                        >
-                          <BiRefresh />
-                        </motion.div>
-                        <span>{isSaving ? "Saving Trip..." : "Generating Trip Plan..."}</span>
-                      </>
-                    ) : (
-                      <>
-                        <FaSuitcase className="mr-2" />
-                        <span>Generate My Trip</span>
-                        <BiSolidChevronRight className={`${isMobile ? 'text-2xl' : 'text-xl'}`} />
-                      </>
-                    )}
-                  </motion.button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+  
 
-            {/* Sign In Dialog with updated loading state */}
-            <AnimatePresence>
-              {openDialog && (
-                <motion.div 
-                  className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setOpenDialog(false)}
-                >
-                  <motion.div 
-                    className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4"
-                    variants={dialogVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    onClick={e => e.stopPropagation()}
-                  >
-                    <div className="flex justify-between items-center mb-6">
-                      <h3 className="text-xl font-bold text-gray-800">Sign in to Continue</h3>
-                      <button 
-                        onClick={() => setOpenDialog(false)}
-                        className="text-gray-500 hover:text-gray-700"
-                        disabled={isLoading}
-                      >
-                        <MdClose className="text-xl" />
-                      </button>
-                    </div>
-                    
-                    <p className="text-gray-600 mb-6">
-                      Please sign in to generate your personalized trip itinerary.
-                    </p>
-                    
-                    <motion.button
-                      onClick={login}
-                      className={`w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-700 hover:bg-gray-50 transition-colors duration-300 shadow-sm ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      whileHover={isLoading ? {} : { scale: 1.02 }}
-                      whileTap={isLoading ? {} : { scale: 0.98 }}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <div className="flex items-center gap-2">
-                          <motion.div
-                            initial={{ rotate: 0 }}
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          >
-                            <BiRefresh className="text-gray-500" />
-                          </motion.div>
-                          <span>Please wait...</span>
-                        </div>
-                      ) : (
-                        <>
-                          <FaGoogle className="text-red-500" />
-                          <span>Sign in with Google</span>
-                        </>
-                      )}
-                    </motion.button>
-                    
-                    <div className="mt-6 text-center text-sm text-gray-500">
-                      By signing in, you agree to our terms of service and privacy policy.
-                    </div>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Success message */}
-            <AnimatePresence>
-              {showSuccess && (
-                <motion.div 
-                  className={`fixed ${isMobile ? 'bottom-20 left-4 right-4' : 'bottom-8 right-8'} bg-emerald-500 text-white p-4 rounded-lg shadow-lg flex items-center gap-2 z-50`}
-                  initial={{ y: 50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 50, opacity: 0 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                >
-                  <FaPaperPlane className="text-xl animate-bounce" />
-                  <span>Trip generated successfully!</span>
-                  <span className="text-2xl ml-1">✈️</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Loading overlay */}
-            <AnimatePresence>
-  {isLoading && (
-    <motion.div 
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+<AnimatePresence>
+  {isFormComplete() && (
+    <motion.div
+      className={`mt-8 ${isMobile ? 'sticky bottom-4 z-20' : ''}`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      {/* Semi-transparent backdrop that covers the entire page */}
-      <div className="fixed inset-0  backdrop-blur-sm"></div>
-      
-      {/* Content that stays centered in the viewport */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen w-full p-4">
-        <motion.div 
-          className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-md w-full mx-4"
-          initial={{ y: 20, scale: 0.95, opacity: 0 }}
-          animate={{ y: 0, scale: 1, opacity: 1 }}
-          exit={{ y: 20, scale: 0.95, opacity: 0 }}
-          transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 25 }}
-        >
-          {/* Loading content remains the same */}
-          <div className="p-6">
-            {/* Loading spinner and content */}
-            <div className="flex justify-center mb-4">
-              {/* Your existing spinner code */}
-              <div className="relative">
-                <motion.div 
-                  className="w-16 h-16 rounded-full border-4 border-emerald-100"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-                />
-                <motion.div 
-                  className="w-16 h-16 rounded-full border-t-4 border-emerald-500 absolute top-0 left-0"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                />
-                <motion.div 
-                  className="absolute inset-0 flex items-center justify-center"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: [0.7, 1, 0.7] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <FaPlane className="text-2xl text-emerald-500" />
-                </motion.div>
-              </div>
-            </div>
-            
-            <h3 className="text-center text-lg font-medium text-emerald-700 mb-1">
-              {isSaving ? "Saving your adventure..." : "Planning your dream trip..."}
-            </h3>
-            
-            <p className="text-center text-sm text-gray-500">
-              We're crafting a personalized itinerary just for you
-            </p>
-            
-            <motion.div 
-              className="w-full bg-gray-100 h-1.5 rounded-full mt-5 overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+      <motion.button
+        onClick={(e) => {
+          e.preventDefault();
+          if (!user) {
+            setErrorMessage("Please sign in from the header to generate your trip");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
+          handleFormSubmit();
+        }}
+        className={`bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-3 px-8 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${isMobile ? 'w-full' : 'md:w-auto'} relative overflow-hidden ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+        whileHover={isLoading ? {} : { scale: 1.03, boxShadow: "0px 8px 15px rgba(16, 185, 129, 0.2)" }}
+        whileTap={isLoading ? {} : { scale: 0.97 }}
+        disabled={isLoading}
+      >
+        <motion.div
+          className="absolute inset-0 bg-white opacity-20"
+          initial={{ x: "-100%" }}
+          whileHover={{ x: "100%" }}
+          transition={{ duration: 1, ease: "easeInOut" }}
+        />
+        {isLoading ? (
+          <>
+            <motion.div
+              initial={{ rotate: 0 }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="mr-2"
             >
-              <motion.div 
-                className="h-full bg-gradient-to-r from-emerald-400 to-teal-500"
-                initial={{ width: "5%" }}
-                animate={{ width: ["15%", "90%"] }}
-                transition={{ 
-                  times: [0, 1],
-                  duration: 8, 
-                  ease: "easeInOut"
-                }}
-              />
+              <BiRefresh />
             </motion.div>
-            
-            <div className="flex justify-center mt-5 space-x-2">
-              <motion.div 
-                className="h-2 w-2 rounded-full bg-emerald-400"
-                animate={{ scale: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.2 }}
-              />
-              <motion.div 
-                className="h-2 w-2 rounded-full bg-emerald-500"
-                animate={{ scale: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.3, delay: 0.2 }}
-              />
-              <motion.div 
-                className="h-2 w-2 rounded-full bg-emerald-600"
-                animate={{ scale: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.4, delay: 0.4 }}
-              />
-            </div>
-          </div>
-          
-          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-3 border-t border-gray-100">
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-              <FaSuitcase className="text-emerald-500" />
-              <span>
-                {isSaving ? 
-                  "Almost there..." : 
-                  `Finding the best ${formData.travelType || ""} experiences for you`}
-              </span>
-            </div>
-          </div>
-        </motion.div>
-      </div>
+            <span>{isSaving ? "Saving Trip..." : "Generating Trip Plan..."}</span>
+          </>
+        ) : (
+          <>
+            <FaSuitcase className="mr-2" />
+            <span>Generate My Trip</span>
+            <BiSolidChevronRight className={`${isMobile ? 'text-2xl' : 'text-xl'}`} />
+          </>
+        )}
+      </motion.button>
     </motion.div>
   )}
 </AnimatePresence>
+
+       {/* Loading overlay */}
+
           </>
         )}
       </motion.div>
