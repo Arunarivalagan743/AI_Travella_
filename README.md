@@ -16,14 +16,3 @@ Backend: Firebase (Authentication, Firestore database)
 APIs: Google Places API, Weather API
 State Management: React Context API
 Routing: React Router
-Project Structure
-The application is organized into several main sections:
-
-Home Page: Introduction to the platform with animated hero section
-About Page: Detailed information about the platform's features and benefits
-Create Trip: Interactive form for generating new travel plans
-My Trips: Dashboard for viewing and managing saved trips
-Trip View: Detailed view of a generated trip with itinerary, hotels, and location information
-Design Elements
-The project features a cohesive design language using:
-
