@@ -22,13 +22,16 @@ import {
   FaSun,
   FaChevronLeft,
   FaChevronRight,
-  FaHandPointer
+  FaHandPointer,
+    FaCloud,
+  FaCloudRain,
 } from 'react-icons/fa';
 import TripSummary from './TripSummary';
 import HotelList from './HotelList';
 import ItineraryView from './ItineraryPlaces';
 
 import { GetPlaceDetails, PHOTO_REF_URL } from '@/ModelWork/GlobalApi';
+import WelcomeMessage from '@/components/ui/custom/WelcomeMessage';
 
 function Information({ trip }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -213,120 +216,171 @@ function Information({ trip }) {
   return (
     <div className="relative pb-12">
       {/* Hero Image Section with improved margin and animations */}
-      <motion.div 
-        className="relative w-full overflow-hidden mb-14 sm:mb-16 md:mb-20"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        {/* Image container with responsive height and improved transitions */}
+   
+<motion.div 
+  className="relative w-full overflow-hidden mb-14 sm:mb-16 md:mb-20"
+  initial={{ y: -20, opacity: 0 }}
+  animate={{ y: 0, opacity: 1 }}
+  transition={{ duration: 0.8 }}
+>
+  {/* Image container with responsive height and improved transitions */}
+  <motion.div 
+    className={`relative h-64 sm:h-80 md:h-96 bg-cover bg-center rounded-xl overflow-hidden`}
+    style={{ 
+      backgroundImage: `url(${backgroundImage})`,
+      backgroundPosition: 'center 25%',
+      boxShadow: '0 10px 30px -5px rgba(0,0,0,0.3)'
+    }}
+    variants={heroImageVariants}
+    initial="initial"
+    animate="animate"
+    whileHover="hover"
+  >
+    {/* Loading overlay - only show when actually loading from API */}
+    <AnimatePresence>
+      {isPhotoLoading && (
         <motion.div 
-          className={`relative h-64 sm:h-80 md:h-96 bg-cover bg-center rounded-xl overflow-hidden`}
-          style={{ 
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundPosition: 'center 25%',
-            boxShadow: '0 10px 30px -5px rgba(0,0,0,0.3)'
-          }}
-          variants={heroImageVariants}
-          initial="initial"
-          animate="animate"
-          whileHover="hover"
+          className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-30 backdrop-blur-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          {/* Loading overlay - only show when actually loading from API */}
-          <AnimatePresence>
-            {isPhotoLoading && (
-              <motion.div 
-                className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-30 backdrop-blur-sm"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <motion.div 
-                  className="flex flex-col items-center"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 mb-2 animate-spin"></div>
-                  <span className="text-white text-sm font-medium">Loading destination image...</span>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Success indicator for loaded API image */}
-          <AnimatePresence>
-            {!isPhotoLoading && placePhotoUrl && (
-              <motion.div 
-                className="absolute top-4 right-4 bg-emerald-500 text-white px-2 py-1 rounded-full text-xs"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 0.75, x: 0 }}
-                whileHover={{ opacity: 1, scale: 1.05 }}
-                transition={{ duration: 0.5 }}
-              >
-                Live Photo
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/30 to-black/70"></div>
+          <motion.div 
+            className="flex flex-col items-center"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 mb-2 animate-spin"></div>
+            <span className="text-white text-sm font-medium">Loading destination image...</span>
+          </motion.div>
         </motion.div>
+      )}
+    </AnimatePresence>
 
-        {/* Content overlay - improved positioning and animations */}
-        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 text-white">
-          <div className="max-w-4xl mx-auto">
-            <motion.h1 
-              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 text-shadow-lg"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              {location}
-            </motion.h1>
-            <motion.div 
-              className="flex flex-wrap gap-3 mb-4 md:mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <motion.span 
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg flex items-center gap-1.5"
-                whileHover={{ 
-                  scale: 1.05, 
-                  boxShadow: "0 8px 20px -5px rgba(16, 185, 129, 0.5)",
-                  background: "linear-gradient(to right, #059669, #047857)" 
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <FaSuitcase className="text-white/90" />
-                {formatTravelType(travelType)}
-              </motion.span>
-              {weather?.weatherPrediction && (
-                <motion.span 
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg flex items-center gap-1.5"
-                  whileHover={{ 
-                    scale: 1.05, 
-                    boxShadow: "0 8px 20px -5px rgba(59, 130, 246, 0.5)",
-                    background: "linear-gradient(to right, #3b82f6, #2563eb)" 
-                  }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <FaSun className="text-yellow-300" />
-                  <span>{weatherCondition}, {temperature}</span>
-                </motion.span>
-              )}
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
+    {/* Success indicator for loaded API image */}
+    <AnimatePresence>
+      {!isPhotoLoading && placePhotoUrl && (
+        <motion.div 
+          className="absolute top-4 right-4 bg-emerald-500 text-white px-2 py-1 rounded-full text-xs"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.75, x: 0 }}
+          whileHover={{ opacity: 1, scale: 1.05 }}
+          transition={{ duration: 0.5 }}
+        >
+          Live Photo
+        </motion.div>
+      )}
+    </AnimatePresence>
 
-      {/* Navigation Tabs with improved positioning and styling */}
+    {/* Location overlay in top left */}
+    <motion.div
+      className="absolute top-4 left-4 z-10"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+    >
       <motion.div 
-        className="bg-white rounded-t-xl shadow-md mx-4 md:mx-auto max-w-4xl -mt-24 sm:-mt-20 relative z-10 border border-gray-100"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
+        className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg"
+        whileHover={{ scale: 1.05, backgroundColor: "rgba(0,0,0,0.6)" }}
       >
+        <FaMapMarkerAlt className="text-red-400" />
+        <span className="text-white font-semibold text-lg tracking-wide text-shadow-sm">
+          {location}
+        </span>
+      </motion.div>
+    </motion.div>
+
+    {/* Weather display in bottom left corner */}
+    {weather?.weatherPrediction && (
+      <motion.div
+        className="absolute bottom-4 left-4 z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      >
+        <motion.div 
+          className="flex items-center gap-3 bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg"
+          whileHover={{ scale: 1.05, backgroundColor: "rgba(0,0,0,0.6)" }}
+        >
+          <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full">
+            {weatherCondition.toLowerCase().includes('sun') ? (
+              <FaSun className="text-yellow-300" />
+            ) : weatherCondition.toLowerCase().includes('cloud') ? (
+              <FaCloud className="text-gray-200" />
+            ) : weatherCondition.toLowerCase().includes('rain') ? (
+              <FaCloudRain className="text-blue-200" />
+            ) : (
+              <FaTemperatureHigh className="text-orange-300" />
+            )}
+          </div>
+          <div>
+            <div className="text-white font-bold text-lg">{temperature}</div>
+            <div className="text-white/80 text-xs">{weatherCondition}</div>
+          </div>
+        </motion.div>
+      </motion.div>
+    )}
+
+    {/* Animated gradient overlay with parallax effect */}
+    <motion.div 
+      className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/30 to-black/70"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.2 }}
+      style={{ 
+        backgroundImage: "linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.3), rgba(0,0,0,0.7))" 
+      }}
+    ></motion.div>
+    
+    {/* Animated particles effect */}
+    <motion.div 
+      className="absolute inset-0 pointer-events-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 0.6 }}
+      transition={{ duration: 2 }}
+    >
+      {Array.from({ length: 20 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 rounded-full bg-white"
+          initial={{ 
+            x: Math.random() * 100 + "%", 
+            y: Math.random() * 100 + "%",
+            opacity: Math.random() * 0.5 + 0.3
+          }}
+          animate={{ 
+            y: [null, Math.random() * 20 - 10 + "%"],
+            opacity: [null, Math.random() * 0.3 + 0.1, Math.random() * 0.5 + 0.3]
+          }}
+          transition={{ 
+            duration: Math.random() * 5 + 5,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+        />
+      ))}
+    </motion.div>
+</motion.div>
+</motion.div>
+
+{/* Welcome Message with name from AuthContext/localStorage */}
+<motion.div
+  className="relative w-full max-w-4xl mx-auto -mt-6 mb-6 z-20 px-4"
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.7, delay: 0.9 }}
+>
+  <WelcomeMessage location={location} />
+</motion.div>
+
+{/* Navigation Tabs with improved positioning and styling */}
+<motion.div 
+  className="bg-white rounded-xl shadow-md mx-4 md:mx-auto max-w-4xl relative z-10 border border-gray-100"
+  initial={{ y: 20, opacity: 0 }}
+  animate={{ y: 0, opacity: 1 }}
+  transition={{ duration: 0.6, delay: 0.5 }}
+>
         <div className="flex overflow-x-auto scrollbar-hide relative" ref={tabsRef}>
           {tabs.map((tab) => (
             <motion.button 
@@ -484,6 +538,7 @@ function Information({ trip }) {
 }
 
 // Add these animations to your global CSS or within a <style> tag
+// Add these animations to your global CSS or within a <style> tag
 const style = document.createElement('style');
 style.textContent = `
   @keyframes fade-in {
@@ -496,12 +551,47 @@ style.textContent = `
     to { transform: translateY(0); opacity: 1; }
   }
   
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
   .animate-fade-in {
     animation: fade-in 0.8s ease-out forwards;
   }
   
   .animate-slide-up {
     animation: slide-up 0.6s ease-out forwards;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s ease-in-out infinite;
+  }
+  
+  .animate-shimmer {
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.3), rgba(255,255,255,0));
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
+  }
+  
+  .text-shadow-sm {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   }
   
   .text-shadow-lg {
