@@ -102,7 +102,7 @@ function WelcomeMessage({ location }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          Welcome, {userName}!
+          Welcome, @{userName}!
         </motion.h2>
         <motion.p
           className="text-sm sm:text-base text-gray-300"
