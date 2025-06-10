@@ -16,8 +16,7 @@ const About = () => {
   // Intersection observers
   const [titleRef, titleInView] = useInView({ threshold: 0.3, triggerOnce: true });
   const [aboutRef, aboutInView] = useInView({ threshold: 0.3, triggerOnce: true });
-  const [howRef, howInView] = useInView({ threshold: 0.1, triggerOnce: true });
-  const [videoRef, videoInView] = useInView({ threshold: 0.3, triggerOnce: true });
+
   
   // Trigger animations when sections come into view
   useEffect(() => {
@@ -262,7 +261,7 @@ const About = () => {
       </section>
 
       {/* Video Section */}
-      <section ref={videoRef} className="py-20 px-6 bg-gradient-to-b from-white to-emerald-50">
+      <section  className="py-20 px-6 bg-gradient-to-b from-white to-emerald-50">
         <div className="max-w-5xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 40 }}

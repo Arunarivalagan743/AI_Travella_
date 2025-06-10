@@ -199,14 +199,9 @@ function Header() {
             whileTap={{ scale: 0.95 }}
             whileHover="hover"
           >
-            <span className="relative z-10">
-              <lord-icon
-                src="https://cdn.lordicon.com/jvucoldz.json"
-                trigger="click"
-                colors="primary:#121331"
-                style={{ width: '28px', height: '28px' }}
-              />
-            </span>
+            <span className="sr-only">Toggle Menu</span>
+            <span className="block w-6 h-0.5 bg-gray-800 mb-1"></span>
+            <span className="block w-6 h-0.5 bg-gray-800"></span>
           </motion.button>
         </div>
       </div>

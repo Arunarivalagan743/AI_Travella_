@@ -16,7 +16,7 @@ import {
 } from 'react-icons/fa';
 import TripSummary from './TripSummary';
 import HotelList from './HotelList';
-import ItineraryView from './ItineraryPlaces';
+import SimpleItinerary from './ItineraryPlaces';
 
 import { GetPlaceDetails, PHOTO_REF_URL } from '@/ModelWork/GlobalApi';
 import WelcomeMessage from '@/components/ui/custom/WelcomeMessage';
@@ -477,7 +477,7 @@ function Information({ trip }) {
             {/* Tab Content */}
             {activeTab === 'overview' && <TripSummary trip={trip} />}
             {activeTab === 'hotels' && <HotelList hotels={trip?.tripData?.hotelsList || []} />}
-            {activeTab === 'itinerary' && <ItineraryView itineraryData={trip.tripData?.itinerary || []} />}
+            {activeTab === 'itinerary' && <SimpleItinerary itineraryData={trip.tripData?.itinerary || []} />}
           
           </motion.div>
         </AnimatePresence>

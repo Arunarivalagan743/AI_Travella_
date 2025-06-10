@@ -4,11 +4,10 @@ import './index.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
 import { Layout } from './components/layout/Layout';
 import App from './App.jsx'; // This is now the Hero page
 import CreateTrip from './trip-maker/index.jsx';
-import ViewTrip from './show_trip/trip_id';
+import ViewTrip from './show_trip/trip_id';   
 
 import About from './pages/About';
 import MyTrips from './pages/MyTrips';
