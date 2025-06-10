@@ -16,7 +16,7 @@
 
 import React, { useEffect, useState } from 'react';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
-import { AI_PROMPT, SelectTravelList } from '@/choices/SelectTravelList';
+import {  SelectTravelList } from '@/choices/SelectTravelList';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlane, FaMapMarkerAlt, FaCalendarAlt, FaWalking, FaSuitcase, FaPaperPlane, FaGoogle, FaUsers } from 'react-icons/fa';
 import { RiMoneyDollarCircleLine, RiFlightTakeoffFill } from 'react-icons/ri';
@@ -27,7 +27,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../ModelWork/firebaseConfig.js';
-import { useNavigate, useNavigation } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext'; // <-- Use context for auth
 function CreateTrip() {
@@ -698,7 +698,7 @@ function CreateTrip() {
             </motion.div>
 
             {/* Submit Button with updated loading state */}
-  
+           
 
 <AnimatePresence>
   {isFormComplete() && (

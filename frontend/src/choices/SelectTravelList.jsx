@@ -17,7 +17,7 @@ import {
     Museum,
     Snowboarding,
     LocationCity,
-    AcUnit
+   
 } from '@mui/icons-material';
 
 // Budget options removed since we're now using direct amount input
