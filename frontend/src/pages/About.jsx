@@ -16,8 +16,9 @@ const About = () => {
   // Intersection observers
   const [titleRef, titleInView] = useInView({ threshold: 0.3, triggerOnce: true });
   const [aboutRef, aboutInView] = useInView({ threshold: 0.3, triggerOnce: true });
+  const [howRef, howInView] = useInView({ threshold: 0.3, triggerOnce: true });
+  const [experienceRef, experienceInView] = useInView({ threshold: 0.3, triggerOnce: true });
 
-  
   // Trigger animations when sections come into view
   useEffect(() => {
     if (titleInView) {
@@ -30,10 +31,10 @@ const About = () => {
     if (howInView) {
       controls.cards.start({ opacity: 1, y: 0, transition: { duration: 0.5, staggerChildren: 0.15, ease: "easeOut" } });
     }
-    if (videoInView) {
+    if (experienceInView) {
       controls.video.start({ opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } });
     }
-  }, [titleInView, aboutInView, howInView, videoInView, controls]);
+  }, [titleInView, aboutInView, howInView, experienceInView, controls]);
 
   // Card animation for staggered reveal
   const cardVariants = {
@@ -260,8 +261,8 @@ const About = () => {
         </div>
       </section>
 
-      {/* Video Section */}
-      <section  className="py-20 px-6 bg-gradient-to-b from-white to-emerald-50">
+      {/* Experience Section */}
+      <section ref={experienceRef} className="py-20 px-6 bg-gradient-to-b from-white to-emerald-50">
         <div className="max-w-5xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 40 }}
@@ -274,8 +275,6 @@ const About = () => {
             <p className="text-gray-700 max-w-2xl mx-auto mb-8">
               Watch how our intelligent platform transforms your travel planning experience
             </p>
-            
-          
           </motion.div>
           
           <motion.div 
