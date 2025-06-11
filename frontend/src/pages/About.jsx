@@ -287,7 +287,7 @@ const About = () => {
               href="/create-trip" 
               className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5"
             >
-              <span className="mr-2">Start Your Journey</span>
+              <span className="mr-2">Start Your Journeywith Travella</span>
               <motion.span 
                 animate={{ x: [0, 5, 0] }} 
                 transition={{ repeat: Infinity, duration: 1.5 }}
