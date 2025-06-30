@@ -277,25 +277,7 @@ const About = () => {
             </p>
           </motion.div>
           
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-            className="text-center mt-12"
-          >
-            <a 
-              href="/create-trip" 
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5"
-            >
-              <span className="mr-2">Start Your Journeywith Travella</span>
-              <motion.span 
-                animate={{ x: [0, 5, 0] }} 
-                transition={{ repeat: Infinity, duration: 1.5 }}
-              >
-                →
-              </motion.span>
-            </a>
-          </motion.div>
+      
         </div>
       </section>
     </div>

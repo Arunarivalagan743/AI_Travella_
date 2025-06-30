@@ -117,6 +117,7 @@ function Information({ trip }) {
       }
     }
   }, [activeTab]);
+  
 
   const getPlacePhoto = async () => {
     if (!trip?.userSelection?.place?.label) {

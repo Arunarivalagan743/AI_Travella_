@@ -200,7 +200,7 @@ function MyTrips() {
   if (!user) {
     return (
       <motion.div
-        className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-emerald-50 to-teal-100"
+        className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center "
         initial={{ opacity: 0, scale: 0.95, y: 40 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
@@ -235,12 +235,7 @@ function MyTrips() {
           >
             Please sign in to view your trips and access your saved journeys.
           </motion.div>
-          <Link
-            to="/"
-            className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-all shadow-md hover:shadow-lg"
-          >
-            Go to Home Page
-          </Link>
+      
         </motion.div>
       </motion.div>
     );
@@ -300,7 +295,7 @@ function MyTrips() {
           </div>
           
           <Link 
-            to="/" 
+            to="/create-trip" 
             className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg"
           >
             <FaPlus />
