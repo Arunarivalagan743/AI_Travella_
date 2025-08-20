@@ -987,7 +987,7 @@
 
 // export default ViewTrip;
 
-import { getDoc } from 'firebase/firestore';
+import { getDoc, updateDoc } from 'firebase/firestore';
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom';
 import { doc } from 'firebase/firestore';
@@ -995,8 +995,9 @@ import { db } from '/src/ModelWork/firebaseConfig.js';
 import Information from '../components/Information';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaFileDownload } from 'react-icons/fa';
+import { FaFileDownload, FaRobot, FaCommentAlt } from 'react-icons/fa';
 import jsPDF from 'jspdf';
+import ChatAssistant from '../../components/ui/custom/ChatAssistant';
 
 function ViewTrip() {
     const { tripId } = useParams();
@@ -1006,6 +1007,7 @@ function ViewTrip() {
     const [confettiActive, setConfettiActive] = useState(true);
     const [showCelebration, setShowCelebration] = useState(true);
     const [downloadingPdf, setDownloadingPdf] = useState(false);
+    const [showChatAssistant, setShowChatAssistant] = useState(false);
     const { user } = useAuth();
     
     // For confetti animation - brighter, more festive colors
@@ -1047,6 +1049,24 @@ function ViewTrip() {
             setError("Error loading trip data");
         } finally {
             setLoading(false);
+        }
+    }
+    
+    // Function to update the trip data both locally and in Firestore
+    const handleTripUpdate = async (updatedTripData) => {
+        try {
+            // Update local state
+            setTripData(updatedTripData);
+            
+            // Update in Firestore
+            const tripRef = doc(db, "alltrips", tripId);
+            await updateDoc(tripRef, updatedTripData);
+            
+            // Show a toast notification or some feedback that changes were saved
+            // This could be implemented with react-hot-toast or similar
+            console.log("Trip updated successfully");
+        } catch (error) {
+            console.error("Error updating trip:", error);
         }
     }
 
@@ -1711,52 +1731,69 @@ function ViewTrip() {
             </div>
             
             {/* Small welcome toast notification */}
+            {/* Chat Assistant */}
+            <AnimatePresence>
+                {tripData && (
+                    <ChatAssistant 
+                        tripData={tripData} 
+                        onTripUpdate={handleTripUpdate} 
+                        isOpen={showChatAssistant} 
+                        onClose={() => setShowChatAssistant(false)} 
+                    />
+                )}
+            </AnimatePresence>
+            
+            {/* Chat Assistant Button with Tooltip */}
+            {!loading && tripData && !showChatAssistant && (
+                <motion.div className="fixed bottom-20 right-6 z-50">
+                    {/* Floating tooltip */}
+                    <motion.div
+                        className="absolute right-16 top-2 bg-white rounded-lg shadow-lg px-4 py-2 w-60 text-sm"
+                        initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                        transition={{ delay: 2, duration: 0.3 }}
+                        exit={{ opacity: 0, scale: 0.8, x: -10 }}
+                    >
+                        <div className="text-gray-800 font-medium">New! AI Travel Assistant</div>
+                        <div className="text-gray-500 text-xs mt-1">Modify your trip, get destination advice, or explore new itineraries!</div>
+                        <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-l-8 border-transparent border-l-white"></div>
+                    </motion.div>
+                    
+                    <motion.button
+                        onClick={() => setShowChatAssistant(true)}
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full p-4 shadow-lg"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: "spring", delay: 1.5 }}
+                        whileHover={{ scale: 1.1, boxShadow: "0 10px 25px -5px rgba(16, 185, 129, 0.4)" }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <motion.div
+                            animate={{ rotate: [0, 10, -10, 0] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                        >
+                            <FaRobot size={24} />
+                        </motion.div>
+                        <span className="absolute -top-2 -right-2 bg-emerald-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            AI
+                        </span>
+                    </motion.button>
+                </motion.div>
+            )}
+            
             <AnimatePresence>
                 {!loading && tripData && (
                     <motion.div
-                        className="fixed bottom-4 right-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-4 flex items-center gap-3 max-w-xs z-50 border border-white/60"
+                        className="fixed bottom-4 right-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-4 flex items-center gap-3 max-w-xs z-40 border border-white/60"
                         initial={{ x: 100, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: 100, opacity: 0 }}
                         transition={{ type: "spring", damping: 20, stiffness: 300, delay: 1 }}
                         whileHover={{ scale: 1.03, boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.3)" }}
                     >
-                        <motion.div 
-                            className="bg-gradient-to-br from-sky-400 to-indigo-400 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                            animate={{ 
-                                boxShadow: ["0 0 0 0 rgba(99, 102, 241, 0.4)", "0 0 0 8px rgba(99, 102, 241, 0)", "0 0 0 0 rgba(99, 102, 241, 0)"] 
-                            }}
-                            transition={{ duration: 2.5, repeat: Infinity }}
-                        >
-                            <motion.svg 
-                                className="w-6 h-6 text-white" 
-                                fill="none" 
-                                stroke="currentColor" 
-                                viewBox="0 0 24 24" 
-                                xmlns="http://www.w3.org/2000/svg"
-                                animate={{ rotate: [0, 10, -10, 0] }}
-                                transition={{ duration: 3, repeat: Infinity }}
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </motion.svg>
-                        </motion.div>
+                     
                         <div>
-                            <motion.p 
-                                className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 1.2 }}
-                            >
-                                Trip loaded successfully!
-                            </motion.p>
-                            <motion.p 
-                                className="text-xs text-blue-500/70"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 1.4 }}
-                            >
-                                Enjoy exploring your adventure
-                            </motion.p>
+                         
                         </div>
                         <motion.div
                             className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-200/20 to-purple-200/20 pointer-events-none"
