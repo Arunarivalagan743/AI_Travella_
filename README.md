@@ -8,6 +8,8 @@
 
 **AI Travella** is a cutting-edge travel planning platform that leverages artificial intelligence to create personalized travel itineraries. Using Google's Gemini AI, the platform generates comprehensive travel plans tailored to your preferences, budget, and travel style.
 
+🌐 **Live Site**: [https://travellai.me/](https://travellai.me/)
+
 ## 🌟 Key Features
 
 ### 🤖 AI-Powered Trip Planning
