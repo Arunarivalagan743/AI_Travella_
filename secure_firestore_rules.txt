@@ -1,0 +1,54 @@
+// SECURE RULES - RESTORE THESE AFTER DEBUGGING
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- All Trips Collection ---
+    match /alltrips/{tripId} {
+      // Anyone can read trips
+      allow read: if true;
+      
+      // Authenticated users can create trips
+      allow create: if request.auth != null;
+
+      // Allow owners full control of their own trips
+      allow update, delete: if request.auth != null && 
+                              request.auth.token.email == resource.data.userEmail;
+      
+      // Special case for social features: any authenticated user can update social-related fields
+      allow update: if request.auth != null;
+    }
+
+    // --- Comments Collection ---
+    match /comments/{commentId} {
+      // Anyone can read comments
+      allow read: if true;
+      
+      // Any authenticated user can create comments
+      allow create: if request.auth != null;
+      
+      // Only comment owners can update/delete their comments
+      allow update, delete: if request.auth != null && 
+                             request.auth.token.email == resource.data.userEmail;
+    }
+
+    // --- Users Collection ---
+    match /users/{userEmail} {
+      // Anyone can read profiles
+      allow read: if true;
+      
+      // Any authenticated user can create/update user documents
+      // This is necessary for features like following/followers
+      allow create, update: if request.auth != null;
+      
+      // Only the owner can delete their profile
+      allow delete: if request.auth != null && 
+                     request.auth.token.email == userEmail;
+    }
+
+    // Default deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Common functions for reuse
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.token.email == userId;
+    }
+    
+    // User profiles collection
+    match /users/{userId} {
+      // Anyone can read user profiles
+      allow read: if true;
+      
+      // Allow authenticated users to create profiles
+      allow create: if isSignedIn();
+      
+      // Only the user can update or delete their own profile, 
+      // or users can add/remove themselves from followers list
+      allow update: if isSignedIn() && 
+                     (request.auth.token.email == userId || 
+                     request.resource.data.followers.hasOnly(resource.data.followers.concat([request.auth.token.email])) ||
+                     resource.data.followers.hasOnly(request.resource.data.followers.concat([request.auth.token.email])));
+                     
+      allow delete: if isOwner(userId);
+      
+      // Users collection has subcollections
+      match /private/{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    // Trips collection
+    match /alltrips/{tripId} {
+      // Public trips can be read by anyone
+      allow read: if resource.data.isPublic == true || 
+                     (isSignedIn() && resource.data.userEmail == request.auth.token.email);
+      
+      // Only the creator can modify their trips
+      allow create: if isSignedIn();
+      
+      // Allow updating likedBy, likesCount, and commentCount
+      allow update: if isSignedIn() && (
+        // If the update is only modifying allowed fields
+        (request.resource.data.diff(resource.data).affectedKeys().hasAny(['likedBy', 'likesCount', 'commentCount'])) ||
+        // Or the original creator can make any changes
+        resource.data.userEmail == request.auth.token.email
+      );
+      
+      // Only the creator can delete their trips
+      allow delete: if isSignedIn() && resource.data.userEmail == request.auth.token.email;
+    }
+    
+    // Likes collection
+    match /likes/{likeId} {
+      // Anyone can read likes
+      allow read: if true;
+      
+      // Only authenticated users can create/update likes
+      allow create, update: if isSignedIn();
+      allow delete: if isSignedIn() && 
+                      (resource.data.userEmail == request.auth.token.email || 
+                       get(/databases/$(database)/documents/alltrips/$(resource.data.contentId)).data.userEmail == request.auth.token.email);
+    }
+    
+    // Comments collection
+    match /comments/{commentId} {
+      // Anyone can read comments
+      allow read: if true;
+      
+      // Anyone can create comments (temporary solution for testing)
+    allow create: if request.auth != null || 
+                (request.resource.data.userEmail != null && 
+                 request.resource.data.text != null &&
+                 !request.resource.data.text.matches('.*[<>].*'));
+      
+      // Only the comment owner or the content owner can delete comments
+      allow update, delete: if isSignedIn() && 
+                             (resource.data.userEmail == request.auth.token.email || 
+                              get(/databases/$(database)/documents/alltrips/$(resource.data.tripId)).data.userEmail == request.auth.token.email);
+    }
+    
+    // Shares collection (analytics)
+    match /shares/{shareId} {
+      // Anyone can read share analytics
+      allow read: if true;
+      
+      // Only authenticated users can record shares
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

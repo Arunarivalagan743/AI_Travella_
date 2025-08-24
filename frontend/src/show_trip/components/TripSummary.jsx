@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   FaMapMarkerAlt, 
   FaCalendarAlt, 
@@ -12,16 +13,53 @@ import {
   FaTemperatureHigh,
   FaSun,
   FaLandmark,
-  FaBed
+  FaBed,
+  FaUser
 } from 'react-icons/fa';
+import SocialInteractions from '../../components/ui/custom/SocialInteractions';
+import Comments from '../../components/ui/custom/Comments';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../ModelWork/firebaseConfig';
 
 function TripSummary({ trip }) {
+  const [showComments, setShowComments] = useState(false);
+  const [tripStats, setTripStats] = useState({
+    likedBy: [],
+    likesCount: 0,
+    commentsCount: 0
+  });
+  
+  useEffect(() => {
+    if (trip?.id) {
+      fetchTripStats();
+    }
+  }, [trip?.id]);
+  
+  const fetchTripStats = async () => {
+    try {
+      const tripRef = doc(db, "alltrips", trip.id);
+      const tripDoc = await getDoc(tripRef);
+      
+      if (tripDoc.exists()) {
+        const data = tripDoc.data();
+        setTripStats({
+          likedBy: data.likedBy || [],
+          likesCount: data.likesCount || 0,
+          commentsCount: data.commentCount || 0
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching trip stats:", error);
+    }
+  };
+  
   if (!trip) return null;
   
   const location = trip?.userSelection?.location || trip?.userSelection?.place?.label || "Destination";
   const budget = trip?.userSelection?.budget || "Not specified";
   const duration = trip?.userSelection?.duration || 0;
   const travelers = trip?.userSelection?.travelers || "Not specified";
+  const creatorEmail = trip?.userEmail;
 
   return (
     <div className="flex flex-wrap -mx-4">
@@ -237,6 +275,46 @@ function TripSummary({ trip }) {
           </div>
         </div>
       )}
+      
+      {/* Creator and Social Interactions */}
+      <div className="w-full px-4 mt-8">
+        <div className="border-t border-gray-200 pt-4 pb-2 flex justify-between items-center">
+          <div className="flex items-center">
+            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mr-2">
+              <FaUser className="text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Created by</p>
+              <Link 
+                to={`/user/${creatorEmail}`} 
+                className="text-blue-600 hover:underline font-medium"
+              >
+                {creatorEmail ? creatorEmail.split('@')[0] : 'Unknown'}
+              </Link>
+            </div>
+          </div>
+        </div>
+        
+        {/* Social Interactions Component */}
+        <div className="mt-2">
+          <SocialInteractions 
+            tripId={trip.id}
+            creatorEmail={creatorEmail}
+            likedBy={tripStats.likedBy}
+            likesCount={tripStats.likesCount}
+            commentsCount={tripStats.commentsCount}
+            onCommentClick={() => setShowComments(true)}
+            onUpdate={fetchTripStats}
+          />
+        </div>
+        
+        {/* Comments Modal */}
+        <Comments 
+          tripId={trip.id} 
+          isOpen={showComments} 
+          onClose={() => setShowComments(false)} 
+        />
+      </div>
     </div>
   );
 }

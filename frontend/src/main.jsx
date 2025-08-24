@@ -11,6 +11,8 @@ import ViewTrip from './show_trip/trip_id';
 
 import About from './pages/About';
 import MyTrips from './pages/MyTrips';
+import Explore from './pages/Explore';
+import UserProfile from './pages/UserProfile';
 import { AuthProvider } from './context/AuthContext';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID;
@@ -25,6 +27,8 @@ const router = createBrowserRouter([
       { path: 'show-trip/:tripId', element: <ViewTrip /> },
       { path: 'about', element: <About /> },
       { path: 'my-trips', element: <MyTrips /> },
+      { path: 'explore', element: <Explore /> },
+      { path: 'user/:userId', element: <UserProfile /> },
       
       // 404 Page - Styled to match your emerald/teal palette with animation
       {

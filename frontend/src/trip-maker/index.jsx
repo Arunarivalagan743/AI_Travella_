@@ -139,8 +139,13 @@ function CreateTrip() {
         userSelection: JSON.parse(JSON.stringify(formData)),
         tripData: tripData,
         userEmail: user.email || "anonymous@example.com",
+        userName: user.name,
+        userPicture: user.picture,
         id: docId,
-        createdAt: new Date().toISOString()
+        isPublic: formData.isPublic || false, // Default to private if not specified
+        createdAt: new Date().toISOString(),
+        likesCount: 0,
+        likedBy: []
       };
       await setDoc(doc(db, "alltrips", docId), tripDocument);
       navigate(`/show-trip/${docId}`);
@@ -693,6 +698,28 @@ function CreateTrip() {
                       `${formData.travelers} ${formData.travelers === 1 ? 'person' : 'people'}` : 
                       'Select number of travelers'}
                   </span>
+                </div>
+              </div>
+
+              {/* Social Sharing Toggle */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <label className="block text-gray-700 text-sm font-medium mb-2">
+                  Share your trip socially?
+                </label>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-800">Make this trip public</p>
+                    <p className="text-sm text-gray-500">Public trips appear in Explore feed for all users</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer"
+                      checked={formData.isPublic || false}
+                      onChange={() => handleInput('isPublic', !formData.isPublic)}
+                    />
+                    <div className={`w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${formData.isPublic ? 'peer-checked:bg-emerald-600' : ''}`}></div>
+                  </label>
                 </div>
               </div>
             </motion.div>
