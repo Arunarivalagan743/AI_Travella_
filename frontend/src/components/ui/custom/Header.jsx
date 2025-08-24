@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUserCircle, FaSignOutAlt, FaSuitcaseRolling, FaHome, FaInfoCircle, FaGlobe } from 'react-icons/fa';
+import { FaUserCircle, FaSignOutAlt, FaSuitcaseRolling, FaHome, FaInfoCircle, FaGlobe, FaUserPlus,FaUser } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 import { Link, useLocation } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -176,6 +176,26 @@ function Header() {
                           <p className="font-medium text-sm text-gray-800">{user.name}</p>
                           <p className="text-xs text-gray-500 truncate">{user.email}</p>
                         </div>
+                        <div className="p-2 border-b border-gray-100">
+                          <Link to={`/user/${user.email}`}>
+                            <motion.button
+                              className="w-full flex items-center gap-2 text-left px-3 py-2 text-sm text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                              whileHover={{ x: 3 }}
+                            >
+                              <FaUser />
+                              <span>My Profile</span>
+                            </motion.button>
+                          </Link>
+                          <Link to="/follower-requests">
+                            <motion.button
+                              className="w-full flex items-center gap-2 text-left px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                              whileHover={{ x: 3 }}
+                            >
+                              <FaUserPlus />
+                              <span>Follower Requests</span>
+                            </motion.button>
+                          </Link>
+                        </div>
                         <div className="p-2">
                           <motion.button
                             onClick={handleSignOut}
@@ -288,6 +308,32 @@ function Header() {
                           <p className="text-xs text-gray-500 truncate">{user.email}</p>
                         </div>
                       </div>
+                      <Link 
+                        to={`/user/${user.email}`}
+                        className="w-full"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <motion.button
+                          className="w-full px-4 py-3 mb-3 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center gap-2 font-medium"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <FaUser />
+                          <span>My Profile</span>
+                        </motion.button>
+                      </Link>
+                      <Link 
+                        to="/follower-requests"
+                        className="w-full"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <motion.button
+                          className="w-full px-4 py-3 mb-3 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center gap-2 font-medium"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <FaUserPlus />
+                          <span>Follower Requests</span>
+                        </motion.button>
+                      </Link>
                       <motion.button
                         onClick={() => {
                           handleSignOut();

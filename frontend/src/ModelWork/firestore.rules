@@ -19,11 +19,25 @@ service cloud.firestore {
       allow create: if isSignedIn();
       
       // Only the user can update or delete their own profile, 
-      // or users can add/remove themselves from followers list
+      // or users can add/remove themselves from followers/following lists
+      // or update follow requests
       allow update: if isSignedIn() && 
-                     (request.auth.token.email == userId || 
-                     request.resource.data.followers.hasOnly(resource.data.followers.concat([request.auth.token.email])) ||
-                     resource.data.followers.hasOnly(request.resource.data.followers.concat([request.auth.token.email])));
+                     (
+                       // Owner can do anything to their profile
+                       request.auth.token.email == userId || 
+                       
+                       // Follower operations
+                       (request.resource.data.followers.hasOnly(resource.data.followers.concat([request.auth.token.email])) ||
+                        resource.data.followers.hasOnly(request.resource.data.followers.concat([request.auth.token.email]))) ||
+                       
+                       // Follow request operations - adding or removing from received requests
+                       (request.resource.data.followRequestsReceived.hasOnly(resource.data.followRequestsReceived.concat([request.auth.token.email])) ||
+                        resource.data.followRequestsReceived.hasOnly(request.resource.data.followRequestsReceived.concat([request.auth.token.email]))) ||
+                       
+                       // Allow modification of sent requests if target user is current user
+                       (request.resource.data.followRequestsSent.hasOnly(resource.data.followRequestsSent.concat([request.auth.token.email])) ||
+                        resource.data.followRequestsSent.hasOnly(request.resource.data.followRequestsSent.concat([request.auth.token.email])))
+                     );
                      
       allow delete: if isOwner(userId);
       

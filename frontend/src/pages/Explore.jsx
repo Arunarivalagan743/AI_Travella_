@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc, orderBy, limit, startAfter, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, orderBy, limit, startAfter, getDoc, setDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db, auth } from '/src/ModelWork/firebaseConfig.js';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -52,6 +52,14 @@ function Explore() {
   useEffect(() => {
     fetchPublicTrips();
   }, [viewMode]);
+  
+  // Refresh user profile data when user changes
+  useEffect(() => {
+    if (user) {
+      // Fetch current user's profile to get fresh follow data
+      fetchUserProfile(user.email);
+    }
+  }, [user]);
   
   // Handle clicks outside search results
   useEffect(() => {
@@ -474,8 +482,6 @@ function Explore() {
   };
 
   const fetchUserProfile = async (userEmail) => {
-    if (userProfiles[userEmail]) return; // Skip if we already have this profile
-    
     try {
       // First check if there's a user document
       const userDocRef = doc(db, "users", userEmail);
@@ -488,9 +494,14 @@ function Explore() {
         const userDoc = await getDoc(userDocRef);
         
         if (userDoc.exists()) {
+          const userData = userDoc.data();
+          // Ensure follow request arrays exist
+          if (!userData.followRequestsSent) userData.followRequestsSent = [];
+          if (!userData.followRequestsReceived) userData.followRequestsReceived = [];
+          
           setUserProfiles(prev => ({
             ...prev,
-            [userEmail]: userDoc.data()
+            [userEmail]: userData
           }));
         } else {
           // If no user document exists, create a basic profile from Google data
@@ -516,6 +527,8 @@ function Explore() {
                   email: userEmail,
                   following: [],
                   followers: [],
+                  followRequestsSent: [],
+                  followRequestsReceived: [],
                   bio: ""
                 }
               }));
@@ -613,7 +626,7 @@ function Explore() {
     }
   };
 
-  // Follow/unfollow a user
+  // Follow/unfollow a user with request system
   const toggleFollow = async (userEmailToFollow) => {
     if (!user) {
       toast.error("Please sign in to follow users");
@@ -645,12 +658,17 @@ function Explore() {
           photoURL: user.picture,
           following: [],
           followers: [],
+          followRequestsSent: [],
+          followRequestsReceived: [],
           bio: ""
         };
         
-        await updateDoc(currentUserRef, currentUserData);
+        await setDoc(currentUserRef, currentUserData);
       } else {
         currentUserData = currentUserDoc.data();
+        // Ensure these arrays exist
+        if (!currentUserData.followRequestsSent) currentUserData.followRequestsSent = [];
+        if (!currentUserData.followRequestsReceived) currentUserData.followRequestsReceived = [];
       }
       
       if (!targetUserDoc.exists()) {
@@ -660,59 +678,82 @@ function Explore() {
           photoURL: null,
           following: [],
           followers: [],
+          followRequestsSent: [],
+          followRequestsReceived: [],
           bio: ""
         };
         
-        await updateDoc(targetUserRef, targetUserProfile);
+        await setDoc(targetUserRef, targetUserProfile);
         targetUserData = targetUserProfile;
       } else {
         targetUserData = targetUserDoc.data();
+        // Ensure these arrays exist
+        if (!targetUserData.followRequestsSent) targetUserData.followRequestsSent = [];
+        if (!targetUserData.followRequestsReceived) targetUserData.followRequestsReceived = [];
       }
       
-      // Check if already following
+      // Check current status
       const following = currentUserData.following || [];
       const isFollowing = following.includes(userEmailToFollow);
-      
-      // Update current user's following list
-      let updatedFollowing;
-      if (isFollowing) {
-        updatedFollowing = following.filter(email => email !== userEmailToFollow);
-      } else {
-        updatedFollowing = [...following, userEmailToFollow];
-      }
-      
-      await updateDoc(currentUserRef, {
-        following: updatedFollowing
-      });
-      
-      // Update target user's followers list
-      const followers = targetUserData.followers || [];
-      let updatedFollowers;
+      const requestsSent = currentUserData.followRequestsSent || [];
+      const requestsReceived = currentUserData.followRequestsReceived || [];
+      const hasRequestedFollow = requestsSent.includes(userEmailToFollow);
+      const hasReceivedRequest = requestsReceived.includes(userEmailToFollow);
       
       if (isFollowing) {
-        updatedFollowers = followers.filter(email => email !== user.email);
+        // If already following, unfollow
+        await updateDoc(currentUserRef, {
+          following: arrayRemove(userEmailToFollow)
+        });
+        
+        await updateDoc(targetUserRef, {
+          followers: arrayRemove(user.email)
+        });
+        
+        toast.success("Unfollowed user");
+      } else if (hasRequestedFollow) {
+        // If already requested, cancel request
+        await updateDoc(currentUserRef, {
+          followRequestsSent: arrayRemove(userEmailToFollow)
+        });
+        
+        await updateDoc(targetUserRef, {
+          followRequestsReceived: arrayRemove(user.email)
+        });
+        
+        toast.success("Follow request cancelled");
+      } else if (hasReceivedRequest) {
+        // If received a request from this user, accept it
+        await updateDoc(currentUserRef, {
+          followRequestsReceived: arrayRemove(userEmailToFollow),
+          followers: arrayUnion(userEmailToFollow)
+        });
+        
+        await updateDoc(targetUserRef, {
+          followRequestsSent: arrayRemove(user.email),
+          following: arrayUnion(user.email)
+        });
+        
+        toast.success("Follow request accepted");
       } else {
-        updatedFollowers = [...followers, user.email];
+        // Send new follow request
+        await updateDoc(currentUserRef, {
+          followRequestsSent: arrayUnion(userEmailToFollow)
+        });
+        
+        await updateDoc(targetUserRef, {
+          followRequestsReceived: arrayUnion(user.email)
+        });
+        
+        toast.success("Follow request sent");
       }
       
-      await updateDoc(targetUserRef, {
-        followers: updatedFollowers
-      });
+      // Update local state for UI with fresh data from database
+      // Immediately fetch fresh data to ensure UI is in sync with database
+      await fetchUserProfiles([user.email, userEmailToFollow]);
       
-      // Update local state
-      setUserProfiles(prev => ({
-        ...prev,
-        [user.email]: {
-          ...prev[user.email],
-          following: updatedFollowing
-        },
-        [userEmailToFollow]: {
-          ...prev[userEmailToFollow],
-          followers: updatedFollowers
-        }
-      }));
-      
-      toast.success(isFollowing ? "Unfollowed user" : "Following user");
+      // Force a UI refresh by updating userProfiles state
+      setUserProfiles(prev => ({...prev}));
       
     } catch (error) {
       console.error("Error toggling follow:", error);
@@ -720,6 +761,40 @@ function Explore() {
     }
   };
 
+  // Fetch multiple user profiles at once
+  const fetchUserProfiles = async (emails) => {
+    if (!emails || emails.length === 0) return;
+    
+    try {
+      // Force refresh of profiles by clearing existing ones first
+      const updatedProfiles = { ...userProfiles };
+      emails.forEach(email => {
+        delete updatedProfiles[email];
+      });
+      setUserProfiles(updatedProfiles);
+      
+      // Fetch fresh data for each profile
+      await Promise.all(emails.map(async (email) => {
+        const userDocRef = doc(db, "users", email);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          // Ensure follow request arrays exist
+          if (!userData.followRequestsSent) userData.followRequestsSent = [];
+          if (!userData.followRequestsReceived) userData.followRequestsReceived = [];
+          
+          setUserProfiles(prev => ({
+            ...prev,
+            [email]: userData
+          }));
+        }
+      }));
+    } catch (error) {
+      console.error("Error fetching multiple user profiles:", error);
+    }
+  };
+  
   // Get the best available image for a trip
   const getTripImage = (trip) => {
     // First try the real place image from API
@@ -1021,6 +1096,11 @@ function Explore() {
               };
               const isLiked = trip.likedBy?.includes(user?.email);
               const isCurrentUserFollowing = userProfiles[user?.email]?.following?.includes(trip.userEmail);
+              const hasRequestedFollow = userProfiles[user?.email]?.followRequestsSent?.includes(trip.userEmail);
+              const hasReceivedRequest = userProfiles[user?.email]?.followRequestsReceived?.includes(trip.userEmail);
+              const followStatus = isCurrentUserFollowing ? 'following' : 
+                                   hasRequestedFollow ? 'requested' : 
+                                   hasReceivedRequest ? 'pending' : 'none';
               
               return (
                 <motion.div
@@ -1059,12 +1139,18 @@ function Explore() {
                         <button
                           onClick={() => toggleFollow(trip.userEmail)}
                           className={`text-xs px-3 py-1 rounded-full transition-colors ${
-                            isCurrentUserFollowing
+                            followStatus === 'following'
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-emerald-600 text-white'
+                              : followStatus === 'requested'
+                                ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+                                : followStatus === 'pending'
+                                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                  : 'bg-emerald-600 text-white'
                           }`}
                         >
-                          {isCurrentUserFollowing ? 'Following' : 'Follow'}
+                          {followStatus === 'following' ? 'Following' : 
+                           followStatus === 'requested' ? 'Requested' :
+                           followStatus === 'pending' ? 'Accept' : 'Follow'}
                         </button>
                       )}
                       
@@ -1106,7 +1192,9 @@ function Explore() {
                         likedBy={trip.likedBy || []}
                         likesCount={trip.likesCount || 0}
                         commentsCount={trip.commentCount || 0}
-                        isFollowing={isCurrentUserFollowing}
+                        isFollowing={followStatus === 'following'}
+                        followRequestStatus={followStatus === 'requested' ? 'requested' : 
+                                            followStatus === 'pending' ? 'pending' : 'none'}
                         onCommentClick={() => {
                           setCurrentTripId(trip.id);
                           setCommentsOpen(true);

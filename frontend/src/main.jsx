@@ -13,6 +13,7 @@ import About from './pages/About';
 import MyTrips from './pages/MyTrips';
 import Explore from './pages/Explore';
 import UserProfile from './pages/UserProfile';
+import FollowerRequests from './pages/FollowerRequests';
 import { AuthProvider } from './context/AuthContext';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID;
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
       { path: 'my-trips', element: <MyTrips /> },
       { path: 'explore', element: <Explore /> },
       { path: 'user/:userId', element: <UserProfile /> },
+      { path: 'follower-requests', element: <FollowerRequests /> },
       
       // 404 Page - Styled to match your emerald/teal palette with animation
       {
