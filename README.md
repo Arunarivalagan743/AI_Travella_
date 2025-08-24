@@ -191,7 +191,7 @@ frontend/
 
 ## 🌐 Live Demo
 
-Experience AI Travella in action: **[https://ai-travella-duag.vercel.app/](https://ai-travella-duag.vercel.app/)**
+Experience AI Travella in action: **[https://travellai.me/](https://travellai.me/)**
 
 ### Demo Features
 - ✅ Create sample trips without registration
@@ -235,7 +235,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support & Contact
 
-- 🌐 **Live Demo**: [https://ai-travella-duag.vercel.app/](https://ai-travella-duag.vercel.app/)
+- 🌐 **Live Demo**: [https://travellai.me/](https://travellai.me/)
 - 💻 **Developer Portfolio**: [https://www.404arunfound.me](https://www.404arunfound.me)
 - 📧 **Email**: [Contact via portfolio](https://www.404arunfound.me)
 
