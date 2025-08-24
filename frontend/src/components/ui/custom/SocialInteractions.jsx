@@ -10,6 +10,8 @@ import { doc, updateDoc, getDoc, arrayUnion, arrayRemove, onSnapshot, setDoc } f
 import { db, auth } from '../../../ModelWork/firebaseConfig';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../../context/AuthContext';
+import ShareOptions from './ShareOptions';
+import TripShareButton from './TripShareButton';
 
 const SocialInteractions = ({ 
   tripId, 
@@ -31,6 +33,8 @@ const SocialInteractions = ({
   const [isUserFollowing, setIsUserFollowing] = useState(isFollowing);
   const [followRequestStatus, setFollowRequestStatus] = useState('none'); // 'none', 'requested', 'pending'
   const [isProcessing, setIsProcessing] = useState({ like: false, follow: false, share: false });
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [followers, setFollowers] = useState([]);
 
   // Subscribe to trip doc in Firestore (real-time updates)
   useEffect(() => {
@@ -312,30 +316,52 @@ const SocialInteractions = ({
     }
   };
   
-  // Share (unchanged)
-  const handleShare = async () => {
+  // Fetch followers for sharing
+  useEffect(() => {
+    const fetchFollowers = async () => {
+      if (!user) return;
+      
+      try {
+        const userDocRef = doc(db, "users", user.email);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const followersList = userData.followers || [];
+          
+          // Fetch follower profiles
+          const followerProfiles = await Promise.all(
+            followersList.map(async (email) => {
+              const followerDocRef = doc(db, "users", email);
+              const followerDoc = await getDoc(followerDocRef);
+              
+              if (followerDoc.exists()) {
+                const followerData = followerDoc.data();
+                return {
+                  id: email,
+                  email: email,
+                  displayName: followerData.displayName || email.split('@')[0],
+                  photoURL: followerData.photoURL || null
+                };
+              }
+              return null;
+            })
+          );
+          
+          setFollowers(followerProfiles.filter(Boolean));
+        }
+      } catch (error) {
+        console.error("Error fetching followers:", error);
+      }
+    };
+    
+    if (user) fetchFollowers();
+  }, [user]);
+
+  // Enhanced Share functionality
+  const handleShare = () => {
     if (isProcessing.share) return;
-    try {
-      setIsProcessing(prev => ({ ...prev, share: true }));
-      const url = `${window.location.origin}/trip/${tripId}`;
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Check out this trip!',
-          text: 'I found this amazing travel plan on TravellaAI',
-          url
-        });
-      } else {
-        await navigator.clipboard.writeText(url);
-        toast.success("Link copied to clipboard!");
-      }
-    } catch (error) {
-      if (error.name !== 'AbortError') {
-        console.error("Share failed:", error);
-        toast.error("Failed to share");
-      }
-    } finally {
-      setIsProcessing(prev => ({ ...prev, share: false }));
-    }
+    setShowShareOptions(true);
   };
 
   // Layout classes
@@ -344,41 +370,42 @@ const SocialInteractions = ({
     : 'flex flex-col items-center gap-4';
 
   return (
-    <div className={containerClass}>
-      {/* Like */}
-      <button 
-        onClick={handleToggleLike}
-        disabled={isProcessing.like}
-        className="flex items-center gap-1.5 hover:scale-110 active:scale-95 transition-transform"
-      >
-        {isLiked 
-          ? <FaHeart className="text-red-500" size={iconSize} /> 
-          : <FaRegHeart className="text-gray-700" size={iconSize} />
-        }
-        <span className="text-sm font-medium">{likeCount}</span>
-      </button>
+    <>
+      <div className={containerClass}>
+        {/* Like */}
+        <button 
+          onClick={handleToggleLike}
+          disabled={isProcessing.like}
+          className="flex items-center gap-1.5 hover:scale-110 active:scale-95 transition-transform"
+        >
+          {isLiked 
+            ? <FaHeart className="text-red-500" size={iconSize} /> 
+            : <FaRegHeart className="text-gray-700" size={iconSize} />
+          }
+          <span className="text-sm font-medium">{likeCount}</span>
+        </button>
 
-      {/* Comment */}
-      <button 
-        onClick={onCommentClick}
-        className="flex items-center gap-1.5 hover:scale-110 active:scale-95 transition-transform"
-      >
-        <FaRegCommentAlt className="text-gray-700" size={iconSize} />
-        <span className="text-sm">{liveCommentsCount}</span>
-      </button>
+        {/* Comment */}
+        <button 
+          onClick={onCommentClick}
+          className="flex items-center gap-1.5 hover:scale-110 active:scale-95 transition-transform"
+        >
+          <FaRegCommentAlt className="text-gray-700" size={iconSize} />
+          <span className="text-sm">{liveCommentsCount}</span>
+        </button>
 
-      {/* Share */}
-      <button
-        onClick={handleShare}
-        disabled={isProcessing.share}
-        className="flex items-center gap-1.5 hover:scale-110 active:scale-95 transition-transform"
-      >
-        <FaShare className="text-gray-700" size={iconSize} />
-        <span className="text-sm">Share</span>
-      </button>
+        {/* Share */}
+        <button
+          onClick={handleShare}
+          disabled={isProcessing.share}
+          className="flex items-center gap-1.5 hover:scale-110 active:scale-95 transition-transform"
+        >
+          <FaShare className="text-gray-700" size={iconSize} />
+          <span className="text-sm">Share</span>
+        </button>
 
-      {/* Follow button with request system */}
-      {user && creatorEmail && user.email !== creatorEmail && (
+        {/* Follow button with request system */}
+        {user && creatorEmail && user.email !== creatorEmail && (
         <button
           onClick={handleToggleFollow}
           className={`flex items-center gap-1.5 transition-colors px-3 py-1 rounded-full ${
@@ -415,7 +442,19 @@ const SocialInteractions = ({
           )}
         </button>
       )}
-    </div>
+      </div>
+      
+      {/* Enhanced Share Options Modal */}
+      {showShareOptions && (
+        <ShareOptions
+          tripId={tripId}
+          creatorEmail={creatorEmail}
+          isOpen={showShareOptions}
+          onClose={() => setShowShareOptions(false)}
+          followers={followers}
+        />
+      )}
+    </>
   );
 };
 

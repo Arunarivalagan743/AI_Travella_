@@ -18,6 +18,7 @@ import {
 } from 'react-icons/fa';
 import SocialInteractions from '../../components/ui/custom/SocialInteractions';
 import Comments from '../../components/ui/custom/Comments';
+import TripShareButton from '../../components/ui/custom/TripShareButton';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../ModelWork/firebaseConfig';
 
@@ -292,6 +293,11 @@ function TripSummary({ trip }) {
                 {creatorEmail ? creatorEmail.split('@')[0] : 'Unknown'}
               </Link>
             </div>
+          </div>
+          
+          {/* Share Button */}
+          <div>
+            <TripShareButton trip={trip} />
           </div>
         </div>
         

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUserCircle, FaSignOutAlt, FaSuitcaseRolling, FaHome, FaInfoCircle, FaGlobe, FaUserPlus,FaUser } from 'react-icons/fa';
+import { FaUserCircle, FaSignOutAlt, FaSuitcaseRolling, FaHome, FaInfoCircle, FaGlobe, FaUserPlus, FaUser, FaComment } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 import { Link, useLocation } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -195,6 +195,15 @@ function Header() {
                               <span>Follower Requests</span>
                             </motion.button>
                           </Link>
+                          <Link to="/chat">
+                            <motion.button
+                              className="w-full flex items-center gap-2 text-left px-3 py-2 text-sm text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                              whileHover={{ x: 3 }}
+                            >
+                              <FaComment />
+                              <span>Messages</span>
+                            </motion.button>
+                          </Link>
                         </div>
                         <div className="p-2">
                           <motion.button
@@ -281,14 +290,32 @@ function Header() {
                   </Link>
                 ))}
                 {user && (
-                  <Link
-                    to="/my-trips"
-                    className="text-emerald-600 font-medium py-3 px-2 border-b border-gray-100/50 flex items-center gap-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FaSuitcaseRolling className="text-lg" />
-                    <span className="text-lg">My Trips</span>
-                  </Link>
+                  <>
+                    <Link
+                      to="/my-trips"
+                      className="text-emerald-600 font-medium py-3 px-2 border-b border-gray-100/50 flex items-center gap-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <FaSuitcaseRolling className="text-lg" />
+                      <span className="text-lg">My Trips</span>
+                    </Link>
+                    <Link
+                      to="/chat"
+                      className="text-emerald-600 font-medium py-3 px-2 border-b border-gray-100/50 flex items-center gap-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <FaComment className="text-lg" />
+                      <span className="text-lg">Messages</span>
+                    </Link>
+                    <Link
+                      to="/follower-requests"
+                      className="text-blue-600 font-medium py-3 px-2 border-b border-gray-100/50 flex items-center gap-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <FaUserPlus className="text-lg" />
+                      <span className="text-lg">Follower Requests</span>
+                    </Link>
+                  </>
                 )}
                 <div className="flex justify-center pt-6 mt-4">
                   {user ? (

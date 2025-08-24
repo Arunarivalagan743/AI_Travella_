@@ -14,13 +14,15 @@ import {
   FaShare,
   FaEllipsisH,
   FaSearch,
-  FaTimes
+  FaTimes,
+  FaUsers
 } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import { GetPlaceDetails, PHOTO_REF_URL } from '@/ModelWork/GlobalApi';
 import { useAuth } from '../context/AuthContext';
 import SocialInteractions from '../components/ui/custom/SocialInteractions';
 import Comments from '../components/ui/custom/Comments';
+import FollowersList from '../components/ui/custom/FollowersList';
 
 function Explore() {
   const { user } = useAuth();

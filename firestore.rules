@@ -106,6 +106,31 @@ service cloud.firestore {
       allow create: if isSignedIn();
       allow update, delete: if false;
     }
+
+    // Follower relationships
+    match /followers/{followId} {
+      // Follower relationships can be read by anyone
+      allow read: if true;
+      
+      // Only authenticated users can create/modify follow relationships
+      allow create, update, delete: if isSignedIn();
+    }
+    
+    // Conversations collection for chat
+    match /conversations/{conversationId} {
+      // Only conversation participants can read/write to their conversations
+      allow read, write: if isSignedIn() && request.auth.token.email in resource.data.participants;
+      
+      // Allow users to create conversations with themselves as a participant
+      allow create: if isSignedIn() && request.auth.token.email in request.resource.data.participants;
+      
+      // Messages subcollection within conversations
+      match /messages/{messageId} {
+        // Only conversation participants can read/write messages
+        allow read, write: if isSignedIn() && 
+                           request.auth.token.email in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+      }
+    }
     
     // Default deny
     match /{document=**} {
