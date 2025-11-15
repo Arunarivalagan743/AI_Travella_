@@ -18,18 +18,15 @@ import React, { useEffect, useState } from 'react';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import {  SelectTravelList } from '@/choices/SelectTravelList';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlane, FaMapMarkerAlt, FaCalendarAlt, FaWalking, FaSuitcase, FaPaperPlane, FaGoogle, FaUsers } from 'react-icons/fa';
+import { FaPlane, FaMapMarkerAlt, FaCalendarAlt, FaWalking, FaSuitcase, FaPaperPlane, FaUsers } from 'react-icons/fa';
 import { RiMoneyDollarCircleLine, RiFlightTakeoffFill } from 'react-icons/ri';
 import { BiSolidChevronRight, BiRefresh } from 'react-icons/bi';
-import { MdLocationOn, MdOutlineSwipe, MdExplore, MdHotel, MdClose } from 'react-icons/md';
+import { MdLocationOn, MdExplore } from 'react-icons/md';
 import AiSetup from '../ModelWork/AiSetup';
-import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../ModelWork/firebaseConfig.js';
 import { useNavigate} from 'react-router-dom';
-
-import { useAuth } from '../context/AuthContext'; // <-- Use context for auth
+import { useAuth } from '../context/AuthContext';
 function CreateTrip() {
   // Load saved form data from localStorage on initial render
   const [place, setPlace] = useState(() => {
@@ -49,11 +46,10 @@ function CreateTrip() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [travelAnimation, setTravelAnimation] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const { user, login } = useAuth(); // <-- Use context
+  const { user, login } = useAuth();
   const { generateTravelPlan, loading: aiLoading, error, travelData } = AiSetup();
   const navigate = useNavigate();
 
@@ -70,33 +66,7 @@ function CreateTrip() {
     localStorage.setItem('createTripActiveSection', activeSection.toString());
   }, [activeSection]);
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: (response) => {
-      setOpenDialog(false);
-      GetUserProfile(response);
-      if (isFormComplete()) {
-        handleFormSubmit();
-      }
-    },
-    onError: (error) => {
-      setErrorMessage("Login failed. Please try again.");
-    }
-  });
-
-  const GetUserProfile = async (tokenInfo) => {
-    if (!tokenInfo?.access_token) return;
-    try {
-      const response = await axios.get(`https://www.googleapis.com/oauth2/v2/userinfo`, {
-        headers: {
-          Authorization: `Bearer ${tokenInfo.access_token}`,
-          Accept: 'application/json'
-        }
-      });
-      login(response.data); // <-- Use context login
-    } catch (error) {
-      setErrorMessage("Error fetching user profile.");
-    }
-  };
+  // Removed old Google OAuth login - now using Firebase Auth from Header
 
   const isFormComplete = () => {
     return formData.place && 
@@ -156,30 +126,58 @@ function CreateTrip() {
     try {
       setIsSaving(true);
       setErrorMessage(null);
+      
       if (!user) {
+        console.error("SaveAiTrip: User not authenticated");
         setErrorMessage("User not authenticated");
         throw new Error("User not authenticated");
       }
+      
+      if (!user.email) {
+        console.error("SaveAiTrip: User email is missing");
+        setErrorMessage("User email is required. Please sign in again.");
+        throw new Error("User email is missing");
+      }
+      
+      // Validate trip data
+      if (!tripData) {
+        console.error("SaveAiTrip: Trip data is empty");
+        setErrorMessage("Trip data is missing. Please try again.");
+        throw new Error("Trip data is empty");
+      }
+      
       // Generate a unique document ID
       const docId = Date.now().toString();
+      
       // Prepare trip data
       const tripDocument = {
         userSelection: JSON.parse(JSON.stringify(formData)),
         tripData: tripData,
-        userEmail: user.email || "anonymous@example.com",
-        userName: user.name,
-        userPicture: user.picture,
+        userEmail: user.email,
+        userName: user.name || user.email.split('@')[0],
+        userPicture: user.picture || '',
         id: docId,
-        isPublic: formData.isPublic || false, // Default to private if not specified
+        isPublic: formData.isPublic || false,
         createdAt: new Date().toISOString(),
         likesCount: 0,
         likedBy: []
       };
+      
+      console.log("Saving trip to Firestore:", { docId, userEmail: user.email });
+      
       await setDoc(doc(db, "alltrips", docId), tripDocument);
+      
+      console.log("Trip saved successfully");
       navigate(`/show-trip/${docId}`);
       return docId;
     } catch (error) {
-      setErrorMessage("Failed to save your trip. Please try again later.");
+      console.error("SaveAiTrip Error:", error);
+      console.error("Error details:", {
+        message: error.message,
+        code: error.code,
+        stack: error.stack
+      });
+      setErrorMessage(`Failed to save your trip: ${error.message}. Please try again later.`);
       throw error;
     } finally {
       setIsSaving(false);
@@ -187,39 +185,63 @@ function CreateTrip() {
   };
 
   const handleFormSubmit = async () => {
+    // Validate all required fields
     if (!formData.location || !formData.duration || !formData.travelType || !formData.budget || !formData.travelers) {
       setErrorMessage("Please fill all the fields");
+      console.error("Form validation failed:", formData);
       return;
     }
-    if (formData.duration > 5) {
-      setErrorMessage("You can only travel for a maximum of 5 days");
-      resetForm();
+    
+    // Validate location is not empty
+    if (formData.location.trim() === '') {
+      setErrorMessage("Please enter a valid destination");
+      console.error("Location is empty");
       return;
     }
+    
+    if (formData.duration > 5 || formData.duration < 1) {
+      setErrorMessage("Trip duration must be between 1 and 5 days");
+      return;
+    }
+    
     setErrorMessage(null);
+    
     try {
       setIsGenerating(true);
+      
       const travelParams = {
         location: formData.location,
         duration: `${formData.duration} Days`,
         for: `${formData.travelers} travelers`,
         budgetAmount: formData.budget
       };
+      
+      console.log("Generating trip with params:", travelParams);
+      
       const result = await generateTravelPlan(travelParams);
+      
       if (result) {
+        console.log("Trip plan generated successfully");
+        
         try {
           await SaveAiTrip(result);
+          // If save is successful, show success message
+          setShowSuccess(true);
+          setTimeout(() => {
+            setShowSuccess(false);
+            resetForm();
+          }, 2500);
         } catch (saveError) {
-          // Continue with success flow despite save error
+          console.error("Error saving trip:", saveError);
+          // Error message already set in SaveAiTrip
+          // Don't reset form so user can try again
         }
-        setShowSuccess(true);
-        setTimeout(() => {
-          setShowSuccess(false);
-          resetForm();
-        }, 2500);
+      } else {
+        setErrorMessage("Failed to generate trip plan. Please try again.");
       }
     } catch (error) {
-      setErrorMessage("Failed to generate your trip plan. Please try again.");
+      console.error("Error in handleFormSubmit:", error);
+      setErrorMessage(`Failed to generate your trip plan: ${error.message}. Please try again.`);
     } finally {
       setIsGenerating(false);
     }
@@ -448,12 +470,29 @@ function CreateTrip() {
               <div className="transform transition-all hover:scale-101">
                 <GooglePlacesAutocomplete
                   apiKey={import.meta.env.VITE_GOOGLE_PLACE_API_KEY}
+                  apiOptions={{
+                    language: 'en',
+                    region: 'us'
+                  }}
+                  autocompletionRequest={{
+                    types: ['(cities)'],
+                    componentRestrictions: {}
+                  }}
                   selectProps={{
                     value: place,
                     placeholder: 'Search for a destination',
                     onChange: (v) => {
-                      setPlace(v);
-                      handleInput('place', v);
+                      console.log('Place selected:', v);
+                      if (v && v.label) {
+                        setPlace(v);
+                        handleInput('place', v);
+                      }
+                    },
+                    isClearable: true,
+                    onInputChange: (inputValue, { action }) => {
+                      if (action === 'input-change') {
+                        console.log('Input changed:', inputValue);
+                      }
                     },
                     styles: {
                       control: (provided) => ({
