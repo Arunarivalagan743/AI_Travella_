@@ -6,6 +6,7 @@ import {
 import { 
   signInWithCredential,
   signInWithPopup,
+  signInWithRedirect,
   GoogleAuthProvider, 
   signOut, 
   onAuthStateChanged 
@@ -34,14 +35,12 @@ export function AuthProvider({ children }) {
         localStorage.setItem("userProfile", JSON.stringify(userData));
         ensureUserInFirestore(userData);
       } else {
-        // No user signed in with Firebase Auth, check local storage as fallback
-        const userProfileString = localStorage.getItem("userProfile");
-        if (userProfileString) {
-          const parsedUser = JSON.parse(userProfileString);
-          setUser(parsedUser);
-        } else {
-          setUser(null);
-        }
+        // No user signed in with Firebase Auth
+        // Important: Do NOT fall back to local storage here — this can
+        // create a mismatch where UI thinks user is signed-in but
+        // Firestore request.auth is null, causing permission-denied.
+        setUser(null);
+        localStorage.removeItem("userProfile");
       }
       setLoading(false);
     });
@@ -101,6 +100,19 @@ export function AuthProvider({ children }) {
       return userData;
     } catch (error) {
       console.error("Firebase Auth error:", error);
+      // Automatic fallback to redirect for environments blocking popups or cookies
+      if (error?.code === 'auth/network-request-failed' || error?.code === 'auth/popup-blocked') {
+        try {
+          const provider = new GoogleAuthProvider();
+          provider.addScope('profile');
+          provider.addScope('email');
+          await signInWithRedirect(auth, provider);
+          return; // flow continues after redirect
+        } catch (redirectErr) {
+          console.error('Firebase Auth redirect fallback failed:', redirectErr);
+          throw redirectErr;
+        }
+      }
       throw error;
     }
   };
