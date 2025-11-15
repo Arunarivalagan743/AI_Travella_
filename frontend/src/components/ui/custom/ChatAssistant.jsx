@@ -35,6 +35,22 @@ const ChatAssistant = ({ tripData, onTripUpdate, isOpen, onClose }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Clean and format text by removing markdown artifacts and extra formatting
+  const cleanText = (text) => {
+    if (!text) return '';
+    
+    return text
+      // Remove excessive asterisks for bold/italic markdown
+      .replace(/\*\*\*/g, '')
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '•')
+      // Clean up bullet points
+      .replace(/^\s*[•\-]\s*/gm, '• ')
+      // Remove excessive whitespace
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
@@ -48,8 +64,13 @@ const ChatAssistant = ({ tripData, onTripUpdate, isOpen, onClose }) => {
 
     try {
       // Initialize Gemini AI
-      const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      const apiKey = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("Gemini API key is not configured");
+      }
+      
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
       // Create history for context
       const chatHistory = messages.map(msg => ({
@@ -90,24 +111,27 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
       
+      // Clean the response text first
+      const cleanedText = cleanText(responseText);
+      
       // Process the response
-      let assistantMessage = responseText;
+      let assistantMessage = cleanedText;
       let updatedItinerary = null;
       
       // Check if response contains JSON
-      const jsonStartIndex = responseText.indexOf('[JSON_START]');
-      const jsonEndIndex = responseText.indexOf('[JSON_END]');
+      const jsonStartIndex = cleanedText.indexOf('[JSON_START]');
+      const jsonEndIndex = cleanedText.indexOf('[JSON_END]');
       
       if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
         // Extract JSON part
-        const jsonText = responseText.substring(jsonStartIndex + 12, jsonEndIndex).trim();
+        const jsonText = cleanedText.substring(jsonStartIndex + 12, jsonEndIndex).trim();
         
         try {
           // Parse the JSON
           updatedItinerary = JSON.parse(jsonText);
           
           // Remove the JSON part from the message
-          assistantMessage = responseText.substring(0, jsonStartIndex).trim();
+          assistantMessage = cleanedText.substring(0, jsonStartIndex).trim();
           
           // If JSON was successfully parsed, offer to update itinerary
           assistantMessage += "\n\nI've prepared changes to your itinerary. Would you like me to update it?";
@@ -125,12 +149,17 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
       
     } catch (err) {
       console.error("Error communicating with AI:", err);
+      console.error("Error details:", {
+        message: err.message,
+        status: err.status,
+        statusText: err.statusText
+      });
       setError("Sorry, I couldn't process your request. Please try again later.");
       
       // Add error message to chat
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: "Sorry, I'm having trouble connecting to my brain. Please try again in a moment." 
+        content: `Sorry, I'm having trouble connecting. Error: ${err.message || 'Unknown error'}` 
       }]);
     } finally {
       setIsLoading(false);
@@ -159,8 +188,18 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
   if (!isOpen) return null;
 
   return (
-    <motion.div 
-      className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded-lg shadow-xl flex flex-col z-50 overflow-hidden"
+    <>
+      {/* Backdrop for mobile */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="md:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-[60]"
+        onClick={onClose}
+      />
+      
+      <motion.div 
+        className="fixed bottom-0 md:bottom-4 right-0 md:right-4 w-full md:w-80 h-[70vh] md:h-[450px] bg-white md:rounded-lg shadow-xl flex flex-col z-[70] overflow-hidden"
       initial={{ opacity: 0, y: 20, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
@@ -200,7 +239,7 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
                   {message.role === 'user' ? 'You' : 'Trip Assistant'}
                 </span>
               </div>
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              <p className="text-sm whitespace-pre-line leading-relaxed">{message.content}</p>
               
               {/* Action button if there's an updated itinerary */}
               {message.role === 'assistant' && message.updatedItinerary && (
@@ -288,6 +327,7 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
         </div>
       </form>
     </motion.div>
+    </>
   );
 };
 

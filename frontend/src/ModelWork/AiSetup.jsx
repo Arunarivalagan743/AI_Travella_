@@ -13,8 +13,8 @@ const AiSetup = () => {
       // Initialize the API with your API key
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GEMINI_API_KEY);
       
-      // Use gemini-1.5-pro model
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      // Use gemini-2.0-flash-exp model (latest available)
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
       const prompt = `Generate a detailed Travel Plan in JSON format for:
 

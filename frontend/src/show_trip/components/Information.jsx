@@ -355,7 +355,7 @@ function Information({ trip }) {
 
 {/* Welcome Message with name from AuthContext/localStorage */}
 <motion.div
-  className="relative w-full max-w-4xl mx-auto -mt-6 mb-6 z-20 px-4"
+  className="relative w-full max-w-7xl mx-auto -mt-4 sm:-mt-6 mb-4 sm:mb-6 z-20 px-3 sm:px-4"
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.7, delay: 0.9 }}
@@ -365,7 +365,7 @@ function Information({ trip }) {
 
 {/* Navigation Tabs with improved positioning and styling */}
 <motion.div 
-  className="bg-white rounded-xl shadow-md mx-4 md:mx-auto max-w-4xl relative z-10 border border-gray-100"
+  className="bg-white rounded-xl shadow-md mx-3 sm:mx-4 md:mx-auto max-w-7xl relative z-10 border border-gray-100"
   initial={{ y: 20, opacity: 0 }}
   animate={{ y: 0, opacity: 1 }}
   transition={{ duration: 0.6, delay: 0.5 }}
@@ -431,7 +431,7 @@ function Information({ trip }) {
       
       {/* Content Section with improved animations */}
       <motion.div 
-        className="bg-white rounded-b-xl p-6 sm:p-8 shadow-xl mx-4 md:mx-auto max-w-4xl relative z-10 min-h-[400px] border-t-0 border border-gray-100 overflow-hidden"
+        className="bg-white rounded-b-xl p-4 sm:p-6 md:p-8 shadow-xl mx-3 sm:mx-4 md:mx-auto max-w-7xl relative z-10 min-h-[300px] sm:min-h-[400px] border-t-0 border border-gray-100 overflow-hidden"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.5 }}

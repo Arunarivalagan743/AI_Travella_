@@ -779,7 +779,7 @@ const SimpleItinerary = ({ itineraryData }) => {
   // Handling loading and empty states
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto py-8 text-center">
+      <div className="max-w-7xl mx-auto py-6 sm:py-8 text-center px-3 sm:px-4">
         <div className="animate-pulse flex flex-col items-center">
           <div className="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
           <div className="h-4 bg-gray-200 rounded w-3/4 mb-6"></div>
@@ -810,14 +810,14 @@ const SimpleItinerary = ({ itineraryData }) => {
   console.log("Activities for this day:", activities);
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-emerald-700 flex items-center gap-2">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-emerald-700 flex items-center gap-2">
         <FaMapMarkerAlt className="text-emerald-500" /> Trip Itinerary
       </h2>
       
       {/* Day selection - with horizontal scrolling for many days */}
       <div className="overflow-x-auto pb-2 mb-4">
-        <div className="flex gap-2 min-w-max">
+        <div className="flex gap-2 min-w-max\">
           {processedData.map(day => (
             <button
               key={day.day}

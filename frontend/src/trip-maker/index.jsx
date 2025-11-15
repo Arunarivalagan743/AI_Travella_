@@ -31,9 +31,19 @@ import { useNavigate} from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext'; // <-- Use context for auth
 function CreateTrip() {
-  const [place, setPlace] = useState(null);
-  const [formData, setFormData] = useState({});
-  const [activeSection, setActiveSection] = useState(0);
+  // Load saved form data from localStorage on initial render
+  const [place, setPlace] = useState(() => {
+    const saved = localStorage.getItem('createTripPlace');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [formData, setFormData] = useState(() => {
+    const saved = localStorage.getItem('createTripFormData');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [activeSection, setActiveSection] = useState(() => {
+    const saved = localStorage.getItem('createTripActiveSection');
+    return saved ? parseInt(saved) : 0;
+  });
   const [showSuccess, setShowSuccess] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -46,6 +56,19 @@ function CreateTrip() {
   const { user, login } = useAuth(); // <-- Use context
   const { generateTravelPlan, loading: aiLoading, error, travelData } = AiSetup();
   const navigate = useNavigate();
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('createTripFormData', JSON.stringify(formData));
+  }, [formData]);
+
+  useEffect(() => {
+    localStorage.setItem('createTripPlace', JSON.stringify(place));
+  }, [place]);
+
+  useEffect(() => {
+    localStorage.setItem('createTripActiveSection', activeSection.toString());
+  }, [activeSection]);
 
   const googleLogin = useGoogleLogin({
     onSuccess: (response) => {
@@ -95,6 +118,7 @@ function CreateTrip() {
   const handleInput = (name, value) => {
     if (name === 'place') {
       const locationName = value?.label || value?.value?.description || "Unknown location";
+      setPlace(value); // Update place state
       setFormData({
         ...formData,
         place: value,
@@ -121,6 +145,10 @@ function CreateTrip() {
       setPlace(null);
       setActiveSection(0);
       setIsRefreshing(false);
+      // Clear localStorage
+      localStorage.removeItem('createTripFormData');
+      localStorage.removeItem('createTripPlace');
+      localStorage.removeItem('createTripActiveSection');
     }, 800);
   };
 
@@ -291,7 +319,7 @@ function CreateTrip() {
     <AnimatePresence mode="wait">
       <motion.div 
         key={isRefreshing ? 'refreshing' : 'content'}
-        className={`p-6 mx-auto bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg ${isMobile ? 'max-w-full' : 'max-w-4xl'} relative overflow-hidden`}
+        className={`p-4 sm:p-6 md:p-8 mx-auto bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg w-full ${isMobile ? 'max-w-full' : 'max-w-4xl'} relative overflow-hidden`}
         initial="hidden"
         animate="visible"
         exit={{ opacity: 0, y: -20 }}

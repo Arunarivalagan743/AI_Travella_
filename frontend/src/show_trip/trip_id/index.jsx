@@ -902,7 +902,7 @@ function ViewTrip() {
     )}
 </motion.button>
             
-            <div className="container mx-auto p-4 z-10 relative">
+            <div className="container mx-auto px-3 sm:px-4 md:px-6 py-4 z-10 relative max-w-7xl">
                 {tripData ? (
                     <>
                         {/* Social Media Header */}

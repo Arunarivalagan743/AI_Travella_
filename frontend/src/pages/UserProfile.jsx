@@ -20,6 +20,9 @@ function UserProfile() {
   const [followers, setFollowers] = useState([]);
   const [followersProfiles, setFollowersProfiles] = useState({});
   const [loadingFollowers, setLoadingFollowers] = useState(false);
+  const [following, setFollowing] = useState([]);
+  const [followingProfiles, setFollowingProfiles] = useState({});
+  const [loadingFollowing, setLoadingFollowing] = useState(false);
   const [followerTrips, setFollowerTrips] = useState([]);
   const [selectedFollower, setSelectedFollower] = useState(null);
   const [loadingFollowerTrips, setLoadingFollowerTrips] = useState(false);
@@ -58,6 +61,9 @@ function UserProfile() {
   useEffect(() => {
     if (profile && profile.followers && profile.followers.length > 0) {
       fetchFollowerProfiles();
+    }
+    if (profile && profile.following && profile.following.length > 0) {
+      fetchFollowingProfiles();
     }
   }, [profile]);
 
@@ -152,6 +158,39 @@ function UserProfile() {
     }
   };
 
+  const fetchFollowingProfiles = async () => {
+    try {
+      setLoadingFollowing(true);
+      const profiles = {};
+      
+      if (!profile || !profile.following) return;
+      
+      await Promise.all((profile.following || []).map(async (email) => {
+        const userDocRef = doc(db, "users", email);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+          profiles[email] = userDoc.data();
+        } else {
+          // Fallback profile if user document doesn't exist
+          profiles[email] = {
+            displayName: email.split('@')[0],
+            email: email,
+            photoURL: null
+          };
+        }
+      }));
+      
+      setFollowingProfiles(profiles);
+      setFollowing(profile.following || []);
+    } catch (error) {
+      console.error("Error fetching following profiles:", error);
+      toast.error("Failed to load following list");
+    } finally {
+      setLoadingFollowing(false);
+    }
+  };
+
   const checkFollowStatus = async () => {
     if (!user || user.email === userId) return; // can't follow yourself
 
@@ -238,9 +277,11 @@ function UserProfile() {
         followers: arrayRemove(user.email)
       });
 
-      toast.success(`Unfollowed ${followersProfiles[followerEmail]?.displayName || followerEmail}`);
-      // Refresh followers list
-      fetchUserProfile();
+      const displayName = followersProfiles[followerEmail]?.displayName || followingProfiles[followerEmail]?.displayName || followerEmail;
+      toast.success(`Unfollowed ${displayName}`);
+      // Refresh profile and status
+      await fetchUserProfile();
+      await checkFollowStatus();
     } catch (error) {
       console.error("Error unfollowing user:", error);
       toast.error("Failed to unfollow user");
@@ -294,7 +335,7 @@ function UserProfile() {
 
   // Render main UI
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-8">
       {/* Profile Header */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
         <div className="bg-gradient-to-r from-emerald-500 to-blue-500 h-32"></div>
@@ -424,6 +465,16 @@ function UserProfile() {
             onClick={() => setActiveTab('followers')}
           >
             Followers ({stats.followers})
+          </button>
+          <button
+            className={`pb-3 px-2 font-medium ${
+              activeTab === 'following'
+                ? 'border-b-2 border-emerald-500 text-emerald-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+            onClick={() => setActiveTab('following')}
+          >
+            Following ({stats.following})
           </button>
           {activeTab === 'followerTrips' && selectedFollower && (
             <button
@@ -715,11 +766,90 @@ function UserProfile() {
                       >
                         View Trips
                       </button>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Following Tab Content */}
+      {activeTab === 'following' && (
+        <>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            Following
+          </h2>
+
+          {loadingFollowing ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+            </div>
+          ) : following.length === 0 ? (
+            <div className="bg-gray-50 rounded-xl p-12 text-center">
+              <div className="text-gray-400 text-6xl mb-4">👥</div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                Not following anyone yet
+              </h3>
+              <p className="text-gray-500">
+                {userId === user?.email ? "Start exploring and follow other travelers!" : "This user hasn't followed anyone yet."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {following.map((followingEmail) => {
+                const followingProfile = followingProfiles[followingEmail] || {
+                  displayName: followingEmail.split('@')[0],
+                  email: followingEmail,
+                  photoURL: null
+                };
+                
+                // Check if this is the current user's profile
+                const isOwnProfile = user && user.email && userId && userId === user.email;
+                
+                return (
+                  <motion.div
+                    key={followingEmail}
+                    className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center">
+                        {followingProfile.photoURL ? (
+                          <img
+                            src={followingProfile.photoURL}
+                            alt={followingProfile.displayName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <FaUserCircle className="text-white" size={32} />
+                        )}
+                      </div>
                       
-                      {user && userId === user.email && (
+                      <div>
+                        <h3 className="font-semibold text-gray-800">
+                          {followingProfile.displayName}
+                        </h3>
+                        <p className="text-sm text-gray-500">{followingProfile.email}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row gap-2">
+                      <button 
+                        onClick={() => viewFollowerTrips(followingProfile.email)}
+                        className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors text-sm text-center"
+                      >
+                        View Trips
+                      </button>
+                      
+                      {/* Show unfollow button only when viewing your own profile */}
+                      {isOwnProfile && (
                         <button
-                          onClick={() => handleUnfollow(followerProfile.email)}
-                          className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center justify-center gap-1"
+                          onClick={() => handleUnfollow(followingProfile.email)}
+                          className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center justify-center gap-1 whitespace-nowrap"
                         >
                           <FaTimesCircle size={12} />
                           <span>Unfollow</span>

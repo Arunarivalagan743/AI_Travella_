@@ -105,7 +105,7 @@ function HotelList({ hotels }) {
   };
 
   return (
-    <div className="px-2 sm:px-4 lg:px-6 py-4 sm:py-6 max-w-7xl mx-auto">
+    <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl mx-auto">
       <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 text-gray-800">
         <span className="flex items-center">
           <FaHotel className="text-emerald-600 mr-2 text-lg sm:text-xl lg:text-2xl" />

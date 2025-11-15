@@ -1,1 +1,159 @@
 @import "tailwindcss";
+
+/* Google Fonts - Inter (Primary) + Playfair Display (Accent) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap');
+
+/* Tailwind CSS Custom Theme - Font Families */
+@theme {
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-serif: 'Playfair Display', Georgia, serif;
+  --font-family-body: var(--font-family-sans);
+  --font-family-heading: var(--font-family-serif);
+}
+
+/* Global Font Settings */
+* {
+  font-family: var(--font-family-sans);
+}
+
+/* Body Text - Inter 400, 16px, line-height 1.5 */
+body {
+  font-family: var(--font-family-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* H1 Hero - Playfair Display 700, 48-64px */
+h1 {
+  font-family: var(--font-family-serif);
+  font-size: clamp(48px, 5vw, 64px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* H2 - Inter/Playfair 600, 32-36px */
+h2 {
+  font-family: var(--font-family-serif);
+  font-size: clamp(32px, 3.5vw, 36px);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* H3 - Inter 600, 24-28px */
+h3 {
+  font-family: var(--font-family-sans);
+  font-size: clamp(24px, 2.5vw, 28px);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* H4, H5, H6 - Inter 600 */
+h4, h5, h6 {
+  font-family: var(--font-family-sans);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+h4 {
+  font-size: 20px;
+}
+
+h5 {
+  font-size: 18px;
+}
+
+h6 {
+  font-size: 16px;
+}
+
+/* Buttons and UI Labels - Inter 600, 14-15px */
+button,
+.btn,
+label,
+input,
+select,
+textarea {
+  font-family: var(--font-family-sans);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Paragraphs - Inter 400, 16px */
+p {
+  font-family: var(--font-family-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Links - Inter 400/600 */
+a {
+  font-family: var(--font-family-sans);
+  font-weight: 400;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  font-weight: 600;
+}
+
+/* Hero/Feature Titles - Playfair Display */
+.hero-title,
+.feature-title,
+.section-title {
+  font-family: var(--font-family-serif);
+  font-weight: 700;
+}
+
+/* Small Text */
+small,
+.text-sm {
+  font-size: 14px;
+}
+
+/* Extra Small Text */
+.text-xs {
+  font-size: 12px;
+}
+
+/* Utility Classes for Direct Font Control */
+.font-inter {
+  font-family: var(--font-family-sans) !important;
+}
+
+.font-playfair {
+  font-family: var(--font-family-serif) !important;
+}
+
+/* Typography Utility Classes */
+.text-body {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.text-hero {
+  font-size: clamp(48px, 5vw, 64px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.text-h2 {
+  font-size: clamp(32px, 3.5vw, 36px);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.text-h3 {
+  font-size: clamp(24px, 2.5vw, 28px);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.text-button {
+  font-size: 15px;
+  font-weight: 600;
+}
