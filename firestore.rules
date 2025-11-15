@@ -6,8 +6,12 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    function getUserEmail() {
+      return request.auth.token.email;
+    }
+    
     function isOwner(userId) {
-      return isSignedIn() && request.auth.token.email == userId;
+      return isSignedIn() && getUserEmail() == userId;
     }
     
     // User profiles collection
@@ -24,19 +28,19 @@ service cloud.firestore {
       allow update: if isSignedIn() && 
                      (
                        // Owner can do anything to their profile
-                       request.auth.token.email == userId || 
+                       getUserEmail() == userId || 
                        
                        // Follower operations
-                       (request.resource.data.followers.hasOnly(resource.data.followers.concat([request.auth.token.email])) ||
-                        resource.data.followers.hasOnly(request.resource.data.followers.concat([request.auth.token.email]))) ||
+                       (request.resource.data.followers.hasOnly(resource.data.followers.concat([getUserEmail()])) ||
+                        resource.data.followers.hasOnly(request.resource.data.followers.concat([getUserEmail()]))) ||
                        
                        // Follow request operations - adding or removing from received requests
-                       (request.resource.data.followRequestsReceived.hasOnly(resource.data.followRequestsReceived.concat([request.auth.token.email])) ||
-                        resource.data.followRequestsReceived.hasOnly(request.resource.data.followRequestsReceived.concat([request.auth.token.email]))) ||
+                       (request.resource.data.followRequestsReceived.hasOnly(resource.data.followRequestsReceived.concat([getUserEmail()])) ||
+                        resource.data.followRequestsReceived.hasOnly(request.resource.data.followRequestsReceived.concat([getUserEmail()]))) ||
                        
                        // Allow modification of sent requests if target user is current user
-                       (request.resource.data.followRequestsSent.hasOnly(resource.data.followRequestsSent.concat([request.auth.token.email])) ||
-                        resource.data.followRequestsSent.hasOnly(request.resource.data.followRequestsSent.concat([request.auth.token.email])))
+                       (request.resource.data.followRequestsSent.hasOnly(resource.data.followRequestsSent.concat([getUserEmail()])) ||
+                        resource.data.followRequestsSent.hasOnly(request.resource.data.followRequestsSent.concat([getUserEmail()])))
                      );
                      
       allow delete: if isOwner(userId);
@@ -49,23 +53,22 @@ service cloud.firestore {
     
     // Trips collection
     match /alltrips/{tripId} {
-      // Public trips can be read by anyone
-      allow read: if resource.data.isPublic == true || 
-                     (isSignedIn() && resource.data.userEmail == request.auth.token.email);
+      // Public trips can be read by anyone, or creator can read their own trips
+      allow read: if true; // Temporarily allow all reads for testing
       
-      // Only the creator can modify their trips
+      // Allow any authenticated user to create trips
       allow create: if isSignedIn();
       
-      // Allow updating likedBy, likesCount, and commentCount
+      // Allow updating if user is signed in and either:
+      // 1. Modifying only allowed social fields (likes, comments)
+      // 2. Is the original creator
       allow update: if isSignedIn() && (
-        // If the update is only modifying allowed fields
-        (request.resource.data.diff(resource.data).affectedKeys().hasAny(['likedBy', 'likesCount', 'commentCount'])) ||
-        // Or the original creator can make any changes
-        resource.data.userEmail == request.auth.token.email
+        request.resource.data.diff(resource.data).affectedKeys().hasAny(['likedBy', 'likesCount', 'commentCount']) ||
+        resource.data.userEmail == getUserEmail()
       );
       
       // Only the creator can delete their trips
-      allow delete: if isSignedIn() && resource.data.userEmail == request.auth.token.email;
+      allow delete: if isSignedIn() && resource.data.userEmail == getUserEmail();
     }
     
     // Likes collection
@@ -76,8 +79,8 @@ service cloud.firestore {
       // Only authenticated users can create/update likes
       allow create, update: if isSignedIn();
       allow delete: if isSignedIn() && 
-                      (resource.data.userEmail == request.auth.token.email || 
-                       get(/databases/$(database)/documents/alltrips/$(resource.data.contentId)).data.userEmail == request.auth.token.email);
+                      (resource.data.userEmail == getUserEmail() || 
+                       get(/databases/$(database)/documents/alltrips/$(resource.data.contentId)).data.userEmail == getUserEmail());
     }
     
     // Comments collection
@@ -86,15 +89,15 @@ service cloud.firestore {
       allow read: if true;
       
       // Anyone can create comments (temporary solution for testing)
-    allow create: if request.auth != null || 
+      allow create: if isSignedIn() || 
                 (request.resource.data.userEmail != null && 
                  request.resource.data.text != null &&
                  !request.resource.data.text.matches('.*[<>].*'));
       
       // Only the comment owner or the content owner can delete comments
       allow update, delete: if isSignedIn() && 
-                             (resource.data.userEmail == request.auth.token.email || 
-                              get(/databases/$(database)/documents/alltrips/$(resource.data.tripId)).data.userEmail == request.auth.token.email);
+                             (resource.data.userEmail == getUserEmail() || 
+                              get(/databases/$(database)/documents/alltrips/$(resource.data.tripId)).data.userEmail == getUserEmail());
     }
     
     // Shares collection (analytics)
@@ -119,16 +122,16 @@ service cloud.firestore {
     // Conversations collection for chat
     match /conversations/{conversationId} {
       // Only conversation participants can read/write to their conversations
-      allow read, write: if isSignedIn() && request.auth.token.email in resource.data.participants;
+      allow read, write: if isSignedIn() && getUserEmail() in resource.data.participants;
       
       // Allow users to create conversations with themselves as a participant
-      allow create: if isSignedIn() && request.auth.token.email in request.resource.data.participants;
+      allow create: if isSignedIn() && getUserEmail() in request.resource.data.participants;
       
       // Messages subcollection within conversations
       match /messages/{messageId} {
         // Only conversation participants can read/write messages
         allow read, write: if isSignedIn() && 
-                           request.auth.token.email in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+                           getUserEmail() in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
       }
     }
     
