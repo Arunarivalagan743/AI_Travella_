@@ -100,8 +100,13 @@ export function AuthProvider({ children }) {
       return userData;
     } catch (error) {
       console.error("Firebase Auth error:", error);
-      // Automatic fallback to redirect for environments blocking popups or cookies
-      if (error?.code === 'auth/network-request-failed' || error?.code === 'auth/popup-blocked') {
+      // Automatic fallback to redirect for environments blocking popups or when the popup was closed
+      if (
+        error?.code === 'auth/network-request-failed' ||
+        error?.code === 'auth/popup-blocked' ||
+        error?.code === 'auth/popup-closed-by-user' ||
+        error?.code === 'auth/cancelled-popup-request'
+      ) {
         try {
           const provider = new GoogleAuthProvider();
           provider.addScope('profile');
