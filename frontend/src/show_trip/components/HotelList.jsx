@@ -16,6 +16,11 @@ function HotelList({ hotels }) {
   const [hotelDetails, setHotelDetails] = useState({});
   const [loading, setLoading] = useState({});
   
+  // Debug: Log hotels data
+  console.log("HotelList received hotels:", hotels);
+  console.log("Hotels type:", typeof hotels);
+  console.log("Is hotels array?", Array.isArray(hotels));
+  
   useEffect(() => {
     // Fetch place details for each hotel
     const fetchPlaceDetails = async (hotel) => {

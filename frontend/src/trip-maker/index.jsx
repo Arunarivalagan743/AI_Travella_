@@ -163,7 +163,10 @@ function CreateTrip() {
         likedBy: []
       };
       
-      console.log("Saving trip to Firestore:", { docId, userEmail: user.email });
+      console.log("=== SAVING TRIP DEBUG ===");
+      console.log("Generated AI Trip Data:", tripData);
+      console.log("Final trip document structure:", tripDocument);
+      console.log("=== END SAVE DEBUG ===");
       
       await setDoc(doc(db, "alltrips", docId), tripDocument);
       

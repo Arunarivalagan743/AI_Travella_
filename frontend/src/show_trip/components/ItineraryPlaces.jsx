@@ -617,7 +617,14 @@ const SimpleItinerary = ({ itineraryData }) => {
 
   // Process and normalize itinerary data
   useEffect(() => {
-    if (!itineraryData || itineraryData.length === 0) return;
+    console.log("ItineraryPlaces received data:", itineraryData);
+    console.log("Itinerary data type:", typeof itineraryData);
+    console.log("Is itinerary array?", Array.isArray(itineraryData));
+    
+    if (!itineraryData || itineraryData.length === 0) {
+      console.log("No itinerary data provided or empty array");
+      return;
+    }
     
     console.log("Original itinerary data:", itineraryData);
     setIsLoading(true);

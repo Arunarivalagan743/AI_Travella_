@@ -109,7 +109,13 @@ function ViewTrip() {
             const docSnap = await getDoc(docRef);
             
             if (docSnap.exists()) {
-                setTripData(docSnap.data());
+                const data = docSnap.data();
+                console.log("=== TRIP DATA DEBUG ===");
+                console.log("Full Firestore document:", data);
+                console.log("Trip data structure:", data.tripData);
+                console.log("User selection:", data.userSelection);
+                console.log("=== END DEBUG ===");
+                setTripData(data);
             } else {
                 setError("Trip not found");
             }

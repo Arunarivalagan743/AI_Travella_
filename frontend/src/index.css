@@ -16,6 +16,30 @@
   font-family: var(--font-family-sans);
 }
 
+/* Prevent text overlap and improve readability */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Ensure proper text spacing */
+.leading-tight {
+  line-height: 1.25;
+}
+
+.leading-normal {
+  line-height: 1.5;
+}
+
 /* Body Text - Inter 400, 16px, line-height 1.5 */
 body {
   font-family: var(--font-family-sans);

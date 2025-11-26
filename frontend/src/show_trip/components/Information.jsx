@@ -477,8 +477,81 @@ function Information({ trip }) {
           >
             {/* Tab Content */}
             {activeTab === 'overview' && <TripSummary trip={trip} />}
-            {activeTab === 'hotels' && <HotelList hotels={trip?.tripData?.hotelsList || []} />}
-            {activeTab === 'itinerary' && <SimpleItinerary itineraryData={trip.tripData?.itinerary || []} />}
+            {activeTab === 'hotels' && (
+              (() => {
+                // Debug: Log the trip data structure
+                console.log("Full trip data:", trip);
+                console.log("Trip data structure:", trip?.tripData);
+                
+                // Try different possible hotel data locations
+                let hotelsList = [];
+                
+                // Check multiple possible locations for hotels data
+                if (trip?.tripData?.hotelsList && Array.isArray(trip.tripData.hotelsList)) {
+                  hotelsList = trip.tripData.hotelsList;
+                } else if (trip?.tripData?.hotels && Array.isArray(trip.tripData.hotels)) {
+                  hotelsList = trip.tripData.hotels;
+                } else if (trip?.hotels && Array.isArray(trip.hotels)) {
+                  hotelsList = trip.hotels;
+                } else if (trip?.travelPlan?.hotelsList && Array.isArray(trip.travelPlan.hotelsList)) {
+                  hotelsList = trip.travelPlan.hotelsList;
+                } else if (trip?.travelPlan?.hotels && Array.isArray(trip.travelPlan.hotels)) {
+                  hotelsList = trip.travelPlan.hotels;
+                } else if (trip?.tripData?.travelPlan?.hotelsList && Array.isArray(trip.tripData.travelPlan.hotelsList)) {
+                  hotelsList = trip.tripData.travelPlan.hotelsList;
+                } else if (trip?.tripData?.travelPlan?.hotels && Array.isArray(trip.tripData.travelPlan.hotels)) {
+                  hotelsList = trip.tripData.travelPlan.hotels;
+                }
+                                 
+                console.log("Hotels data found:", hotelsList);
+                console.log("Hotels array length:", hotelsList?.length || 0);
+                
+                return <HotelList hotels={hotelsList} />;
+              })()
+            )}
+            {activeTab === 'itinerary' && (
+              (() => {
+                // Try different possible itinerary data locations
+                let itineraryData = [];
+                
+                // Check if itinerary is in travelPlan and convert object format to array
+                const travelPlanItinerary = trip?.tripData?.travelPlan?.itinerary;
+                
+                if (travelPlanItinerary && typeof travelPlanItinerary === 'object' && !Array.isArray(travelPlanItinerary)) {
+                  console.log("Found itinerary in travelPlan object format:", travelPlanItinerary);
+                  
+                  // Convert day1, day2, etc. object format to array format
+                  itineraryData = [];
+                  Object.keys(travelPlanItinerary).forEach(dayKey => {
+                    const dayNumber = parseInt(dayKey.replace('day', ''));
+                    const places = travelPlanItinerary[dayKey];
+                    
+                    if (Array.isArray(places)) {
+                      itineraryData.push({
+                        day: dayNumber,
+                        places: places
+                      });
+                    }
+                  });
+                  
+                  // Sort by day number
+                  itineraryData.sort((a, b) => a.day - b.day);
+                } else if (trip?.tripData?.itinerary && Array.isArray(trip.tripData.itinerary)) {
+                  itineraryData = trip.tripData.itinerary;
+                } else if (trip?.itinerary && Array.isArray(trip.itinerary)) {
+                  itineraryData = trip.itinerary;
+                } else if (trip?.travelPlan?.itinerary && Array.isArray(trip.travelPlan.itinerary)) {
+                  itineraryData = trip.travelPlan.itinerary;
+                } else if (trip?.tripData?.travelPlan?.itinerary && Array.isArray(trip.tripData.travelPlan.itinerary)) {
+                  itineraryData = trip.tripData.travelPlan.itinerary;
+                }
+                                    
+                console.log("Final itinerary data:", itineraryData);
+                console.log("Itinerary array length:", itineraryData?.length || 0);
+                
+                return <SimpleItinerary itineraryData={itineraryData} />;
+              })()
+            )}
           
           </motion.div>
         </AnimatePresence>

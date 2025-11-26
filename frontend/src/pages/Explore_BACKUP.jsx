@@ -850,441 +850,422 @@ function Explore() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-first responsive container */}
-      <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-2 sm:py-4 lg:py-6 max-w-6xl">
-        {/* Compact Search Bar */}
-        <div className="mb-4 sm:mb-6 relative" ref={searchRef}>
-          <div className="flex items-center bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-            <div className="flex-1 relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
-              <input 
-                type="text" 
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder="Search destinations, activities..."
-                className="w-full pl-10 pr-10 py-2.5 sm:py-3 text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-inset rounded-lg"
-                onFocus={() => {
-                  if (searchQuery.length > 2) setShowSearchResults(true);
-                  if (recentSearches.length > 0 || searchQuery.length > 2) setShowKeywordSuggestions(true);
-                }}
-              />
-              {searchQuery && (
-                <button 
-                  onClick={clearSearch}
-                  className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
-                >
-                  <FaTimes className="text-xs sm:text-sm" />
-                </button>
-              )}
-            </div>
-            <button 
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 sm:px-5 py-2.5 sm:py-3 transition-colors"
-              onClick={() => {
-                if (searchQuery) {
-                  performSearch(searchQuery);
-                  saveToRecentSearches(searchQuery);
-                }
+    <div className="container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 max-w-7xl">
+      {/* Search Bar */}
+      <div className="mb-8 relative" ref={searchRef}>
+        <div className="flex items-center bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="flex-1 relative">
+            <input 
+              type="text" 
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search for destinations, experiences, or travel types..."
+              className="w-full px-4 py-3 text-gray-700 focus:outline-none"
+              onFocus={() => {
+                if (searchQuery.length > 2) setShowSearchResults(true);
+                if (recentSearches.length > 0 || searchQuery.length > 2) setShowKeywordSuggestions(true);
               }}
-            >
-              <FaSearch className="text-sm sm:text-base" />
-            </button>
+            />
+            {searchQuery && (
+              <button 
+                onClick={clearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <FaTimes />
+              </button>
+            )}
           </div>
+          <button 
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 transition-colors"
+            onClick={() => {
+              if (searchQuery) {
+                performSearch(searchQuery);
+                saveToRecentSearches(searchQuery);
+              }
+            }}
+          >
+            <FaSearch />
+          </button>
+        </div>
         
-          {/* Compact Keyword/Recent Search Suggestions */}
-          {showKeywordSuggestions && (
-            <div className="absolute z-20 top-full left-0 right-0 bg-white rounded-b-lg sm:rounded-b-xl shadow-lg border border-gray-200 mt-1 p-2 sm:p-3 max-h-64 overflow-y-auto">
-              {isSearching ? (
-                <div className="flex justify-center p-3 sm:p-4">
-                  <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-emerald-500"></div>
-                </div>
-              ) : (
-                <>
-                  {recentSearches.length > 0 && (
-                    <div className="mb-2 sm:mb-3">
-                      <h3 className="text-xs font-medium text-gray-500 mb-1.5 sm:mb-2">RECENT</h3>
-                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                        {recentSearches.map((search, index) => (
-                          <button
-                            key={`recent-${index}`}
-                            onClick={() => searchWithKeyword(search)}
-                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs sm:text-sm rounded transition-colors"
-                          >
-                            {search}
-                          </button>
-                        ))}
-                      </div>
+        {/* Keyword/Recent Search Suggestions */}
+        {showKeywordSuggestions && (
+          <div className="absolute z-20 top-full left-0 right-0 bg-white rounded-b-xl shadow-lg border border-gray-200 mt-1 p-3">
+            {isSearching ? (
+              <div className="flex justify-center p-4">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500"></div>
+              </div>
+            ) : (
+              <>
+                {recentSearches.length > 0 && (
+                  <div className="mb-3">
+                    <h3 className="text-xs font-medium text-gray-500 mb-2">RECENT SEARCHES</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {recentSearches.map((search, index) => (
+                        <button
+                          key={`recent-${index}`}
+                          onClick={() => searchWithKeyword(search)}
+                          className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-md transition-colors"
+                        >
+                          {search}
+                        </button>
+                      ))}
                     </div>
-                  )}
-                  
-                  {searchKeywords.length > 0 && (
+                  </div>
+                )}
+                
+                {searchKeywords.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-medium text-gray-500 mb-2">SUGGESTED PLACES & ACTIVITIES</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {searchKeywords.map((keyword, index) => (
+                        <button
+                          key={`keyword-${index}`}
+                          onClick={() => searchWithKeyword(keyword)}
+                          className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-md transition-colors"
+                        >
+                          {keyword}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+        
+        {/* Search Results Display */}
+        {showSearchResults && (
+          <div className="mt-6 bg-white rounded-xl shadow-md p-4 border border-gray-100">
+            <h2 className="text-lg font-medium text-gray-800 mb-4">Search Results for "{searchQuery}"</h2>
+            
+            {searchResults.length === 0 && (
+              <div className="text-center py-8">
+                <FaSuitcase className="mx-auto text-gray-300 text-5xl mb-4" />
+                <h3 className="text-xl font-medium text-gray-700">No trips found</h3>
+                <p className="text-gray-500 mt-2">Try a different search term or explore trending trips below</p>
+              </div>
+            )}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {searchResults.slice(0, 6).map((trip) => {
+                const location = trip.userSelection?.location || 
+                              trip.userSelection?.place?.label || 
+                              "Unknown Location";
+                return (
+                  <Link 
+                    to={`/show-trip/${trip.id}`} 
+                    key={trip.id}
+                    className="flex gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
+                  >
+                    <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
+                      <img 
+                        src={placeImages[trip.id] || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1121&q=80"} 
+                        alt={location} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <div>
-                      <h3 className="text-xs font-medium text-gray-500 mb-1.5 sm:mb-2">SUGGESTIONS</h3>
-                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                        {searchKeywords.slice(0, 8).map((keyword, index) => (
-                          <button
-                            key={`keyword-${index}`}
-                            onClick={() => searchWithKeyword(keyword)}
-                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs sm:text-sm rounded transition-colors"
-                          >
-                            {keyword}
-                          </button>
-                        ))}
+                      <h3 className="font-medium text-gray-800">{location}</h3>
+                      <p className="text-sm text-gray-500 mb-1">
+                        {formatTravelType(trip.userSelection?.travelType)}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <FaHeart className="text-red-500" />
+                        <span>{trip.likesCount || 0} likes</span>
                       </div>
                     </div>
-                  )}
-                </>
-              )}
+                  </Link>
+                );
+              })}
             </div>
-          )}
-        
-          {/* Compact Search Results Display */}
-          {showSearchResults && (
-            <div className="mt-3 sm:mt-4 bg-white rounded-lg sm:rounded-xl shadow-md p-3 sm:p-4 border border-gray-100">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h2 className="text-sm sm:text-lg font-medium text-gray-800 truncate">Results for "{searchQuery}"</h2>
+            
+            {searchResults.length > 6 && (
+              <div className="mt-4 text-center">
                 <button 
-                  onClick={() => setShowSearchResults(false)}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                  onClick={() => setShowSearchResults(false)} 
+                  className="text-emerald-600 hover:text-emerald-700 text-sm font-medium"
                 >
-                  <FaTimes className="text-xs" />
+                  Show all {searchResults.length} results
                 </button>
               </div>
-              
-              {searchResults.length === 0 ? (
-                <div className="text-center py-6 sm:py-8">
-                  <FaSuitcase className="mx-auto text-gray-300 text-3xl sm:text-5xl mb-3 sm:mb-4" />
-                  <h3 className="text-lg sm:text-xl font-medium text-gray-700">No trips found</h3>
-                  <p className="text-sm sm:text-base text-gray-500 mt-1 sm:mt-2">Try a different search term</p>
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-2 sm:space-y-3">
-                    {searchResults.slice(0, 4).map((trip) => {
-                      const location = trip.userSelection?.location || 
-                                    trip.userSelection?.place?.label || 
-                                    "Unknown Location";
-                      return (
-                        <Link 
-                          to={`/show-trip/${trip.id}`} 
-                          key={trip.id}
-                          className="flex items-center gap-3 p-2 sm:p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
-                        >
-                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
-                            <img 
-                              src={placeImages[trip.id] || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1121&q=80"} 
-                              alt={location} 
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-sm sm:text-base text-gray-800 truncate">{location}</h3>
-                            <p className="text-xs sm:text-sm text-gray-500 mb-1">
-                              {formatTravelType(trip.userSelection?.travelType)}
-                            </p>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <FaHeart className="text-red-500" />
-                              <span>{trip.likesCount || 0}</span>
-                              <span className="text-gray-300">•</span>
-                              <span>{trip.userSelection?.duration || 0}d</span>
-                            </div>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                  
-                  {searchResults.length > 4 && (
-                    <div className="mt-3 sm:mt-4 text-center">
-                      <button 
-                        onClick={() => setShowSearchResults(false)} 
-                        className="text-emerald-600 hover:text-emerald-700 text-xs sm:text-sm font-medium"
-                      >
-                        View all {searchResults.length} results
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
+            )}
+          </div>
+        )}
       </div>
       
-        {/* Compact Header */}
-        <div className="flex items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Explore</h1>
-          
-          {/* Compact View mode toggle */}
-          <div className="bg-gray-100 rounded-lg p-0.5 sm:p-1 flex">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">Explore Trips</h1>
+        
+        {/* View mode toggle */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="bg-gray-100 rounded-lg p-1 flex">
             <button
               onClick={() => setViewMode('trending')}
-              className={`px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors ${
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'trending' 
                   ? 'bg-white shadow-sm text-emerald-700' 
                   : 'text-gray-600 hover:bg-gray-200'
               }`}
             >
-              🔥 Hot
+              Trending
             </button>
             <button
               onClick={() => setViewMode('recent')}
-              className={`px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors ${
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'recent'
                   ? 'bg-white shadow-sm text-emerald-700'
                   : 'text-gray-600 hover:bg-gray-200'
               }`}
             >
-              🆕 New
+              Recent
             </button>
             {user && (
               <button
                 onClick={() => setViewMode('following')}
-                className={`px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors ${
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   viewMode === 'following'
                     ? 'bg-white shadow-sm text-emerald-700'
                     : 'text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                👥 Following
+                Following
               </button>
             )}
           </div>
         </div>
+      </div>
       
-        {/* Compact Popular keywords display */}
-        {!searchQuery && !showSearchResults && (
-          <div className="mb-4 sm:mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <h3 className="text-xs sm:text-sm font-medium text-gray-600 flex-shrink-0">Popular:</h3>
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {fetchPopularKeywords().slice(0, 5).map((keyword, index) => (
-                  <button
-                    key={`popular-${index}`}
-                    onClick={() => searchWithKeyword(keyword)}
-                    className="px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs sm:text-sm rounded transition-colors flex items-center gap-1"
-                  >
-                    <FaMapMarkerAlt className="text-emerald-600" size={10} />
-                    <span className="truncate max-w-20 sm:max-w-none">{keyword}</span>
-                  </button>
-                ))}
-              </div>
+      {/* Popular keywords display */}
+      {!searchQuery && !showSearchResults && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <h3 className="text-sm font-medium text-gray-600">Popular Destinations:</h3>
+            <div className="flex flex-wrap gap-2">
+              {fetchPopularKeywords().slice(0, 6).map((keyword, index) => (
+                <button
+                  key={`popular-${index}`}
+                  onClick={() => searchWithKeyword(keyword)}
+                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-sm rounded-md transition-colors flex items-center gap-1"
+                >
+                  <FaMapMarkerAlt className="text-emerald-600" size={12} />
+                  <span>{keyword}</span>
+                </button>
+              ))}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {trips.length === 0 ? (
-          <div className="bg-white rounded-lg sm:rounded-xl p-6 sm:p-8 lg:p-12 text-center shadow-sm border border-gray-100">
-            <FaSuitcase className="mx-auto text-gray-300 text-4xl sm:text-5xl mb-3 sm:mb-4" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-2">
-              {viewMode === 'following' ? "No trips from followers" : "No trips yet"}
-            </h2>
-            <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6 max-w-md mx-auto">
-              {viewMode === 'following' 
-                ? "Follow more users to see their amazing journeys here!" 
-                : "Be the first to share your travel adventures with the community!"}
-            </p>
-            {viewMode === 'following' ? (
-              <button 
-                onClick={() => setViewMode('recent')}
-                className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base transition-all shadow-md hover:shadow-lg"
-              >
-                Explore Recent Trips
-              </button>
-            ) : (
-              <Link 
-                to="/create-trip" 
-                className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base transition-all shadow-md hover:shadow-lg"
-              >
-                Create A Trip
-              </Link>
-            )}
-          </div>
-        ) : (
-          <>
-            {/* Responsive grid layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-              {trips.map((trip) => {
-                const location = trip.userSelection?.location || trip.userSelection?.place?.label || "Unknown Location";
-                const travelType = trip.userSelection?.travelType || "adventure";
-                const tripImage = getTripImage(trip);
-                const userProfile = userProfiles[trip.userEmail] || { 
-                  displayName: trip.userEmail ? trip.userEmail.split('@')[0] : "Anonymous",
-                  photoURL: null
-                };
-                const isLiked = trip.likedBy?.includes(user?.email);
-                const isCurrentUserFollowing = userProfiles[user?.email]?.following?.includes(trip.userEmail);
-                const hasRequestedFollow = userProfiles[user?.email]?.followRequestsSent?.includes(trip.userEmail);
-                const hasReceivedRequest = userProfiles[user?.email]?.followRequestsReceived?.includes(trip.userEmail);
-                const followStatus = isCurrentUserFollowing ? 'following' : 
-                                     hasRequestedFollow ? 'requested' : 
-                                     hasReceivedRequest ? 'pending' : 'none';
-                
-                return (
-                  <motion.div
-                    key={trip.id}
-                    className="bg-white rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all border border-gray-100"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {/* Compact Header with user info */}
-                    <div className="p-3 sm:p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                          {userProfile.photoURL ? (
-                            <img 
-                              src={userProfile.photoURL} 
-                              alt={userProfile.displayName}
-                              className="w-full h-full object-cover" 
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-emerald-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                              {userProfile.displayName.charAt(0).toUpperCase()}
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <Link to={`/user/${trip.userEmail}`} className="hover:underline">
-                            <h3 className="font-semibold text-sm sm:text-base truncate">{userProfile.displayName}</h3>
-                          </Link>
-                          <p className="text-xs text-gray-500">{formatDate(trip.createdAt)}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-1 sm:gap-2">
-                        {user && user.email !== trip.userEmail && (
-                          <button
-                            onClick={() => toggleFollow(trip.userEmail)}
-                            className={`text-xs px-2 sm:px-3 py-1 rounded-full transition-colors ${
-                              followStatus === 'following'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : followStatus === 'requested'
-                                  ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
-                                  : followStatus === 'pending'
-                                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                    : 'bg-emerald-600 text-white'
-                            }`}
-                          >
-                            {followStatus === 'following' ? '✓' : 
-                             followStatus === 'requested' ? '⏳' :
-                             followStatus === 'pending' ? '✓' : '+'}
-                          </button>
-                        )}
-                        
-                        <button className="p-1 text-gray-400 hover:text-gray-600">
-                          <FaEllipsisH size={12} />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Compact Trip image */}
-                    <Link to={`/show-trip/${trip.id}`} className="block">
-                      <div className="relative aspect-[16/10] sm:aspect-[4/3] bg-gray-100">
-                        {/* Loading indicator for images */}
-                        {loadingImages[trip.id] && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 z-10">
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+      {trips.length === 0 ? (
+        <div className="bg-gray-50 rounded-xl p-12 text-center shadow-sm">
+          <FaSuitcase className="mx-auto text-gray-300 text-5xl mb-4" />
+          <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+            {viewMode === 'following' ? "No trips from people you follow" : "No trips available"}
+          </h2>
+          <p className="text-gray-500 mb-6">
+            {viewMode === 'following' 
+              ? "Follow more users to see their trips here!" 
+              : "Be the first to share your travel adventures!"}
+          </p>
+          {viewMode === 'following' ? (
+            <button 
+              onClick={() => setViewMode('recent')}
+              className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-all shadow-md hover:shadow-lg"
+            >
+              Explore Recent Trips
+            </button>
+          ) : (
+            <Link 
+              to="/create-trip" 
+              className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-all shadow-md hover:shadow-lg"
+            >
+              Create A Trip
+            </Link>
+          )}
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-8">
+            {trips.map((trip) => {
+              const location = trip.userSelection?.location || trip.userSelection?.place?.label || "Unknown Location";
+              const travelType = trip.userSelection?.travelType || "adventure";
+              const tripImage = getTripImage(trip);
+              const userProfile = userProfiles[trip.userEmail] || { 
+                displayName: trip.userEmail ? trip.userEmail.split('@')[0] : "Anonymous",
+                photoURL: null
+              };
+              const isLiked = trip.likedBy?.includes(user?.email);
+              const isCurrentUserFollowing = userProfiles[user?.email]?.following?.includes(trip.userEmail);
+              const hasRequestedFollow = userProfiles[user?.email]?.followRequestsSent?.includes(trip.userEmail);
+              const hasReceivedRequest = userProfiles[user?.email]?.followRequestsReceived?.includes(trip.userEmail);
+              const followStatus = isCurrentUserFollowing ? 'following' : 
+                                   hasRequestedFollow ? 'requested' : 
+                                   hasReceivedRequest ? 'pending' : 'none';
+              
+              return (
+                <motion.div
+                  key={trip.id}
+                  className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-100"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {/* Header with user info */}
+                  <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                        {userProfile.photoURL ? (
+                          <img 
+                            src={userProfile.photoURL} 
+                            alt={userProfile.displayName}
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-emerald-500 flex items-center justify-center text-white font-bold">
+                            {userProfile.displayName.charAt(0).toUpperCase()}
                           </div>
                         )}
-                        
-                        <img 
-                          src={tripImage} 
-                          alt={location}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1121&q=80";
-                          }}
-                        />
-                        
-                        {/* Overlay badges */}
-                        <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
-                          {trip.userSelection?.duration || 0}d
-                        </div>
                       </div>
-                    </Link>
-                    
-                    {/* Compact Trip details */}
-                    <div className="p-3 sm:p-4">
-                      <div className="mb-3">
-                        <Link to={`/show-trip/${trip.id}`}>
-                          <h3 className="font-bold text-base sm:text-lg mb-1 text-gray-800 hover:text-emerald-700 transition-colors line-clamp-1">{location}</h3>
+                      <div>
+                        <Link to={`/user/${trip.userEmail}`} className="hover:underline">
+                          <h3 className="font-semibold">{userProfile.displayName}</h3>
                         </Link>
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-2">
-                          <FaSuitcase className="text-emerald-600" size={12} />
-                          <span className="truncate">{formatTravelType(travelType)}</span>
-                          <span className="text-gray-300">•</span>
-                          <span>{trip.userSelection?.travelers || 1}p</span>
-                        </div>
-                        
-                        {trip.tripData?.summary && (
-                          <p className="text-gray-600 text-xs sm:text-sm line-clamp-2">
-                            {trip.tripData.summary}
-                          </p>
-                        )}
-                      </div>
-                      
-                      {/* Neat Social interactions and actions */}
-                      <div className="flex items-center gap-3 mt-1">
-                        <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
-                          <SocialInteractions
-                            tripId={trip.id}
-                            creatorEmail={trip.userEmail}
-                            likedBy={trip.likedBy || []}
-                            likesCount={trip.likesCount || 0}
-                            commentsCount={trip.commentCount || 0}
-                            isFollowing={followStatus === 'following'}
-                            followRequestStatus={followStatus === 'requested' ? 'requested' : 
-                                                followStatus === 'pending' ? 'pending' : 'none'}
-                            onCommentClick={() => {
-                              setCurrentTripId(trip.id);
-                              setCommentsOpen(true);
-                            }}
-                            onUpdate={(updatedData) => {
-                              setTrips(trips.map(t => 
-                                t.id === trip.id ? { ...t, ...updatedData } : t
-                              ));
-                            }}
-                          />
-                        </div>
-                        
-                       
+                        <p className="text-xs text-gray-500">{formatDate(trip.createdAt)}</p>
                       </div>
                     </div>
-                  </motion.div>
+                    
+                    <div className="flex items-center gap-2">
+                      {user && user.email !== trip.userEmail && (
+                        <button
+                          onClick={() => toggleFollow(trip.userEmail)}
+                          className={`text-xs px-3 py-1 rounded-full transition-colors ${
+                            followStatus === 'following'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : followStatus === 'requested'
+                                ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+                                : followStatus === 'pending'
+                                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                  : 'bg-emerald-600 text-white'
+                          }`}
+                        >
+                          {followStatus === 'following' ? 'Following' : 
+                           followStatus === 'requested' ? 'Requested' :
+                           followStatus === 'pending' ? 'Accept' : 'Follow'}
+                        </button>
+                      )}
+                      
+                      <button className="p-1 text-gray-500 hover:text-gray-700">
+                        <FaEllipsisH size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Trip image */}
+                  <div className="relative aspect-[4/3] bg-gray-100">
+                    {/* Loading indicator for images */}
+                    {loadingImages[trip.id] && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 z-10">
+                        <div className="flex flex-col items-center">
+                          <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-1"></div>
+                          <span className="text-xs text-gray-500">Loading image...</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <img 
+                      src={tripImage} 
+                      alt={location}
+                      className="w-full h-full object-cover transition-transform duration-700"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1121&q=80";
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Trip details and interaction */}
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <SocialInteractions
+                        tripId={trip.id}
+                        creatorEmail={trip.userEmail}
+                        likedBy={trip.likedBy || []}
+                        likesCount={trip.likesCount || 0}
+                        commentsCount={trip.commentCount || 0}
+                        isFollowing={followStatus === 'following'}
+                        followRequestStatus={followStatus === 'requested' ? 'requested' : 
+                                            followStatus === 'pending' ? 'pending' : 'none'}
+                        onCommentClick={() => {
+                          setCurrentTripId(trip.id);
+                          setCommentsOpen(true);
+                        }}
+                        onUpdate={(updatedData) => {
+                          setTrips(trips.map(t => 
+                            t.id === trip.id ? { ...t, ...updatedData } : t
+                          ));
+                        }}
+                      />
+                      
+                      <Link 
+                        to={`/show-trip/${trip.id}`}
+                        className="text-sm text-emerald-600 font-medium hover:text-emerald-700"
+                      >
+                        View Trip
+                      </Link>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <h3 className="font-bold text-xl mb-1 text-gray-800">{location}</h3>
+                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                        <FaSuitcase className="text-emerald-600" size={14} />
+                        <span>{formatTravelType(travelType)}</span>
+                        <span className="text-gray-400">•</span>
+                        <span>{trip.userSelection?.duration || 0} {trip.userSelection?.duration === 1 ? 'Day' : 'Days'}</span>
+                        <span className="text-gray-400">•</span>
+                        <span>{trip.userSelection?.travelers || 1} {trip.userSelection?.travelers === 1 ? 'Traveler' : 'Travelers'}</span>
+                      </div>
+                      
+                      {trip.tripData?.summary && (
+                        <p className="text-gray-600 text-sm line-clamp-2">
+                          {trip.tripData.summary}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
               );
             })}
           </div>
           
           {/* Load more button */}
           {hasMoreTrips && (
-              <div className="col-span-full flex justify-center mt-4 sm:mt-6 mb-4">
-                <button 
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 sm:py-2.5 px-4 sm:px-6 rounded-full flex items-center gap-2 disabled:opacity-50 text-sm sm:text-base transition-colors"
-                  onClick={loadMoreTrips}
-                  disabled={loadingMore}
-                >
-                  {loadingMore ? (
-                    <>
-                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
-                      Loading...
-                    </>
-                  ) : (
-                    "Load More"
-                  )}
-                </button>
-              </div>
-            )}
-          </>
-        )}
-        
-        {/* Comments modal */}
-        <Comments 
-          tripId={currentTripId}
-          isOpen={commentsOpen}
-          onClose={() => setCommentsOpen(false)}
-        />
-      </div>
+            <div className="flex justify-center mt-8 mb-4">
+              <button 
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-6 rounded-full flex items-center gap-2 disabled:opacity-50"
+                onClick={loadMoreTrips}
+                disabled={loadingMore}
+              >
+                {loadingMore ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+                    Loading...
+                  </>
+                ) : (
+                  "Load More Trips"
+                )}
+              </button>
+            </div>
+          )}
+        </>
+      )}
+      {/* Comments modal */}
+      <Comments 
+        tripId={currentTripId}
+        isOpen={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+      />
     </div>
   );
 }

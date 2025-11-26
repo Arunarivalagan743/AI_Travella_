@@ -30,6 +30,10 @@ function TripSummary({ trip }) {
     commentsCount: 0
   });
   
+  // Debug: Log trip data structure
+  console.log("TripSummary received trip data:", trip);
+  console.log("Trip data travelPlan:", trip?.tripData?.travelPlan);
+  
   useEffect(() => {
     if (trip?.id) {
       fetchTripStats();
@@ -119,13 +123,13 @@ function TripSummary({ trip }) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Temperature</p>
-              <p className="font-medium">{trip?.tripData?.weatherForecast?.averageTemperature || "Not available"}</p>
+              <p className="font-medium">{trip?.tripData?.travelPlan?.weather?.averageTemperature || trip?.tripData?.weatherForecast?.averageTemperature || "Not available"}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Conditions</p>
               <div className="flex items-center">
                 <FaSun className="text-amber-500 mr-1" />
-                <p className="font-medium">{trip?.tripData?.weatherForecast?.weatherPrediction?.[0] || "Not available"}</p>
+                <p className="font-medium">{trip?.tripData?.travelPlan?.weather?.weatherPrediction?.[0] || trip?.tripData?.weatherForecast?.weatherPrediction?.[0] || "Not available"}</p>
               </div>
             </div>
           </div>
@@ -144,7 +148,7 @@ function TripSummary({ trip }) {
             <div>
               <p className="font-medium">From Airport</p>
               <p className="text-gray-600 text-sm">
-                {trip?.tripData?.transportSuggestions?.airportToHotelTransport || "Not specified"}
+                {trip?.tripData?.travelPlan?.transport?.airportToHotelTransport || trip?.tripData?.transportSuggestions?.airportToHotelTransport || "Not specified"}
               </p>
             </div>
           </div>
@@ -152,8 +156,8 @@ function TripSummary({ trip }) {
           <div className="mt-3">
             <p className="font-medium mb-1">Local Transport Options</p>
             <div className="flex flex-wrap gap-2 mt-1">
-              {trip?.tripData?.transportSuggestions?.localTransportOptions?.length > 0 ? (
-                trip.tripData.transportSuggestions.localTransportOptions.map((option, index) => (
+              {(trip?.tripData?.travelPlan?.transport?.localTransportOptions || trip?.tripData?.transportSuggestions?.localTransportOptions)?.length > 0 ? (
+                (trip?.tripData?.travelPlan?.transport?.localTransportOptions || trip?.tripData?.transportSuggestions?.localTransportOptions).map((option, index) => (
                   <span key={index} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-xs">
                     {option}
                   </span>
@@ -167,7 +171,7 @@ function TripSummary({ trip }) {
           <div className="mt-3">
             <p className="font-medium">Estimated Daily Transport Cost</p>
             <p className="text-gray-600 text-sm">
-              {trip?.tripData?.transportSuggestions?.estimatedDailyCost || "Not specified"}
+              {trip?.tripData?.travelPlan?.transport?.estimatedDailyCost || trip?.tripData?.transportSuggestions?.estimatedDailyCost || "Not specified"}
             </p>
           </div>
         </div>
@@ -178,8 +182,8 @@ function TripSummary({ trip }) {
             <h3 className="font-semibold text-amber-700">Safety Tips</h3>
           </div>
           <ul className="text-sm text-gray-600 list-disc pl-5 space-y-1">
-            {trip?.tripData?.safetyTips?.locationPrecautions?.length > 0 ? (
-              trip.tripData.safetyTips.locationPrecautions.map((tip, index) => (
+            {(trip?.tripData?.travelPlan?.safety?.locationPrecautions || trip?.tripData?.safetyTips?.locationPrecautions)?.length > 0 ? (
+              (trip?.tripData?.travelPlan?.safety?.locationPrecautions || trip?.tripData?.safetyTips?.locationPrecautions).map((tip, index) => (
                 <li key={index}>{tip}</li>
               ))
             ) : (
@@ -187,13 +191,13 @@ function TripSummary({ trip }) {
             )}
           </ul>
           <div className="mt-2">
-            <p className="text-xs text-gray-500">Safe Hours: {trip?.tripData?.safetyTips?.safeHoursToTravel || "Not specified"}</p>
+            <p className="text-xs text-gray-500">Safe Hours: {trip?.tripData?.travelPlan?.safety?.safeHoursToTravel || trip?.tripData?.safetyTips?.safeHoursToTravel || "Not specified"}</p>
           </div>
-          {trip?.tripData?.safetyTips?.emergencyNumbers && (
+          {(trip?.tripData?.travelPlan?.safety?.emergencyNumbers || trip?.tripData?.safetyTips?.emergencyNumbers) && (
             <div className="flex items-center mt-2">
               <FaAmbulance className="text-red-500 mr-2" />
               <p className="text-sm font-medium text-red-600">
-                Emergency: {trip.tripData.safetyTips.emergencyNumbers.join(', ')}
+                Emergency: {(trip?.tripData?.travelPlan?.safety?.emergencyNumbers || trip?.tripData?.safetyTips?.emergencyNumbers).join(', ')}
               </p>
             </div>
           )}

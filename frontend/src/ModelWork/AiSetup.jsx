@@ -157,6 +157,14 @@ Provide ONLY valid JSON with NO explanations or comments outside the JSON. Do no
         jsonData = method();
         if (jsonData) {
           console.log("Successfully parsed JSON using extraction method");
+          console.log("=== AI GENERATED DATA DEBUG ===");
+          console.log("Parsed JSON data:", jsonData);
+          console.log("Data structure keys:", Object.keys(jsonData));
+          if (jsonData.travelPlan) {
+            console.log("Travel plan structure:", jsonData.travelPlan);
+            console.log("Travel plan keys:", Object.keys(jsonData.travelPlan));
+          }
+          console.log("=== END AI DEBUG ===");
           break;
         }
       }
