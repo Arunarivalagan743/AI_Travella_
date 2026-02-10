@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getGeminiModel } from "./geminiClient";
 
 const AiSetup = () => {
   const [travelData, setTravelData] = useState(null);
@@ -10,11 +10,8 @@ const AiSetup = () => {
     setLoading(true);
     setError(null);
     try {
-      // Initialize the API with your API key
-      const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GEMINI_API_KEY);
-      
-      // Use gemini-2.0-flash-exp model (latest available)
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+      // Initialize Gemini model (defaults to gemini-1.5-flash)
+      const model = getGeminiModel();
 
       const prompt = `Generate a detailed Travel Plan in JSON format for:
 

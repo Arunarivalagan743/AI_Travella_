@@ -189,7 +189,7 @@ frontend/
 5. **AI Generation** - Gemini AI creates comprehensive itinerary
 6. **Review & Save** - View, edit, and save generated plans
 7. **Social Sharing** - Share your trip with followers or make it public
-
+<!-- https://generativelanguage.googleapis.com/v1beta/models?key= see the list of models -->
 ### AI Integration
 - **Prompt Engineering**: Carefully crafted prompts for optimal AI responses
 - **JSON Validation**: Robust parsing and validation of AI-generated content

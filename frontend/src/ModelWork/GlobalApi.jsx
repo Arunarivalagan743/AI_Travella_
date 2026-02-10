@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getGeminiModel } from "./geminiClient";
 
 const BASE_URL = 'https://places.googleapis.com/v1/places:searchText';
 
@@ -21,11 +21,8 @@ export const PHOTO_REF_URL = 'https://places.googleapis.com/v1/{Name}/media?maxH
 // Trip Assistant Chat API
 export const processChatMessage = async (userMessage, tripData, chatHistory = []) => {
   try {
-    // Initialize the API with your API key
-    const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GEMINI_API_KEY);
-    
-    // Use gemini-2.0-flash-exp model (latest available)
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    // Initialize the API with the configured Gemini model
+    const model = getGeminiModel();
 
     // Create system prompt
     const systemPrompt = `You are a helpful Trip Assistant AI for TravellaAI app. You are a travel expert who can both help users refine their existing travel plans and provide general travel advice about destinations worldwide.

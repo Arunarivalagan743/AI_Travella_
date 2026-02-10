@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { motion } from 'framer-motion';
 import { BiSend, BiX } from 'react-icons/bi';
 import { FaRobot } from 'react-icons/fa';
 import { RiUserSmileLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import { getGeminiModel } from '../../../ModelWork/geminiClient';
 
 const HomeChatAssistant = ({ isOpen, onClose }) => {
   const [inputMessage, setInputMessage] = useState('');
@@ -65,19 +65,7 @@ const HomeChatAssistant = ({ isOpen, onClose }) => {
 
     try {
       // Initialize Gemini AI
-      const apiKey = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error("Gemini API key is not configured");
-      }
-      
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-
-      // Create history for context
-      const chatHistory = messages.map(msg => ({
-        role: msg.role,
-        parts: [{ text: msg.content }]
-      }));
+      const model = getGeminiModel();
 
       // Prepare the prompt with focus on travel inspiration
       const prompt = `You are a helpful AI Travel Assistant for TravellaAI app. You help users discover destinations and plan trips.
