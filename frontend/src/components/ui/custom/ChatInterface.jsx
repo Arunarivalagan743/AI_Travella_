@@ -324,16 +324,16 @@ function ChatInterface({
   const ChatContent = () => (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {chatView === 'messages' && (
           <button 
-            className="p-2 rounded-full hover:bg-gray-100"
+            className="p-2 hover:bg-[#f5f0eb] transition-colors"
             onClick={() => setChatView('conversations')}
           >
-            <FaArrowLeft />
+            <FaArrowLeft className="text-gray-500" />
           </button>
         )}
-        <h2 className="text-lg font-semibold flex-1 text-center">
+        <h2 className="text-[12px] uppercase tracking-[0.15em] font-medium text-[#1a1a2e] flex-1 text-center">
           {chatView === 'conversations' ? 'Messages' : 
             (currentChat && getOtherParticipant(currentChat) ? 
               userProfiles[getOtherParticipant(currentChat)]?.displayName || getOtherParticipant(currentChat) 
@@ -343,10 +343,10 @@ function ChatInterface({
         </h2>
         {!embedded && (
           <button 
-            className="p-2 rounded-full hover:bg-gray-100"
+            className="p-2 hover:bg-[#f5f0eb] transition-colors"
             onClick={onClose}
           >
-            <FaTimes />
+            <FaTimes className="text-gray-500" />
           </button>
         )}
       </div>
@@ -355,13 +355,14 @@ function ChatInterface({
       {chatView === 'conversations' && (
         <div className="flex-1 overflow-y-auto">
           {loading ? (
-            <div className="flex justify-center items-center h-32">
-              <div className="w-8 h-8 border-4 border-gray-200 border-t-emerald-500 rounded-full animate-spin"></div>
+            <div className="flex flex-col items-center justify-center h-32 gap-3">
+              <div className="w-[1px] h-8 bg-emerald-600 animate-pulse"></div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400">Loading</p>
             </div>
           ) : conversations.length === 0 ? (
-            <div className="text-center p-6 text-gray-500">
-              <p>No conversations yet</p>
-              <p className="text-sm mt-2">Your chats with followers will appear here</p>
+            <div className="text-center p-6">
+              <p className="font-serif text-lg text-[#1a1a2e]">No Conversations</p>
+              <p className="text-[12px] text-gray-400 mt-1 tracking-wide">Your chats will appear here</p>
             </div>
           ) : (
             <ul>
@@ -372,34 +373,34 @@ function ChatInterface({
                 return (
                   <li key={conv.id}>
                     <button 
-                      className="w-full p-3 flex items-center hover:bg-gray-50 border-b"
+                      className="w-full p-3 flex items-center hover:bg-[#f5f0eb] border-b border-gray-100 transition-colors"
                       onClick={() => {
                         setCurrentChat(conv);
                         setChatView('messages');
                         loadMessages(conv.id);
                       }}
                     >
-                      <div className="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mr-3">
+                      <div className="w-10 h-10 bg-[#f5f0eb] text-[#1a1a2e] flex items-center justify-center mr-3 overflow-hidden">
                         {profile.photoURL ? (
                           <img 
                             src={profile.photoURL} 
                             alt={profile.displayName || otherUser}
-                            className="w-10 h-10 rounded-full object-cover"
+                            className="w-10 h-10 object-cover"
                           />
                         ) : (
-                          <FaUser />
+                          <span className="font-serif text-sm">{(profile.displayName || otherUser || '?').charAt(0).toUpperCase()}</span>
                         )}
                       </div>
                       <div className="flex-1 text-left">
-                        <div className="font-medium">
+                        <div className="text-[12px] font-medium text-[#1a1a2e] tracking-wide">
                           {profile.displayName || otherUser}
                         </div>
-                        <div className="text-sm text-gray-600 truncate">
+                        <div className="text-[11px] text-gray-400 truncate">
                           {conv.lastMessage || 'Start a conversation'}
                         </div>
                       </div>
                       {conv.lastMessageTime && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-[10px] text-gray-400 tracking-wide">
                           {formatTimestamp(conv.lastMessageTime.toDate ? conv.lastMessageTime.toDate() : conv.lastMessageTime)}
                         </div>
                       )}
@@ -417,9 +418,9 @@ function ChatInterface({
         <>
           <div className="flex-1 overflow-y-auto p-4" style={{ maxHeight: embedded ? undefined : 'calc(80vh - 120px)' }}>
             {messages.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <p>No messages yet</p>
-                <p className="text-sm mt-2">Start the conversation!</p>
+              <div className="text-center py-8">
+                <p className="font-serif text-lg text-[#1a1a2e]">No Messages</p>
+                <p className="text-[12px] text-gray-400 mt-1 tracking-wide">Start the conversation</p>
               </div>
             ) : (
               <>
@@ -432,45 +433,45 @@ function ChatInterface({
                       className={`mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                     >
                       <div 
-                        className={`rounded-lg px-4 py-2 max-w-[80%] break-words ${
+                        className={`px-4 py-2 max-w-[80%] break-words ${
                           isCurrentUser 
-                            ? 'bg-emerald-500 text-white' 
-                            : 'bg-gray-200 text-gray-800'
+                            ? 'bg-[#1a1a2e] text-white' 
+                            : 'bg-[#f5f0eb] text-gray-800'
                         }`}
                       >
                         {/* Regular text message */}
-                        {msg.text && <p>{msg.text}</p>}
+                        {msg.text && <p className="text-sm">{msg.text}</p>}
                         
                         {/* Shared trip */}
                         {msg.tripData && (
-                          <div className={`mt-2 p-3 rounded ${
-                            isCurrentUser ? 'bg-emerald-600' : 'bg-white border'
+                          <div className={`mt-2 p-3 ${
+                            isCurrentUser ? 'bg-[#2a2a4e]' : 'bg-white border border-gray-200'
                           }`}>
                             <div className="flex items-center">
                               {msg.tripData.image ? (
                                 <img 
                                   src={msg.tripData.image} 
                                   alt={msg.tripData.title} 
-                                  className="w-12 h-12 rounded object-cover mr-3"
+                                  className="w-12 h-12 object-cover mr-3"
                                 />
                               ) : (
-                                <div className={`w-12 h-12 rounded flex items-center justify-center mr-3 ${
-                                  isCurrentUser ? 'bg-emerald-700 text-white' : 'bg-emerald-100 text-emerald-700'
+                                <div className={`w-12 h-12 flex items-center justify-center mr-3 ${
+                                  isCurrentUser ? 'bg-[#1a1a2e] text-white' : 'bg-[#f5f0eb] text-[#1a1a2e]'
                                 }`}>
-                                  <span className="text-xs">Trip</span>
+                                  <span className="text-[10px] uppercase tracking-wider">Trip</span>
                                 </div>
                               )}
                               <div>
-                                <p className={`font-medium ${isCurrentUser ? 'text-white' : 'text-gray-800'}`}>
+                                <p className={`font-medium text-sm ${isCurrentUser ? 'text-white' : 'text-[#1a1a2e]'}`}>
                                   {msg.tripData.title}
                                 </p>
-                                <p className={`text-xs ${isCurrentUser ? 'text-emerald-100' : 'text-gray-500'}`}>
+                                <p className={`text-[10px] uppercase tracking-[0.1em] ${isCurrentUser ? 'text-gray-300' : 'text-gray-400'}`}>
                                   Shared Trip
                                 </p>
                               </div>
                             </div>
                             {msg.tripData.description && (
-                              <p className={`text-sm mt-2 ${isCurrentUser ? 'text-emerald-100' : 'text-gray-600'}`}>
+                              <p className={`text-[12px] mt-2 ${isCurrentUser ? 'text-gray-300' : 'text-gray-500'}`}>
                                 {msg.tripData.description.substring(0, 100)}
                                 {msg.tripData.description.length > 100 ? '...' : ''}
                               </p>
@@ -479,11 +480,11 @@ function ChatInterface({
                               href={`/show_trip/trip_id/${msg.tripData.id}`}
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className={`text-xs mt-2 inline-block py-1 px-3 rounded ${
+                              className={`text-[11px] uppercase tracking-[0.1em] mt-2 inline-block py-1 px-3 ${
                                 isCurrentUser 
-                                  ? 'bg-white text-emerald-700 hover:bg-gray-100' 
-                                  : 'bg-emerald-500 text-white hover:bg-emerald-600'
-                              }`}
+                                  ? 'bg-white text-[#1a1a2e] hover:bg-gray-100' 
+                                  : 'bg-[#1a1a2e] text-white hover:bg-[#2a2a4e]'
+                              } transition-colors`}
                             >
                               View Trip
                             </a>
@@ -492,8 +493,8 @@ function ChatInterface({
                         
                         {/* Timestamp */}
                         <div 
-                          className={`text-xs mt-1 ${
-                            isCurrentUser ? 'text-emerald-100' : 'text-gray-500'
+                          className={`text-[10px] mt-1 tracking-wide ${
+                            isCurrentUser ? 'text-gray-400' : 'text-gray-400'
                           }`}
                         >
                           {formatTimestamp(msg.timestamp)}
@@ -509,28 +510,28 @@ function ChatInterface({
           
           {/* Trip Sharing Preview */}
           {tripToShare && (
-            <div className="border-t p-3">
-              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 flex items-center justify-between">
+            <div className="border-t border-gray-200 p-3">
+              <div className="bg-[#f5f0eb] border border-gray-200 p-3 flex items-center justify-between">
                 <div className="flex items-center">
                   {tripToShare.image ? (
                     <img 
                       src={tripToShare.image} 
                       alt={tripToShare.title || tripToShare.name} 
-                      className="w-12 h-12 rounded object-cover mr-3"
+                      className="w-12 h-12 object-cover mr-3"
                     />
                   ) : (
-                    <div className="w-12 h-12 bg-emerald-200 rounded flex items-center justify-center mr-3">
-                      <span className="text-emerald-700 text-xs">Trip</span>
+                    <div className="w-12 h-12 bg-[#1a1a2e] flex items-center justify-center mr-3">
+                      <span className="text-white text-[10px] uppercase tracking-wider">Trip</span>
                     </div>
                   )}
                   <div>
-                    <p className="font-medium">{tripToShare.title || tripToShare.name}</p>
-                    <p className="text-xs text-gray-500">Trip to share</p>
+                    <p className="text-sm font-medium text-[#1a1a2e]">{tripToShare.title || tripToShare.name}</p>
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-gray-400">Trip to share</p>
                   </div>
                 </div>
                 <button 
                   type="button" 
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-400 hover:text-gray-600"
                   onClick={() => setTripToShare(null)}
                 >
                   <FaTimes />
@@ -540,22 +541,22 @@ function ChatInterface({
           )}
           
           {/* Message Input */}
-          <form onSubmit={sendMessage} className="border-t p-3 flex">
+          <form onSubmit={sendMessage} className="border-t border-gray-200 p-3 flex">
             <input
               type="text"
               placeholder={tripToShare ? "Add a message with your trip..." : "Type a message..."}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="flex-1 border rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="flex-1 border border-gray-200 px-4 py-2 focus:outline-none focus:border-[#1a1a2e] text-sm transition-colors"
             />
             <button
               type="submit"
               disabled={!message.trim() && !tripToShare}
-              className={`rounded-r-lg px-4 py-2 flex items-center justify-center ${
+              className={`px-4 py-2 flex items-center justify-center ${
                 message.trim() || tripToShare
-                  ? 'bg-emerald-500 text-white hover:bg-emerald-600' 
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
+                  ? 'bg-[#1a1a2e] text-white hover:bg-[#2a2a4e]' 
+                  : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+              } transition-colors`}
             >
               <FaPaperPlane />
             </button>
@@ -568,7 +569,7 @@ function ChatInterface({
   // For embedded mode (used in Chat.jsx page)
   if (embedded) {
     return (
-      <div className="bg-white rounded-lg shadow-xl w-full h-full flex flex-col overflow-hidden">
+      <div className="bg-white border border-gray-200 w-full h-full flex flex-col overflow-hidden">
         <ChatContent />
       </div>
     );
@@ -586,7 +587,7 @@ function ChatInterface({
           onClick={onClose}
         >
           <motion.div 
-            className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[80vh] flex flex-col"
+            className="bg-white border border-gray-200 w-full max-w-xl max-h-[80vh] flex flex-col"
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}

@@ -843,72 +843,77 @@ function Explore() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      <div className="flex flex-col justify-center items-center min-h-[60vh]">
+        <div className="w-[2px] h-10 bg-emerald-600 animate-pulse mb-4" />
+        <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400">Loading stories</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-first responsive container */}
-      <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-2 sm:py-4 lg:py-6 max-w-6xl">
-        {/* Compact Search Bar */}
-        <div className="mb-4 sm:mb-6 relative" ref={searchRef}>
-          <div className="flex items-center bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-            <div className="flex-1 relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
-              <input 
-                type="text" 
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder="Search destinations, activities..."
-                className="w-full pl-10 pr-10 py-2.5 sm:py-3 text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-inset rounded-lg"
-                onFocus={() => {
-                  if (searchQuery.length > 2) setShowSearchResults(true);
-                  if (recentSearches.length > 0 || searchQuery.length > 2) setShowKeywordSuggestions(true);
+    <div className="min-h-screen bg-white">
+      {/* LP-style header banner */}
+      <div className="bg-[#1a1a2e] py-12 sm:py-16 px-4 mb-8 sm:mb-12">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-400 font-medium mb-3">DISCOVER</p>
+          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-white mb-6">Explore Stories</h1>
+          
+          {/* Search bar */}
+          <div className="max-w-2xl relative" ref={searchRef}>
+            <div className="flex items-center bg-white overflow-hidden">
+              <div className="flex-1 relative">
+                <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                <input 
+                  type="text" 
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="SEARCH DESTINATIONS, ACTIVITIES..."
+                  className="w-full pl-11 pr-10 py-3 sm:py-3.5 text-[12px] uppercase tracking-[0.1em] text-gray-700 focus:outline-none placeholder:text-gray-400"
+                  onFocus={() => {
+                    if (searchQuery.length > 2) setShowSearchResults(true);
+                    if (recentSearches.length > 0 || searchQuery.length > 2) setShowKeywordSuggestions(true);
+                  }}
+                />
+                {searchQuery && (
+                  <button 
+                    onClick={clearSearch}
+                    className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                  >
+                    <FaTimes className="text-xs sm:text-sm" />
+                  </button>
+                )}
+              </div>
+              <button 
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 sm:px-6 py-3 sm:py-3.5 transition-colors"
+                onClick={() => {
+                  if (searchQuery) {
+                    performSearch(searchQuery);
+                    saveToRecentSearches(searchQuery);
+                  }
                 }}
-              />
-              {searchQuery && (
-                <button 
-                  onClick={clearSearch}
-                  className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
-                >
-                  <FaTimes className="text-xs sm:text-sm" />
-                </button>
-              )}
+              >
+                <FaSearch className="text-sm" />
+              </button>
             </div>
-            <button 
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 sm:px-5 py-2.5 sm:py-3 transition-colors"
-              onClick={() => {
-                if (searchQuery) {
-                  performSearch(searchQuery);
-                  saveToRecentSearches(searchQuery);
-                }
-              }}
-            >
-              <FaSearch className="text-sm sm:text-base" />
-            </button>
-          </div>
         
-          {/* Compact Keyword/Recent Search Suggestions */}
+          {/* Keyword/Recent Search Suggestions */}
           {showKeywordSuggestions && (
-            <div className="absolute z-20 top-full left-0 right-0 bg-white rounded-b-lg sm:rounded-b-xl shadow-lg border border-gray-200 mt-1 p-2 sm:p-3 max-h-64 overflow-y-auto">
+            <div className="absolute z-20 top-full left-0 right-0 bg-white shadow-lg border border-gray-200 mt-0 p-3 sm:p-4 max-h-64 overflow-y-auto">
               {isSearching ? (
                 <div className="flex justify-center p-3 sm:p-4">
-                  <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-emerald-500"></div>
+                  <div className="w-[2px] h-6 bg-emerald-600 animate-pulse" />
                 </div>
               ) : (
                 <>
                   {recentSearches.length > 0 && (
-                    <div className="mb-2 sm:mb-3">
-                      <h3 className="text-xs font-medium text-gray-500 mb-1.5 sm:mb-2">RECENT</h3>
-                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    <div className="mb-3">
+                      <h3 className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-medium mb-2">RECENT SEARCHES</h3>
+                      <div className="flex flex-wrap gap-2">
                         {recentSearches.map((search, index) => (
                           <button
                             key={`recent-${index}`}
                             onClick={() => searchWithKeyword(search)}
-                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs sm:text-sm rounded transition-colors"
+                            className="px-3 py-1.5 border border-gray-200 hover:border-[#1a1a2e] text-[11px] uppercase tracking-[0.1em] text-gray-600 hover:text-[#1a1a2e] transition-colors"
                           >
                             {search}
                           </button>
@@ -919,13 +924,13 @@ function Explore() {
                   
                   {searchKeywords.length > 0 && (
                     <div>
-                      <h3 className="text-xs font-medium text-gray-500 mb-1.5 sm:mb-2">SUGGESTIONS</h3>
-                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                      <h3 className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-medium mb-2">SUGGESTIONS</h3>
+                      <div className="flex flex-wrap gap-2">
                         {searchKeywords.slice(0, 8).map((keyword, index) => (
                           <button
                             key={`keyword-${index}`}
                             onClick={() => searchWithKeyword(keyword)}
-                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs sm:text-sm rounded transition-colors"
+                            className="px-3 py-1.5 bg-[#f5f0eb] hover:bg-emerald-600 hover:text-white text-[11px] uppercase tracking-[0.1em] text-[#1a1a2e] transition-colors"
                           >
                             {keyword}
                           </button>
@@ -938,28 +943,27 @@ function Explore() {
             </div>
           )}
         
-          {/* Compact Search Results Display */}
+          {/* Search Results Display */}
           {showSearchResults && (
-            <div className="mt-3 sm:mt-4 bg-white rounded-lg sm:rounded-xl shadow-md p-3 sm:p-4 border border-gray-100">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h2 className="text-sm sm:text-lg font-medium text-gray-800 truncate">Results for "{searchQuery}"</h2>
+            <div className="mt-0 bg-white shadow-md p-4 sm:p-5 border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-[12px] uppercase tracking-[0.15em] font-semibold text-[#1a1a2e]">Results for "{searchQuery}"</h2>
                 <button 
                   onClick={() => setShowSearchResults(false)}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                  className="p-1.5 text-gray-400 hover:text-gray-600"
                 >
                   <FaTimes className="text-xs" />
                 </button>
               </div>
               
               {searchResults.length === 0 ? (
-                <div className="text-center py-6 sm:py-8">
-                  <FaSuitcase className="mx-auto text-gray-300 text-3xl sm:text-5xl mb-3 sm:mb-4" />
-                  <h3 className="text-lg sm:text-xl font-medium text-gray-700">No trips found</h3>
-                  <p className="text-sm sm:text-base text-gray-500 mt-1 sm:mt-2">Try a different search term</p>
+                <div className="text-center py-8">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-2">NO RESULTS</p>
+                  <p className="text-sm text-gray-500">Try a different search term</p>
                 </div>
               ) : (
                 <>
-                  <div className="space-y-2 sm:space-y-3">
+                  <div className="space-y-3">
                     {searchResults.slice(0, 4).map((trip) => {
                       const location = trip.userSelection?.location || 
                                     trip.userSelection?.place?.label || 
@@ -968,9 +972,9 @@ function Explore() {
                         <Link 
                           to={`/show-trip/${trip.id}`} 
                           key={trip.id}
-                          className="flex items-center gap-3 p-2 sm:p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
+                          className="flex items-center gap-4 p-3 hover:bg-[#f5f0eb] transition-colors border-b border-gray-100 last:border-0"
                         >
-                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-200 overflow-hidden flex-shrink-0">
                             <img 
                               src={placeImages[trip.id] || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1121&q=80"} 
                               alt={location} 
@@ -978,16 +982,10 @@ function Explore() {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-sm sm:text-base text-gray-800 truncate">{location}</h3>
-                            <p className="text-xs sm:text-sm text-gray-500 mb-1">
-                              {formatTravelType(trip.userSelection?.travelType)}
+                            <h3 className="font-semibold text-sm text-[#1a1a2e] truncate">{location}</h3>
+                            <p className="text-[11px] uppercase tracking-[0.1em] text-gray-400">
+                              {formatTravelType(trip.userSelection?.travelType)} &middot; {trip.userSelection?.duration || 0} DAYS
                             </p>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <FaHeart className="text-red-500" />
-                              <span>{trip.likesCount || 0}</span>
-                              <span className="text-gray-300">•</span>
-                              <span>{trip.userSelection?.duration || 0}d</span>
-                            </div>
                           </div>
                         </Link>
                       );
@@ -995,12 +993,12 @@ function Explore() {
                   </div>
                   
                   {searchResults.length > 4 && (
-                    <div className="mt-3 sm:mt-4 text-center">
+                    <div className="mt-4 text-center">
                       <button 
                         onClick={() => setShowSearchResults(false)} 
-                        className="text-emerald-600 hover:text-emerald-700 text-xs sm:text-sm font-medium"
+                        className="text-[11px] uppercase tracking-[0.15em] text-emerald-600 hover:text-emerald-700 font-semibold"
                       >
-                        View all {searchResults.length} results
+                        VIEW ALL {searchResults.length} RESULTS
                       </button>
                     </div>
                   )}
@@ -1008,77 +1006,74 @@ function Explore() {
               )}
             </div>
           )}
+          </div>
+        </div>
       </div>
       
-        {/* Compact Header */}
-        <div className="flex items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Explore</h1>
-          
-          {/* Compact View mode toggle */}
-          <div className="bg-gray-100 rounded-lg p-0.5 sm:p-1 flex">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* View mode toggle — LP editorial tabs */}
+        <div className="flex items-center justify-between gap-4 mb-8 sm:mb-10 border-b border-gray-200 pb-4">
+          <div className="flex items-center gap-6">
             <button
               onClick={() => setViewMode('trending')}
-              className={`px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors ${
+              className={`text-[12px] uppercase tracking-[0.15em] font-semibold pb-1 transition-colors ${
                 viewMode === 'trending' 
-                  ? 'bg-white shadow-sm text-emerald-700' 
-                  : 'text-gray-600 hover:bg-gray-200'
+                  ? 'text-[#1a1a2e] border-b-2 border-emerald-600' 
+                  : 'text-gray-400 hover:text-gray-600'
               }`}
             >
-              🔥 Hot
+              TRENDING
             </button>
             <button
               onClick={() => setViewMode('recent')}
-              className={`px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors ${
+              className={`text-[12px] uppercase tracking-[0.15em] font-semibold pb-1 transition-colors ${
                 viewMode === 'recent'
-                  ? 'bg-white shadow-sm text-emerald-700'
-                  : 'text-gray-600 hover:bg-gray-200'
+                  ? 'text-[#1a1a2e] border-b-2 border-emerald-600'
+                  : 'text-gray-400 hover:text-gray-600'
               }`}
             >
-              🆕 New
+              LATEST
             </button>
             {user && (
               <button
                 onClick={() => setViewMode('following')}
-                className={`px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors ${
+                className={`text-[12px] uppercase tracking-[0.15em] font-semibold pb-1 transition-colors ${
                   viewMode === 'following'
-                    ? 'bg-white shadow-sm text-emerald-700'
-                    : 'text-gray-600 hover:bg-gray-200'
+                    ? 'text-[#1a1a2e] border-b-2 border-emerald-600'
+                    : 'text-gray-400 hover:text-gray-600'
                 }`}
               >
-                👥 Following
+                FOLLOWING
               </button>
             )}
           </div>
         </div>
       
-        {/* Compact Popular keywords display */}
+        {/* Popular keywords */}
         {!searchQuery && !showSearchResults && (
-          <div className="mb-4 sm:mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <h3 className="text-xs sm:text-sm font-medium text-gray-600 flex-shrink-0">Popular:</h3>
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {fetchPopularKeywords().slice(0, 5).map((keyword, index) => (
-                  <button
-                    key={`popular-${index}`}
-                    onClick={() => searchWithKeyword(keyword)}
-                    className="px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs sm:text-sm rounded transition-colors flex items-center gap-1"
-                  >
-                    <FaMapMarkerAlt className="text-emerald-600" size={10} />
-                    <span className="truncate max-w-20 sm:max-w-none">{keyword}</span>
-                  </button>
-                ))}
-              </div>
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-medium mr-2">POPULAR:</span>
+              {fetchPopularKeywords().slice(0, 5).map((keyword, index) => (
+                <button
+                  key={`popular-${index}`}
+                  onClick={() => searchWithKeyword(keyword)}
+                  className="px-3 py-1.5 border border-gray-200 hover:border-emerald-600 hover:text-emerald-600 text-[11px] uppercase tracking-[0.1em] text-gray-500 transition-colors"
+                >
+                  {keyword}
+                </button>
+              ))}
             </div>
           </div>
         )}
 
         {trips.length === 0 ? (
-          <div className="bg-white rounded-lg sm:rounded-xl p-6 sm:p-8 lg:p-12 text-center shadow-sm border border-gray-100">
-            <FaSuitcase className="mx-auto text-gray-300 text-4xl sm:text-5xl mb-3 sm:mb-4" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-2">
+          <div className="bg-[#f5f0eb] p-12 sm:p-16 text-center">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-3">NO STORIES FOUND</p>
+            <h2 className="font-serif text-2xl sm:text-3xl text-[#1a1a2e] mb-4">
               {viewMode === 'following' ? "No trips from followers" : "No trips yet"}
             </h2>
-            <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6 max-w-md mx-auto">
+            <p className="text-sm text-gray-500 mb-8 max-w-md mx-auto">
               {viewMode === 'following' 
                 ? "Follow more users to see their amazing journeys here!" 
                 : "Be the first to share your travel adventures with the community!"}
@@ -1086,23 +1081,23 @@ function Explore() {
             {viewMode === 'following' ? (
               <button 
                 onClick={() => setViewMode('recent')}
-                className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base transition-all shadow-md hover:shadow-lg"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 text-[12px] uppercase tracking-[0.15em] font-semibold transition-colors"
               >
-                Explore Recent Trips
+                EXPLORE LATEST
               </button>
             ) : (
               <Link 
                 to="/create-trip" 
-                className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base transition-all shadow-md hover:shadow-lg"
+                className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 text-[12px] uppercase tracking-[0.15em] font-semibold transition-colors"
               >
-                Create A Trip
+                CREATE A TRIP
               </Link>
             )}
           </div>
         ) : (
           <>
-            {/* Responsive grid layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+            {/* LP editorial grid layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {trips.map((trip) => {
                 const location = trip.userSelection?.location || trip.userSelection?.place?.label || "Unknown Location";
                 const travelType = trip.userSelection?.travelType || "adventure";
@@ -1122,133 +1117,103 @@ function Explore() {
                 return (
                   <motion.div
                     key={trip.id}
-                    className="bg-white rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all border border-gray-100"
+                    className="group bg-white overflow-hidden border border-gray-100 hover:shadow-lg transition-all"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {/* Compact Header with user info */}
-                    <div className="p-3 sm:p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                          {userProfile.photoURL ? (
-                            <img 
-                              src={userProfile.photoURL} 
-                              alt={userProfile.displayName}
-                              className="w-full h-full object-cover" 
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-emerald-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                              {userProfile.displayName.charAt(0).toUpperCase()}
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <Link to={`/user/${trip.userEmail}`} className="hover:underline">
-                            <h3 className="font-semibold text-sm sm:text-base truncate">{userProfile.displayName}</h3>
-                          </Link>
-                          <p className="text-xs text-gray-500">{formatDate(trip.createdAt)}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-1 sm:gap-2">
-                        {user && user.email !== trip.userEmail && (
-                          <button
-                            onClick={() => toggleFollow(trip.userEmail)}
-                            className={`text-xs px-2 sm:px-3 py-1 rounded-full transition-colors ${
-                              followStatus === 'following'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : followStatus === 'requested'
-                                  ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
-                                  : followStatus === 'pending'
-                                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                    : 'bg-emerald-600 text-white'
-                            }`}
-                          >
-                            {followStatus === 'following' ? '✓' : 
-                             followStatus === 'requested' ? '⏳' :
-                             followStatus === 'pending' ? '✓' : '+'}
-                          </button>
-                        )}
-                        
-                        <button className="p-1 text-gray-400 hover:text-gray-600">
-                          <FaEllipsisH size={12} />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Compact Trip image */}
+                    {/* Trip image — LP editorial card */}
                     <Link to={`/show-trip/${trip.id}`} className="block">
-                      <div className="relative aspect-[16/10] sm:aspect-[4/3] bg-gray-100">
-                        {/* Loading indicator for images */}
+                      <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
                         {loadingImages[trip.id] && (
                           <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 z-10">
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-[2px] h-6 bg-emerald-600 animate-pulse" />
                           </div>
                         )}
                         
                         <img 
                           src={tripImage} 
                           alt={location}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1121&q=80";
                           }}
                         />
                         
-                        {/* Overlay badges */}
-                        <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
-                          {trip.userSelection?.duration || 0}d
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                        
+                        {/* Duration badge */}
+                        <div className="absolute top-3 left-3 bg-[#1a1a2e] text-white px-3 py-1 text-[10px] uppercase tracking-[0.15em] font-semibold">
+                          {trip.userSelection?.duration || 0} DAYS
+                        </div>
+                        
+                        {/* Like count */}
+                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-white/90 px-2 py-1 text-xs font-medium">
+                          <FaHeart className="text-red-500" size={10} />
+                          <span className="text-gray-700">{trip.likesCount || 0}</span>
                         </div>
                       </div>
                     </Link>
                     
-                    {/* Compact Trip details */}
-                    <div className="p-3 sm:p-4">
-                      <div className="mb-3">
-                        <Link to={`/show-trip/${trip.id}`}>
-                          <h3 className="font-bold text-base sm:text-lg mb-1 text-gray-800 hover:text-emerald-700 transition-colors line-clamp-1">{location}</h3>
-                        </Link>
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-2">
-                          <FaSuitcase className="text-emerald-600" size={12} />
-                          <span className="truncate">{formatTravelType(travelType)}</span>
-                          <span className="text-gray-300">•</span>
-                          <span>{trip.userSelection?.travelers || 1}p</span>
+                    {/* Trip details — LP style */}
+                    <div className="p-4 sm:p-5">
+                      {/* Category label */}
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-semibold mb-2">
+                        {formatTravelType(travelType)}
+                      </p>
+                      
+                      <Link to={`/show-trip/${trip.id}`}>
+                        <h3 className="font-serif text-lg sm:text-xl text-[#1a1a2e] mb-2 group-hover:text-emerald-700 transition-colors leading-tight">{location}</h3>
+                      </Link>
+                      
+                      {trip.tripData?.summary && (
+                        <p className="text-gray-500 text-sm line-clamp-2 mb-3 leading-relaxed">
+                          {trip.tripData.summary}
+                        </p>
+                      )}
+                      
+                      {/* Author row */}
+                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="w-7 h-7 overflow-hidden bg-gray-200 flex-shrink-0">
+                            {userProfile.photoURL ? (
+                              <img src={userProfile.photoURL} alt={userProfile.displayName} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-[#1a1a2e] flex items-center justify-center text-white text-[10px] font-bold">
+                                {userProfile.displayName.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                          </div>
+                          <Link to={`/user/${trip.userEmail}`} className="text-[11px] uppercase tracking-[0.1em] text-gray-500 hover:text-[#1a1a2e] truncate">
+                            {userProfile.displayName}
+                          </Link>
                         </div>
                         
-                        {trip.tripData?.summary && (
-                          <p className="text-gray-600 text-xs sm:text-sm line-clamp-2">
-                            {trip.tripData.summary}
-                          </p>
-                        )}
+                        <span className="text-[11px] text-gray-400">{formatDate(trip.createdAt)}</span>
                       </div>
                       
-                      {/* Neat Social interactions and actions */}
-                      <div className="flex items-center gap-3 mt-1">
-                        <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
-                          <SocialInteractions
-                            tripId={trip.id}
-                            creatorEmail={trip.userEmail}
-                            likedBy={trip.likedBy || []}
-                            likesCount={trip.likesCount || 0}
-                            commentsCount={trip.commentCount || 0}
-                            isFollowing={followStatus === 'following'}
-                            followRequestStatus={followStatus === 'requested' ? 'requested' : 
-                                                followStatus === 'pending' ? 'pending' : 'none'}
-                            onCommentClick={() => {
-                              setCurrentTripId(trip.id);
-                              setCommentsOpen(true);
-                            }}
-                            onUpdate={(updatedData) => {
-                              setTrips(trips.map(t => 
-                                t.id === trip.id ? { ...t, ...updatedData } : t
-                              ));
-                            }}
-                          />
-                        </div>
-                        
-                       
+                      {/* Social interactions */}
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        <SocialInteractions
+                          tripId={trip.id}
+                          creatorEmail={trip.userEmail}
+                          likedBy={trip.likedBy || []}
+                          likesCount={trip.likesCount || 0}
+                          commentsCount={trip.commentCount || 0}
+                          isFollowing={followStatus === 'following'}
+                          followRequestStatus={followStatus === 'requested' ? 'requested' : 
+                                              followStatus === 'pending' ? 'pending' : 'none'}
+                          onCommentClick={() => {
+                            setCurrentTripId(trip.id);
+                            setCommentsOpen(true);
+                          }}
+                          onUpdate={(updatedData) => {
+                            setTrips(trips.map(t => 
+                              t.id === trip.id ? { ...t, ...updatedData } : t
+                            ));
+                          }}
+                        />
                       </div>
                     </div>
                   </motion.div>
@@ -1256,21 +1221,21 @@ function Explore() {
             })}
           </div>
           
-          {/* Load more button */}
+          {/* Load more */}
           {hasMoreTrips && (
-              <div className="col-span-full flex justify-center mt-4 sm:mt-6 mb-4">
+              <div className="col-span-full flex justify-center mt-10 mb-6">
                 <button 
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 sm:py-2.5 px-4 sm:px-6 rounded-full flex items-center gap-2 disabled:opacity-50 text-sm sm:text-base transition-colors"
+                  className="border border-[#1a1a2e] hover:bg-[#1a1a2e] hover:text-white text-[#1a1a2e] font-semibold py-3 px-8 flex items-center gap-2 disabled:opacity-50 text-[12px] uppercase tracking-[0.15em] transition-colors"
                   onClick={loadMoreTrips}
                   disabled={loadingMore}
                 >
                   {loadingMore ? (
                     <>
-                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
-                      Loading...
+                      <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                      LOADING...
                     </>
                   ) : (
-                    "Load More"
+                    "LOAD MORE STORIES"
                   )}
                 </button>
               </div>

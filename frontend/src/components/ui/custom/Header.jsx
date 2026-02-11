@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUserCircle, FaSignOutAlt, FaSuitcaseRolling, FaHome, FaInfoCircle, FaGlobe, FaUserPlus, FaUser, FaComment } from 'react-icons/fa';
+import { FaUserCircle, FaSignOutAlt, FaSuitcaseRolling, FaHome, FaInfoCircle, FaGlobe, FaUserPlus, FaUser, FaComment, FaSearch } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 import { Link, useLocation } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -9,9 +9,10 @@ import axios from 'axios';
 import { useAuth } from '../../../context/AuthContext';
 
 const menuItems = [
-  { name: 'Home', path: '/', icon: <FaHome className="inline mr-2 mb-0.5" /> },
-  { name: 'Explore', path: '/explore', icon: <FaGlobe className="inline mr-2 mb-0.5" /> },
-  { name: 'About Us', path: '/about', icon: <FaInfoCircle className="inline mr-2 mb-0.5" /> },
+  { name: 'EXPLORE', path: '/explore' },
+  { name: 'MY TRIPS', path: '/my-trips', requiresAuth: true },
+  { name: 'PLAN TRIP', path: '/create-trip' },
+  { name: 'ABOUT', path: '/about' },
 ];
 
 function Header() {
@@ -98,296 +99,224 @@ function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full py-3 px-6 md:px-8 shadow-sm border-b border-gray-100 bg-white/60 backdrop-blur-lg">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      {/* Top accent line */}
+      <div className="w-full h-1 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600" />
+      
+      <header className="sticky top-0 z-50 w-full bg-[#1a1a2e] text-white">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-8 flex justify-between items-center h-16">
           {/* Logo */}
-          <motion.div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-2.5 group">
             <motion.div
-              className="relative w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center backdrop-blur-sm"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
+              className="relative w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center"
+              whileHover={{ scale: 1.05 }}
             >
-              <motion.img
+              <img
                 src="/wired-outline-2026-gdansk-city-hover-pinch.gif"
                 alt="Travella Logo"
-                className="w-10 h-10 object-contain mix-blend-screen"
+                className="w-8 h-8 object-contain brightness-200"
               />
             </motion.div>
-            <div>
-              <span className="font-extrabold text-xl bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent block tracking-tight">
-                Travella
-              </span>
-              <span className="text-xs text-gray-500 font-light tracking-wide">Explore the world</span>
-            </div>
-          </motion.div>
+            <span className="font-bold text-lg tracking-wider text-white uppercase" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '0.15em' }}>
+              Travella
+            </span>
+          </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
-            <nav className="flex items-center gap-6">
-              {menuItems.map(item => (
+          <div className="hidden md:flex items-center gap-1">
+            <nav className="flex items-center gap-0">
+              {menuItems.filter(item => !item.requiresAuth || user).map(item => (
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`flex items-center gap-2 text-gray-800 hover:text-emerald-600 font-medium text-sm transition-colors py-1 px-2 z-10 relative ${
-                    location.pathname === item.path ? 'text-emerald-700' : ''
+                  className={`px-4 py-2 text-[13px] font-semibold tracking-[0.12em] transition-colors hover:text-emerald-400 ${
+                    location.pathname === item.path ? 'text-emerald-400' : 'text-gray-300'
                   }`}
+                  style={{ fontFamily: "'Inter', sans-serif" }}
                 >
-                  {item.icon}
                   {item.name}
-                  {location.pathname === item.path && (
-                    <motion.div
-                      layoutId="navHighlight"
-                      className="absolute inset-0 bg-gradient-to-r from-emerald-100 to-teal-100 opacity-10 rounded-lg -z-10"
-                    />
-                  )}
                 </Link>
               ))}
             </nav>
-            <div className="flex items-center gap-4">
-              {user ? (
-                <div className="flex items-center gap-3">
-                  <Link to="/my-trips">
-                    <motion.button
-                      className="px-4 py-2 bg-teal-50 text-emerald-600 rounded-full flex items-center gap-2 hover:bg-teal-100 transition-colors"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <FaSuitcaseRolling className="text-sm" />
-                      <span className="text-sm font-medium">My Trips</span>
-                    </motion.button>
-                  </Link>
-                  <div className="flex items-center gap-2 group relative">
-                    <motion.div
-                      className="w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-500 shadow-md"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <img
-                        src={user.picture}
-                        alt={user.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </motion.div>
-                    <div className="absolute right-0 top-full mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pt-2">
-                      <motion.div
-                        className="bg-white shadow-lg rounded-lg overflow-hidden w-48 border border-gray-100"
-                      >
-                        <div className="p-3 border-b border-gray-100">
-                          <p className="font-medium text-sm text-gray-800">{user.name}</p>
-                          <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                        </div>
-                        <div className="p-2 border-b border-gray-100">
-                          <Link to={`/user/${user.email}`}>
-                            <motion.button
-                              className="w-full flex items-center gap-2 text-left px-3 py-2 text-sm text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
-                              whileHover={{ x: 3 }}
-                            >
-                              <FaUser />
-                              <span>My Profile</span>
-                            </motion.button>
-                          </Link>
-                          <Link to="/follower-requests">
-                            <motion.button
-                              className="w-full flex items-center gap-2 text-left px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                              whileHover={{ x: 3 }}
-                            >
-                              <FaUserPlus />
-                              <span>Follower Requests</span>
-                            </motion.button>
-                          </Link>
-                          <Link to="/chat">
-                            <motion.button
-                              className="w-full flex items-center gap-2 text-left px-3 py-2 text-sm text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
-                              whileHover={{ x: 3 }}
-                            >
-                              <FaComment />
-                              <span>Messages</span>
-                            </motion.button>
-                          </Link>
-                        </div>
-                        <div className="p-2">
-                          <motion.button
-                            onClick={handleSignOut}
-                            className="w-full flex items-center gap-2 text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                            whileHover={{ x: 3 }}
-                          >
-                            <FaSignOutAlt />
-                            <span>Sign Out</span>
-                          </motion.button>
-                        </div>
-                      </motion.div>
+
+            <button className="p-2 ml-2 text-gray-300 hover:text-white transition-colors">
+              <FaSearch className="text-sm" />
+            </button>
+
+            <div className="w-px h-6 bg-gray-600 mx-3" />
+
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 group relative cursor-pointer">
+                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-emerald-500/50 hover:border-emerald-400 transition-colors">
+                    <img
+                      src={user.picture}
+                      alt={user.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  {/* Dropdown */}
+                  <div className="absolute right-0 top-full mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pt-2">
+                    <div className="bg-white shadow-2xl rounded-xl overflow-hidden w-56 border border-gray-100">
+                      <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-gray-100">
+                        <p className="font-semibold text-sm text-gray-800">{user.name}</p>
+                        <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
+                      </div>
+                      <div className="p-2">
+                        <Link to={`/user/${user.email}`}>
+                          <button className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <FaUser className="text-emerald-600" />
+                            <span>My Profile</span>
+                          </button>
+                        </Link>
+                        <Link to="/my-trips">
+                          <button className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <FaSuitcaseRolling className="text-emerald-600" />
+                            <span>My Trips</span>
+                          </button>
+                        </Link>
+                        <Link to="/follower-requests">
+                          <button className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <FaUserPlus className="text-blue-600" />
+                            <span>Follower Requests</span>
+                          </button>
+                        </Link>
+                        <Link to="/chat">
+                          <button className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <FaComment className="text-emerald-600" />
+                            <span>Messages</span>
+                          </button>
+                        </Link>
+                      </div>
+                      <div className="p-2 border-t border-gray-100">
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <FaSignOutAlt />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              ) : (
-                <motion.button
-                  onClick={() => setOpenDialog(true)}
-                  className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium relative overflow-hidden"
-                  whileHover="hover"
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <FaUserCircle className="w-5 h-5 relative z-10" />
-                  <span className="tracking-wide relative z-10">Sign In</span>
-                </motion.button>
-              )}
-            </div>
+              </div>
+            ) : (
+              <motion.button
+                onClick={() => setOpenDialog(true)}
+                className="px-5 py-2 bg-white text-[#1a1a2e] text-[13px] font-bold tracking-[0.1em] uppercase hover:bg-gray-100 transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                SIGN IN
+              </motion.button>
+            )}
           </div>
 
           {/* Mobile Nav Button */}
           <div className="md:hidden flex items-center gap-3">
             {user && (
-              <motion.div
-                className="w-8 h-8 rounded-full overflow-hidden border-2 border-emerald-400"
-                whileTap={{ scale: 0.9 }}
-              >
+              <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-emerald-400/50">
                 <img
                   src={user.picture}
                   alt={user.name}
                   className="w-full h-full object-cover"
                 />
-              </motion.div>
-            )}
-            <motion.button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-md text-gray-800 hover:bg-emerald-50/80 transition-all backdrop-blur-sm relative overflow-hidden"
-              whileTap={{ scale: 0.95 }}
-              whileHover="hover"
-            >
-              <span className="sr-only">Toggle Menu</span>
-              <div className="flex flex-col gap-1">
-                <span className={`block w-6 h-0.5 bg-gray-800 transition-transform duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
-                <span className={`block w-6 h-0.5 bg-gray-800 transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
-                <span className={`block w-6 h-0.5 bg-gray-800 transition-transform duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
               </div>
-            </motion.button>
+            )}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-white"
+            >
+              <div className="flex flex-col gap-1.5">
+                <span className={`block w-6 h-0.5 bg-white transition-transform duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                <span className={`block w-6 h-0.5 bg-white transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+                <span className={`block w-6 h-0.5 bg-white transition-transform duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+              </div>
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Nav - Fixed position overlay */}
+      {/* Mobile Nav */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            className="md:hidden fixed inset-0 top-[60px] z-40 bg-white/95 backdrop-blur-lg shadow-lg border-t border-gray-100 overflow-y-auto"
+            className="md:hidden fixed inset-0 top-[68px] z-40 bg-[#1a1a2e] overflow-y-auto"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="px-6 py-6 h-full">
-              <nav className="flex flex-col space-y-4">
-                {menuItems.map(item => (
+            <div className="px-6 py-8">
+              <nav className="flex flex-col space-y-1">
+                {menuItems.filter(item => !item.requiresAuth || user).map(item => (
                   <Link
                     key={item.name}
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2 text-gray-800 hover:text-emerald-600 font-medium py-3 px-2 border-b border-gray-100/50 relative group ${
-                      location.pathname === item.path ? 'text-emerald-700' : ''
+                    className={`text-[15px] font-semibold tracking-[0.15em] py-4 border-b border-gray-700/50 transition-colors ${
+                      location.pathname === item.path ? 'text-emerald-400' : 'text-gray-300 hover:text-white'
                     }`}
+                    style={{ fontFamily: "'Inter', sans-serif" }}
                   >
-                    {item.icon}
-                    <span className="text-lg">{item.name}</span>
+                    {item.name}
                   </Link>
                 ))}
                 {user && (
                   <>
                     <Link
-                      to="/my-trips"
-                      className="text-emerald-600 font-medium py-3 px-2 border-b border-gray-100/50 flex items-center gap-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <FaSuitcaseRolling className="text-lg" />
-                      <span className="text-lg">My Trips</span>
-                    </Link>
-                    <Link
                       to="/chat"
-                      className="text-emerald-600 font-medium py-3 px-2 border-b border-gray-100/50 flex items-center gap-2"
+                      className="text-[15px] font-semibold tracking-[0.15em] text-gray-300 hover:text-white py-4 border-b border-gray-700/50"
                       onClick={() => setMobileMenuOpen(false)}
+                      style={{ fontFamily: "'Inter', sans-serif" }}
                     >
-                      <FaComment className="text-lg" />
-                      <span className="text-lg">Messages</span>
+                      MESSAGES
                     </Link>
                     <Link
                       to="/follower-requests"
-                      className="text-blue-600 font-medium py-3 px-2 border-b border-gray-100/50 flex items-center gap-2"
+                      className="text-[15px] font-semibold tracking-[0.15em] text-gray-300 hover:text-white py-4 border-b border-gray-700/50"
                       onClick={() => setMobileMenuOpen(false)}
+                      style={{ fontFamily: "'Inter', sans-serif" }}
                     >
-                      <FaUserPlus className="text-lg" />
-                      <span className="text-lg">Follower Requests</span>
+                      FOLLOWER REQUESTS
                     </Link>
                   </>
                 )}
-                <div className="flex justify-center pt-6 mt-4">
-                  {user ? (
-                    <div className="w-full flex flex-col gap-4 items-center">
-                      <div className="flex items-center gap-3 mb-2">
-                        <motion.div
-                          className="w-12 h-12 rounded-full overflow-hidden border-2 border-emerald-500 shadow-md"
-                        >
-                          <img
-                            src={user.picture}
-                            alt={user.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </motion.div>
-                        <div>
-                          <p className="font-medium text-gray-800">{user.name}</p>
-                          <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                        </div>
-                      </div>
-                      <Link 
-                        to={`/user/${user.email}`}
-                        className="w-full"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <motion.button
-                          className="w-full px-4 py-3 mb-3 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center gap-2 font-medium"
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <FaUser />
-                          <span>My Profile</span>
-                        </motion.button>
-                      </Link>
-                      <Link 
-                        to="/follower-requests"
-                        className="w-full"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <motion.button
-                          className="w-full px-4 py-3 mb-3 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center gap-2 font-medium"
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <FaUserPlus />
-                          <span>Follower Requests</span>
-                        </motion.button>
-                      </Link>
-                      <motion.button
-                        onClick={() => {
-                          handleSignOut();
-                          setMobileMenuOpen(false);
-                        }}
-                        className="w-full px-4 py-3 bg-red-50 text-red-600 rounded-full flex items-center justify-center gap-2 font-medium"
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <FaSignOutAlt />
-                        <span>Sign Out</span>
-                      </motion.button>
-                    </div>
-                  ) : (
-                    <motion.button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setOpenDialog(true);
-                      }}
-                      className="w-full px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full shadow-sm flex items-center justify-center gap-2 font-medium"
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <FaUserCircle className="text-lg" />
-                      <span>Sign In</span>
-                    </motion.button>
-                  )}
-                </div>
               </nav>
+              <div className="mt-8">
+                {user ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 pb-4 border-b border-gray-700/50">
+                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-emerald-500/50">
+                        <img src={user.picture} alt={user.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">{user.name}</p>
+                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                      </div>
+                    </div>
+                    <Link to={`/user/${user.email}`} className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                      <button className="w-full py-3 bg-emerald-600 text-white font-semibold tracking-wider text-sm uppercase rounded-sm mb-3">
+                        MY PROFILE
+                      </button>
+                    </Link>
+                    <button
+                      onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
+                      className="w-full py-3 bg-transparent border border-gray-600 text-gray-300 font-semibold tracking-wider text-sm uppercase rounded-sm hover:bg-gray-800 transition-colors"
+                    >
+                      SIGN OUT
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); setOpenDialog(true); }}
+                    className="w-full py-3 bg-white text-[#1a1a2e] font-bold tracking-[0.15em] text-sm uppercase"
+                  >
+                    SIGN IN
+                  </button>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

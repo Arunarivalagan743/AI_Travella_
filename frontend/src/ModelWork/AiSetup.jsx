@@ -18,7 +18,7 @@ const AiSetup = () => {
 **Location**: ${travelParams.location || 'Las Vegas'}  
 **Duration**: ${travelParams.duration || '3 Days'}  
 **For**: ${travelParams.for || 'A couple'}  
-**Budget Type**: ${travelParams.budgetType || 'Cheap/Budget-friendly'}  
+**Budget Type**: ₹{travelParams.budgetType || 'Cheap/Budget-friendly'}  
 
 The response MUST be in VALID JSON format with no formatting errors. Use double quotes for all keys and string values.
 
@@ -180,7 +180,7 @@ Provide ONLY valid JSON with NO explanations or comments outside the JSON. Do no
               {
                 hotelName: "Example Hotel",
                 hotelAddress: "City Center",
-                pricePerNight: "$$",
+                pricePerNight: "₹₹",
                 starRating: 3,
                 amenities: ["WiFi", "Breakfast"]
               }

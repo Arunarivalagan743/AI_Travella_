@@ -120,10 +120,6 @@ a {
   transition: all 0.2s ease;
 }
 
-a:hover {
-  font-weight: 600;
-}
-
 /* Hero/Feature Titles - Playfair Display */
 .hero-title,
 .feature-title,

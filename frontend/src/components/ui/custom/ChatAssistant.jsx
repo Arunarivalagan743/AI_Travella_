@@ -187,21 +187,23 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
       />
       
       <motion.div 
-        className="fixed bottom-0 md:bottom-4 right-0 md:right-4 w-full md:w-80 h-[70vh] md:h-[450px] bg-white md:rounded-lg shadow-xl flex flex-col z-[70] overflow-hidden"
+        className="fixed bottom-0 md:bottom-4 right-0 md:right-4 w-full md:w-[500px] h-[70vh] md:h-[450px] bg-white shadow-xl flex flex-col z-[70] overflow-hidden border border-gray-200"
       initial={{ opacity: 0, y: 20, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.2 }}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-500 text-white p-3 flex justify-between items-center">
+      <div className="bg-[#1a1a2e] text-white p-3 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <FaRobot className="text-xl" />
-          <h3 className="font-medium">Trip Assistant</h3>
+          <FaRobot className="text-emerald-400 text-xl" />
+          <div>
+            <h3 className="text-[11px] uppercase tracking-[0.15em] font-medium">Trip Assistant</h3>
+          </div>
         </div>
         <button 
           onClick={onClose}
-          className="p-1 rounded-full hover:bg-white/20 transition-colors"
+          className="p-1 hover:bg-white/10 transition-colors"
           aria-label="Close assistant"
         >
           <BiX className="text-xl" />
@@ -209,22 +211,22 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
       </div>
       
       {/* Chat Messages */}
-      <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+      <div className="flex-1 p-4 overflow-y-auto bg-[#f5f0eb]/30">
         {messages.map((message, index) => (
           <div key={index} className={`mb-4 flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`
-              max-w-[80%] rounded-lg p-3 
+              max-w-[80%] p-3 
               ${message.role === 'user' 
-                ? 'bg-emerald-500 text-white rounded-tr-none' 
-                : 'bg-white border border-gray-200 rounded-tl-none'}
+                ? 'bg-[#1a1a2e] text-white' 
+                : 'bg-white border border-gray-200'}
             `}>
               <div className="flex items-center gap-2 mb-1">
                 {message.role === 'user' 
-                  ? <RiUserSmileLine className="text-white" /> 
-                  : <FaRobot className="text-emerald-500" />
+                  ? <RiUserSmileLine className="text-emerald-400" /> 
+                  : <FaRobot className="text-emerald-600" />
                 }
-                <span className="text-xs font-medium">
-                  {message.role === 'user' ? 'You' : 'Trip Assistant'}
+                <span className="text-[10px] uppercase tracking-[0.15em] font-medium">
+                  {message.role === 'user' ? 'You' : 'Assistant'}
                 </span>
               </div>
               <p className="text-sm whitespace-pre-line leading-relaxed">{message.content}</p>
@@ -234,11 +236,11 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
                 <motion.button
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-3 px-3 py-1.5 bg-teal-600 text-white text-xs rounded-full flex items-center gap-1.5"
+                  className="mt-3 px-3 py-1.5 bg-emerald-600 text-white text-[11px] uppercase tracking-[0.1em] flex items-center gap-1.5"
                   onClick={() => handleApplyChanges(message.updatedItinerary)}
                 >
                   <MdOutlineRocketLaunch />
-                  <span>Apply these changes</span>
+                  <span>Apply Changes</span>
                 </motion.button>
               )}
             </div>
@@ -247,19 +249,15 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
         
         {/* Loading indicator */}
         {isLoading && (
-          <div className="flex items-center gap-2 text-gray-500 mb-4">
-            <div className="flex space-x-1">
-              <div className="h-2 w-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="h-2 w-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="h-2 w-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-            </div>
-            <span className="text-sm">Thinking...</span>
+          <div className="flex items-center gap-3 text-gray-400 mb-4">
+            <div className="w-[1px] h-5 bg-emerald-600 animate-pulse"></div>
+            <span className="text-[10px] uppercase tracking-[0.2em]">Thinking</span>
           </div>
         )}
         
         {/* Error message */}
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-3 text-sm text-red-700 mb-4">
+          <div className="bg-[#f5f0eb] border-l-2 border-red-400 p-3 text-sm text-red-700 mb-4">
             {error}
           </div>
         )}
@@ -271,7 +269,7 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
       {/* Sample Questions */}
       {messages.length < 3 && (
         <div className="px-3 pb-2">
-          <p className="text-xs text-gray-500 mb-1.5">Try asking:</p>
+          <p className="text-[10px] uppercase tracking-[0.15em] text-gray-400 mb-1.5">Try asking:</p>
           <div className="flex flex-wrap gap-1.5">
             {[
               "Add a museum to Day 2",
@@ -283,7 +281,7 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
               <button
                 key={index}
                 onClick={() => setInputMessage(question)}
-                className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-full transition-colors"
+                className="text-[10px] bg-[#f5f0eb] hover:bg-gray-200 text-gray-600 px-2.5 py-1.5 transition-colors tracking-wide"
               >
                 {question}
               </button>
@@ -300,13 +298,13 @@ IMPORTANT: For itinerary modifications only, include a JSON block at the end bet
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Ask about any destination or modify your trip..."
-            className="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+            placeholder="Ask about any destination..."
+            className="flex-1 border border-gray-200 px-4 py-2 focus:outline-none focus:border-[#1a1a2e] text-sm transition-colors"
             disabled={isLoading}
           />
           <button
             type="submit"
-            className="bg-emerald-500 text-white rounded-full p-2.5 hover:bg-emerald-600 transition-colors disabled:opacity-50"
+            className="bg-[#1a1a2e] text-white p-2.5 hover:bg-[#2a2a4e] transition-colors disabled:opacity-50"
             disabled={isLoading || !inputMessage.trim()}
             aria-label="Send message"
           >

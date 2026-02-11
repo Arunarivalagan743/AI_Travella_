@@ -11,10 +11,7 @@ import {
   FaUser, 
   FaCalendarAlt, 
   FaTimesCircle, 
-  FaUserCircle,
   FaHeart,
-  FaComment,
-  FaShare,
   FaEdit,
   FaChevronRight,
   FaGlobe,
@@ -435,8 +432,9 @@ function UserProfile() {
   // Render loading state
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
+      <div className="flex flex-col justify-center items-center h-96 gap-4">
+        <div className="w-[1px] h-10 bg-emerald-600 animate-pulse"></div>
+        <span className="text-[11px] uppercase tracking-[0.25em] text-gray-400 font-medium">Loading profile</span>
       </div>
     );
   }
@@ -444,16 +442,17 @@ function UserProfile() {
   // Render not found state
   if (!profile) {
     return (
-      <div className="text-center py-12">
-        <h1 className="text-2xl font-bold text-gray-800">User not found</h1>
-        <p className="text-gray-600 mt-2">
+      <div className="text-center py-16">
+        <h1 className="font-serif text-2xl text-[#1a1a2e] mb-2">User not found</h1>
+        <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-4"></div>
+        <p className="text-gray-500 text-sm tracking-wide mb-6">
           The user you're looking for doesn't exist or has been deleted.
         </p>
         <Link
           to="/explore"
-          className="mt-6 inline-block bg-emerald-600 text-white px-4 py-2 rounded-lg"
+          className="inline-block bg-[#1a1a2e] hover:bg-[#2a2a4e] text-white text-[11px] uppercase tracking-[0.2em] font-medium px-6 py-3 transition-colors"
         >
-          Back to Explore
+          BACK TO EXPLORE
         </Link>
       </div>
     );
@@ -461,247 +460,193 @@ function UserProfile() {
 
   // Render main UI
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-first responsive container */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
-        
-        {/* Modern Profile Header */}
-        <div className="bg-white shadow-sm border border-gray-200 overflow-hidden mb-6 sm:mb-8">
-          {/* Cover Image with latest trip background */}
-          <div 
-            className="relative h-40 sm:h-48 lg:h-56"
-            style={{
-              background: latestTripImage 
-                ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url(${latestTripImage}) center/cover no-repeat`
-                : 'linear-gradient(135deg, #059669, #047857)'
-            }}
-          >
-            <div className="absolute inset-0 bg-black/5"></div>
-            {latestTripImage && (
-              <div className="absolute bottom-3 right-3 px-3 py-1.5 bg-white/20 backdrop-blur-sm text-white text-xs sm:text-sm font-medium rounded-full border border-white/30">
-                Latest Adventure
+    <div className="min-h-screen bg-white">
+      {/* Dark banner profile header */}
+      <div 
+        className="relative"
+        style={{
+          background: latestTripImage 
+            ? `linear-gradient(rgba(26, 26, 46, 0.75), rgba(26, 26, 46, 0.9)), url(${latestTripImage}) center/cover no-repeat`
+            : '#1a1a2e'
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-6">
+            {/* Profile Picture */}
+            <div className="w-20 h-20 sm:w-24 sm:h-24 border-2 border-white/30 overflow-hidden bg-gray-700">
+              {profile.photoURL ? (
+                <img src={profile.photoURL} alt={profile.displayName} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-emerald-600 text-white text-2xl font-serif">
+                  {profile.displayName?.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <span className="text-[11px] uppercase tracking-[0.25em] text-white/40 font-medium">Traveler Profile</span>
+              <h1 className="font-serif text-2xl sm:text-3xl text-white mt-1 truncate">{profile.displayName}</h1>
+              <div className="flex items-center gap-2 text-white/50 text-sm mt-1">
+                <FaEnvelope size={12} />
+                <span className="truncate">{userId}</span>
+              </div>
+              {profile.bio && (
+                <p className="mt-3 text-white/60 text-sm line-clamp-2">{profile.bio}</p>
+              )}
+              <div className="w-12 h-[2px] bg-emerald-600 mt-4"></div>
+            </div>
+
+            {/* Action Buttons */}
+            {user && userId !== user.email && (
+              <div className="flex gap-2">
+                <SocialInteractions
+                  tripId={null}
+                  creatorEmail={userId}
+                  isFollowing={isFollowing.status === 'following'}
+                  followRequestStatus={isFollowing.status}
+                  onUpdate={() => {
+                    fetchUserProfile();
+                    checkFollowStatus();
+                  }}
+                />
+                <button className="p-2.5 border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-colors">
+                  <FaEnvelope size={14} />
+                </button>
               </div>
             )}
             
-            {/* Gradient overlay for better text contrast */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20"></div>
-          </div>
-
-          <div className="px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8 relative">
-            {/* Profile Picture - Responsive positioning */}
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between relative -mt-12 sm:-mt-16">
-              <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
-                <div className="relative">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 border-4 border-white overflow-hidden bg-gray-100 shadow-lg">
-                    {profile.photoURL ? (
-                      <img
-                        src={profile.photoURL}
-                        alt={profile.displayName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-emerald-500 text-white text-xl sm:text-2xl font-bold">
-                        {profile.displayName?.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                  {/* Online/Active indicator */}
-                  <div className="absolute bottom-1 right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 border-2 border-white"></div>
-                </div>
-
-                {/* User Info */}
-                <div className="flex-1 min-w-0 pt-2 sm:pt-0">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 truncate">
-                    {profile.displayName}
-                  </h1>
-                  <div className="flex items-center text-gray-600 mt-1 text-sm sm:text-base">
-                    <FaEnvelope className="mr-2 text-emerald-500 flex-shrink-0" size={14} />
-                    <span className="truncate">{userId}</span>
-                  </div>
-                  {profile.bio && (
-                    <p className="mt-2 sm:mt-3 text-gray-700 text-sm sm:text-base line-clamp-2">
-                      {profile.bio}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Buttons - Responsive layout */}
-              {user && userId !== user.email && (
-                <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-0 sm:ml-4">
-                  <SocialInteractions
-                    tripId={null}
-                    creatorEmail={userId}
-                    isFollowing={isFollowing.status === 'following'}
-                    followRequestStatus={isFollowing.status}
-                    onUpdate={() => {
-                      fetchUserProfile();
-                      checkFollowStatus();
-                    }}
-                  />
-                  
-                  <button className="p-2 sm:p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                    <FaEnvelope className="text-gray-600" size={16} />
-                  </button>
-                </div>
-              )}
-              
-              {/* Edit button for own profile */}
-              {user && userId === user.email && (
-                <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-sm font-medium mt-4 sm:mt-0">
-                  <FaEdit size={14} />
-                  <span className="hidden sm:inline">Edit Profile</span>
-                </button>
-              )}
-            </div>
-
-            {/* Stats Cards - Responsive grid */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mt-6 sm:mt-8">
-              <div className="bg-blue-50 border border-blue-200 p-3 sm:p-4 text-center">
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700">
-                  {stats.tripCount}
-                </div>
-                <div className="text-xs sm:text-sm text-blue-600 font-medium mt-1">
-                  Trips
-                </div>
-              </div>
-              
-              <div className="bg-emerald-50 border border-emerald-200 p-3 sm:p-4 text-center">
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-700">
-                  {stats.followers}
-                </div>
-                <div className="text-xs sm:text-sm text-emerald-600 font-medium mt-1">
-                  Followers
-                </div>
-              </div>
-              
-              <div className="bg-gray-50 border border-gray-200 p-3 sm:p-4 text-center">
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-700">
-                  {stats.following}
-                </div>
-                <div className="text-xs sm:text-sm text-gray-600 font-medium mt-1">
-                  Following
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Modern Tabs Navigation */}
-        <div className="bg-white shadow-sm border border-gray-200 mb-6 sm:mb-8 overflow-hidden">
-          <div className="flex overflow-x-auto">
-            <button
-              className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 font-medium whitespace-nowrap transition-all ${
-                activeTab === 'trips'
-                  ? 'bg-emerald-50 text-emerald-700 border-b-2 border-emerald-500'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-              }`}
-              onClick={() => setActiveTab('trips')}
-            >
-              <FaGlobe size={16} />
-              <span>Trips</span>
-              <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 ml-1">
-                {stats.tripCount}
-              </span>
-            </button>
-            
-            <button
-              className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 font-medium whitespace-nowrap transition-all ${
-                activeTab === 'followers'
-                  ? 'bg-emerald-50 text-emerald-700 border-b-2 border-emerald-500'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-              }`}
-              onClick={() => setActiveTab('followers')}
-            >
-              <FaUsers size={16} />
-              <span>Followers</span>
-              <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 ml-1">
-                {stats.followers}
-              </span>
-            </button>
-            
-            <button
-              className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 font-medium whitespace-nowrap transition-all ${
-                activeTab === 'following'
-                  ? 'bg-emerald-50 text-emerald-700 border-b-2 border-emerald-500'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-              }`}
-              onClick={() => setActiveTab('following')}
-            >
-              <FaUserPlus size={16} />
-              <span>Following</span>
-              <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 ml-1">
-                {stats.following}
-              </span>
-            </button>
-            
-            {activeTab === 'followerTrips' && selectedFollower && (
-              <button className="flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 font-medium whitespace-nowrap bg-emerald-50 text-emerald-700 border-b-2 border-emerald-500">
-                <FaArrowLeft size={14} />
-                <span className="truncate max-w-32 sm:max-w-none">
-                  {followersProfiles[selectedFollower]?.displayName || selectedFollower.split('@')[0]}'s Trips
-                </span>
+            {user && userId === user.email && (
+              <button className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] uppercase tracking-[0.15em] font-medium transition-colors">
+                <FaEdit size={12} />
+                <span>Edit</span>
               </button>
             )}
           </div>
+
+          {/* Stats row */}
+          <div className="flex items-center gap-8 mt-8 border-t border-white/10 pt-6">
+            <div className="text-center">
+              <div className="text-xl sm:text-2xl font-serif text-white">{stats.tripCount}</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-medium mt-1">Trips</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xl sm:text-2xl font-serif text-white">{stats.followers}</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-medium mt-1">Followers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xl sm:text-2xl font-serif text-white">{stats.following}</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-medium mt-1">Following</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        {/* LP-style tabs */}
+        <div className="border-b border-gray-200 flex overflow-x-auto">
+          <button
+            className={`flex items-center gap-2 px-5 py-4 text-[12px] uppercase tracking-[0.2em] font-medium whitespace-nowrap transition-all border-b-2 ${
+              activeTab === 'trips'
+                ? 'text-[#1a1a2e] border-emerald-600'
+                : 'text-gray-400 border-transparent hover:text-gray-600'
+            }`}
+            onClick={() => setActiveTab('trips')}
+          >
+            <FaGlobe size={12} />
+            <span>Trips</span>
+          </button>
+          
+          <button
+            className={`flex items-center gap-2 px-5 py-4 text-[12px] uppercase tracking-[0.2em] font-medium whitespace-nowrap transition-all border-b-2 ${
+              activeTab === 'followers'
+                ? 'text-[#1a1a2e] border-emerald-600'
+                : 'text-gray-400 border-transparent hover:text-gray-600'
+            }`}
+            onClick={() => setActiveTab('followers')}
+          >
+            <FaUsers size={12} />
+            <span>Followers</span>
+          </button>
+          
+          <button
+            className={`flex items-center gap-2 px-5 py-4 text-[12px] uppercase tracking-[0.2em] font-medium whitespace-nowrap transition-all border-b-2 ${
+              activeTab === 'following'
+                ? 'text-[#1a1a2e] border-emerald-600'
+                : 'text-gray-400 border-transparent hover:text-gray-600'
+            }`}
+            onClick={() => setActiveTab('following')}
+          >
+            <FaUserPlus size={12} />
+            <span>Following</span>
+          </button>
+          
+          {activeTab === 'followerTrips' && selectedFollower && (
+            <button className="flex items-center gap-2 px-5 py-4 text-[12px] uppercase tracking-[0.2em] font-medium whitespace-nowrap text-[#1a1a2e] border-b-2 border-emerald-600">
+              <FaArrowLeft size={10} />
+              <span className="truncate max-w-32 sm:max-w-none">
+                {followersProfiles[selectedFollower]?.displayName || selectedFollower.split('@')[0]}'s Trips
+              </span>
+            </button>
+          )}
         </div>
 
-        {/* Modern Trips Tab Content */}
+        <div className="py-8 sm:py-10">
+
+        {/* Trips Tab Content */}
         {activeTab === 'trips' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                Travel Adventures
-              </h2>
-              <div className="text-sm text-gray-500">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-medium">Adventures</span>
+                <h2 className="font-serif text-xl sm:text-2xl text-[#1a1a2e]">
+                  Travel Collection
+                </h2>
+              </div>
+              <div className="text-[11px] uppercase tracking-[0.15em] text-gray-400 font-medium">
                 {stats.tripCount} {stats.tripCount === 1 ? 'trip' : 'trips'}
               </div>
             </div>
 
             {loadingTrips ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+              <div className="flex flex-col items-center justify-center h-64 gap-4">
+                <div className="w-[1px] h-8 bg-emerald-600 animate-pulse"></div>
+                <span className="text-[11px] uppercase tracking-[0.25em] text-gray-400 font-medium">Loading trips</span>
               </div>
             ) : trips.length === 0 ? (
-              <div className="bg-white border border-gray-200 p-8 sm:p-12 text-center shadow-sm">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-emerald-100 border border-emerald-200 flex items-center justify-center">
-                  <FaGlobe className="text-emerald-500 text-2xl sm:text-3xl" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
-                  No adventures shared yet
-                </h3>
-                <p className="text-gray-600 text-sm sm:text-base max-w-md mx-auto">
+              <div className="bg-[#f5f0eb] p-12 sm:p-16 text-center">
+                <FaGlobe className="mx-auto text-[#1a1a2e]/20 text-3xl mb-4" />
+                <h3 className="font-serif text-xl text-[#1a1a2e] mb-2">No adventures shared yet</h3>
+                <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-4"></div>
+                <p className="text-gray-500 text-sm tracking-wide max-w-md mx-auto">
                   {userId === user?.email 
-                    ? "Start planning your first trip and share your adventures with the community!"
-                    : "This traveler hasn't shared any public trips yet. Check back later for amazing adventures!"}
+                    ? "Start planning your first trip and share your adventures."
+                    : "This traveler hasn't shared any public trips yet."}
                 </p>
                 {userId === user?.email && (
                   <Link 
                     to="/create-trip"
-                    className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600 font-medium transition-colors"
+                    className="inline-flex items-center gap-2 mt-6 bg-[#1a1a2e] hover:bg-[#2a2a4e] text-white text-[11px] uppercase tracking-[0.2em] font-medium px-6 py-3 transition-colors"
                   >
-                    <FaGlobe size={16} />
-                    Plan Your First Trip
+                    <FaGlobe size={11} />
+                    PLAN YOUR FIRST TRIP
                   </Link>
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                 {trips.map((trip) => (
                   <motion.div
                     key={trip.id}
-                    className="group bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
+                    className="group bg-white border border-gray-200 overflow-hidden"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    whileHover={{ y: -4 }}
                   >
                     <Link to={`/show-trip/${trip.id}`}>
                       <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
-                        {/* Loading indicator for images */}
                         {loadingImages[trip.id] && (
                           <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 z-10">
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-[1px] h-6 bg-emerald-600 animate-pulse"></div>
                           </div>
                         )}
                         
@@ -715,51 +660,29 @@ function UserProfile() {
                           }}
                         />
                         
-                        {/* Gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                         
-                        {/* Duration badge */}
-                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-emerald-700">
-                          {trip.userSelection?.duration || '?'}d
+                        <div className="absolute top-3 right-3 bg-[#1a1a2e]/80 backdrop-blur-sm text-white text-[10px] uppercase tracking-[0.15em] font-medium px-2.5 py-1">
+                          {trip.userSelection?.duration || '?'} Days
                         </div>
                         
-                        {/* Like count */}
-                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium">
-                          <FaHeart className="text-red-500" size={12} />
-                          <span className="text-gray-700">{trip.likesCount || 0}</span>
+                        <div className="absolute bottom-3 left-3 flex items-center gap-1 text-white/90 text-xs">
+                          <FaHeart size={10} />
+                          <span>{trip.likesCount || 0}</span>
                         </div>
                       </div>
 
                       <div className="p-4 sm:p-5">
-                        <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-2 line-clamp-1 group-hover:text-emerald-700 transition-colors">
+                        <span className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-medium">
+                          {trip.userSelection?.travelType || 'Adventure'}
+                        </span>
+                        <h3 className="font-serif text-lg text-[#1a1a2e] mt-1 mb-2 line-clamp-1 group-hover:text-emerald-700 transition-colors">
                           {getLocationName(trip)}
                         </h3>
 
-                        <div className="space-y-2 mb-3">
-                          <div className="flex items-center text-xs sm:text-sm text-gray-600">
-                            <FaMapMarkerAlt className="mr-2 text-emerald-500 flex-shrink-0" size={12} />
-                            <span className="truncate">{trip.userSelection?.country || 'Adventure'}</span>
-                          </div>
-                          
-                          <div className="flex items-center text-xs sm:text-sm text-gray-600">
-                            <FaCalendarAlt className="mr-2 text-emerald-500 flex-shrink-0" size={12} />
-                            <span>{formatDate(trip.createdAt)}</span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex flex-wrap gap-1 sm:gap-2">
-                            <span className="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded-md font-medium">
-                              {trip.userSelection?.travelType || 'Adventure'}
-                            </span>
-                            {trip.userSelection?.budgetType && (
-                              <span className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-md font-medium">
-                                {trip.userSelection?.budgetType}
-                              </span>
-                            )}
-                          </div>
-
-                          <FaChevronRight className="text-gray-400 group-hover:text-emerald-600 transition-colors" size={14} />
+                        <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
+                          <span className="text-[10px] uppercase tracking-[0.15em] text-gray-400">{formatDate(trip.createdAt)}</span>
+                          <FaChevronRight className="text-gray-300 group-hover:text-emerald-600 transition-colors" size={12} />
                         </div>
                       </div>
                     </Link>
@@ -880,38 +803,37 @@ function UserProfile() {
         </>
       )}
 
-        {/* Modern Followers Tab Content */}
+        {/* Followers Tab Content */}
         {activeTab === 'followers' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                Followers
-              </h2>
-              <div className="text-sm text-gray-500">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-medium">Community</span>
+                <h2 className="font-serif text-xl sm:text-2xl text-[#1a1a2e]">Followers</h2>
+              </div>
+              <div className="text-[11px] uppercase tracking-[0.15em] text-gray-400 font-medium">
                 {stats.followers} {stats.followers === 1 ? 'follower' : 'followers'}
               </div>
             </div>
 
             {loadingFollowers ? (
-              <div className="flex justify-center items-center h-48">
-                <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+              <div className="flex flex-col items-center justify-center h-48 gap-4">
+                <div className="w-[1px] h-8 bg-emerald-600 animate-pulse"></div>
+                <span className="text-[11px] uppercase tracking-[0.25em] text-gray-400 font-medium">Loading</span>
               </div>
             ) : followers.length === 0 ? (
-              <div className="bg-white rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center shadow-sm border border-gray-100">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-gray-100 border border-gray-200 flex items-center justify-center">
-                  <FaUsers className="text-purple-500 text-2xl sm:text-3xl" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
-                  No followers yet
-                </h3>
-                <p className="text-gray-600 text-sm sm:text-base max-w-md mx-auto">
+              <div className="bg-[#f5f0eb] p-12 text-center">
+                <FaUsers className="mx-auto text-[#1a1a2e]/20 text-3xl mb-4" />
+                <h3 className="font-serif text-xl text-[#1a1a2e] mb-2">No followers yet</h3>
+                <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-4"></div>
+                <p className="text-gray-500 text-sm tracking-wide max-w-md mx-auto">
                   {userId === user?.email 
-                    ? "Share amazing trips to attract fellow travel enthusiasts!"
+                    ? "Share amazing trips to attract fellow travel enthusiasts."
                     : "This traveler is just getting started on their journey."}
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {followers.map((email) => {
                   const followerProfile = followersProfiles[email] || { 
                     displayName: email.split('@')[0],
@@ -920,56 +842,41 @@ function UserProfile() {
                   };
                   
                   return (
-                    <motion.div
+                    <div
                       key={email}
-                      className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      whileHover={{ y: -2 }}
+                      className="bg-white border border-gray-200 p-5"
                     >
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="relative">
-                          <div className="w-12 h-12 sm:w-14 sm:h-14 border-2 border-white shadow-lg overflow-hidden bg-emerald-500">
-                            {followerProfile.photoURL ? (
-                              <img 
-                                src={followerProfile.photoURL} 
-                                alt={followerProfile.displayName} 
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg">
-                                {followerProfile.displayName.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                        <div className="w-11 h-11 overflow-hidden bg-emerald-600">
+                          {followerProfile.photoURL ? (
+                            <img src={followerProfile.photoURL} alt={followerProfile.displayName} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-white font-serif text-lg">
+                              {followerProfile.displayName.charAt(0).toUpperCase()}
+                            </div>
+                          )}
                         </div>
-                        
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
-                            {followerProfile.displayName}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-gray-500 truncate">{followerProfile.email}</p>
+                          <h3 className="font-medium text-[#1a1a2e] text-sm truncate">{followerProfile.displayName}</h3>
+                          <p className="text-[11px] uppercase tracking-[0.1em] text-gray-400 truncate">{followerProfile.email}</p>
                         </div>
                       </div>
                       
                       <div className="flex gap-2">
                         <button 
                           onClick={() => viewFollowerTrips(followerProfile.email)}
-                          className="flex-1 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg transition-colors text-sm font-medium"
+                          className="flex-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] uppercase tracking-[0.15em] font-medium transition-colors"
                         >
-                          View Trips
+                          Trips
                         </button>
-                        
                         <Link 
                           to={`/user/${followerProfile.email}`}
-                          className="px-3 py-2 border border-gray-200 hover:border-gray-300 text-gray-700 rounded-lg transition-colors text-sm font-medium"
+                          className="px-3 py-2 border border-gray-200 hover:bg-gray-50 text-gray-600 text-[11px] uppercase tracking-[0.15em] font-medium transition-colors"
                         >
                           Profile
                         </Link>
                       </div>
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
@@ -977,47 +884,46 @@ function UserProfile() {
           </div>
         )}
 
-        {/* Modern Following Tab Content */}
+        {/* Following Tab Content */}
         {activeTab === 'following' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                Following
-              </h2>
-              <div className="text-sm text-gray-500">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-medium">Community</span>
+                <h2 className="font-serif text-xl sm:text-2xl text-[#1a1a2e]">Following</h2>
+              </div>
+              <div className="text-[11px] uppercase tracking-[0.15em] text-gray-400 font-medium">
                 {stats.following} {stats.following === 1 ? 'person' : 'people'}
               </div>
             </div>
 
             {loadingFollowing ? (
-              <div className="flex justify-center items-center h-48">
-                <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+              <div className="flex flex-col items-center justify-center h-48 gap-4">
+                <div className="w-[1px] h-8 bg-emerald-600 animate-pulse"></div>
+                <span className="text-[11px] uppercase tracking-[0.25em] text-gray-400 font-medium">Loading</span>
               </div>
             ) : following.length === 0 ? (
-              <div className="bg-white rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center shadow-sm border border-gray-100">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
-                  <FaUserPlus className="text-blue-500 text-2xl sm:text-3xl" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
-                  Not following anyone yet
-                </h3>
-                <p className="text-gray-600 text-sm sm:text-base max-w-md mx-auto">
+              <div className="bg-[#f5f0eb] p-12 text-center">
+                <FaUserPlus className="mx-auto text-[#1a1a2e]/20 text-3xl mb-4" />
+                <h3 className="font-serif text-xl text-[#1a1a2e] mb-2">Not following anyone yet</h3>
+                <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-4"></div>
+                <p className="text-gray-500 text-sm tracking-wide max-w-md mx-auto">
                   {userId === user?.email 
-                    ? "Discover amazing travelers and start following them to see their adventures!"
+                    ? "Discover amazing travelers and start following them."
                     : "This traveler hasn't started following others yet."}
                 </p>
                 {userId === user?.email && (
                   <Link 
                     to="/explore"
-                    className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors"
+                    className="inline-flex items-center gap-2 mt-6 bg-[#1a1a2e] hover:bg-[#2a2a4e] text-white text-[11px] uppercase tracking-[0.2em] font-medium px-6 py-3 transition-colors"
                   >
-                    <FaUsers size={16} />
-                    Discover Travelers
+                    <FaUsers size={11} />
+                    DISCOVER TRAVELERS
                   </Link>
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {following.map((followingEmail) => {
                   const followingProfile = followingProfiles[followingEmail] || {
                     displayName: followingEmail.split('@')[0],
@@ -1028,51 +934,38 @@ function UserProfile() {
                   const isOwnProfile = user && user.email && userId && userId === user.email;
                   
                   return (
-                    <motion.div
+                    <div
                       key={followingEmail}
-                      className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      whileHover={{ y: -2 }}
+                      className="bg-white border border-gray-200 p-5"
                     >
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="relative">
-                          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-gradient-to-br from-purple-400 to-pink-500 border-2 border-white shadow-lg">
-                            {followingProfile.photoURL ? (
-                              <img
-                                src={followingProfile.photoURL}
-                                alt={followingProfile.displayName}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg">
-                                {followingProfile.displayName.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                        <div className="w-11 h-11 overflow-hidden bg-[#1a1a2e]">
+                          {followingProfile.photoURL ? (
+                            <img src={followingProfile.photoURL} alt={followingProfile.displayName} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-white font-serif text-lg">
+                              {followingProfile.displayName.charAt(0).toUpperCase()}
+                            </div>
+                          )}
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
-                            {followingProfile.displayName}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-gray-500 truncate">{followingProfile.email}</p>
+                          <h3 className="font-medium text-[#1a1a2e] text-sm truncate">{followingProfile.displayName}</h3>
+                          <p className="text-[11px] uppercase tracking-[0.1em] text-gray-400 truncate">{followingProfile.email}</p>
                         </div>
                       </div>
                       
                       <div className="flex gap-2">
                         <button 
                           onClick={() => viewFollowerTrips(followingProfile.email)}
-                          className="flex-1 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg transition-colors text-sm font-medium"
+                          className="flex-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] uppercase tracking-[0.15em] font-medium transition-colors"
                         >
-                          View Trips
+                          Trips
                         </button>
                         
                         <Link 
                           to={`/user/${followingProfile.email}`}
-                          className="px-3 py-2 border border-gray-200 hover:border-gray-300 text-gray-700 rounded-lg transition-colors text-sm font-medium"
+                          className="px-3 py-2 border border-gray-200 hover:bg-gray-50 text-gray-600 text-[11px] uppercase tracking-[0.15em] font-medium transition-colors"
                         >
                           Profile
                         </Link>
@@ -1080,13 +973,13 @@ function UserProfile() {
                         {isOwnProfile && (
                           <button
                             onClick={() => handleUnfollow(followingProfile.email)}
-                            className="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-colors text-sm font-medium"
+                            className="px-3 py-2 border border-red-200 hover:bg-red-50 text-red-500 transition-colors"
                           >
-                            <FaTimesCircle size={14} />
+                            <FaTimesCircle size={13} />
                           </button>
                         )}
                       </div>
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
@@ -1097,57 +990,38 @@ function UserProfile() {
         {/* Follower Trips Tab Content - Simplified for space */}
         {activeTab === 'followerTrips' && selectedFollower && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                  {followersProfiles[selectedFollower]?.displayName || selectedFollower.split('@')[0]}'s Adventures
-                </h2>
-                <button 
-                  onClick={() => setActiveTab('followers')}
-                  className="text-emerald-600 hover:text-emerald-700 text-sm flex items-center gap-1 mt-1"
-                >
-                  <FaArrowLeft size={12} />
-                  Back to Followers
-                </button>
-              </div>
+            <div>
+              <button 
+                onClick={() => setActiveTab('followers')}
+                className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] font-medium text-emerald-600 hover:text-emerald-700 mb-4 transition-colors"
+              >
+                <FaArrowLeft size={10} />
+                Back to Followers
+              </button>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-600 font-medium mb-2">Traveler</p>
+              <h2 className="font-serif text-2xl sm:text-3xl text-[#1a1a2e]">
+                {followersProfiles[selectedFollower]?.displayName || selectedFollower.split('@')[0]}'s Adventures
+              </h2>
+              <div className="w-12 h-[2px] bg-emerald-600 mt-3"></div>
             </div>
 
             {loadingFollowerTrips ? (
-              <div className="flex justify-center items-center h-48">
-                <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-[1px] h-10 bg-emerald-600 animate-pulse mb-4"></div>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 font-medium">Loading trips</p>
               </div>
             ) : followerTrips.length === 0 ? (
-              <div className="bg-white rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center shadow-sm border border-gray-100">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-full flex items-center justify-center">
-                  <FaGlobe className="text-emerald-500 text-2xl sm:text-3xl" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
-                  No public trips yet
-                </h3>
-                <p className="text-gray-600 text-sm sm:text-base">
-                  This traveler hasn't shared any adventures yet.
-                </p>
+              <div className="bg-[#f5f0eb] p-10 sm:p-14 text-center">
+                <FaGlobe className="text-emerald-600 text-2xl mx-auto mb-4" />
+                <h3 className="font-serif text-xl text-[#1a1a2e] mb-2">No Public Trips Yet</h3>
+                <p className="text-sm text-gray-500">This traveler hasn't shared any adventures yet.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {followerTrips.map((trip) => (
-                  <motion.div
-                    key={trip.id}
-                    className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    whileHover={{ y: -4 }}
-                  >
+                  <div key={trip.id} className="group bg-white border border-gray-200 overflow-hidden">
                     <Link to={`/show-trip/${trip.id}`}>
                       <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
-                        {/* Loading indicator for images */}
-                        {loadingImages[trip.id] && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 z-10">
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                          </div>
-                        )}
-                        
                         <img 
                           src={getTripImage(trip)} 
                           alt={getLocationName(trip)}
@@ -1158,51 +1032,49 @@ function UserProfile() {
                           }}
                         />
                         
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
-                        
-                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-emerald-700">
-                          {trip.userSelection?.duration || '?'}d
+                        <div className="absolute top-3 left-3 bg-[#1a1a2e] text-white px-3 py-1 text-[10px] uppercase tracking-[0.15em] font-medium">
+                          {trip.userSelection?.travelType || 'Adventure'}
                         </div>
                         
-                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium">
-                          <FaHeart className="text-red-500" size={12} />
+                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-white px-2 py-1 text-[11px] font-medium">
+                          <FaHeart className="text-red-500" size={10} />
                           <span className="text-gray-700">{trip.likesCount || 0}</span>
                         </div>
                       </div>
 
-                      <div className="p-4 sm:p-5">
-                        <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-2 line-clamp-1 group-hover:text-emerald-700 transition-colors">
+                      <div className="p-4">
+                        <h3 className="font-serif text-lg text-[#1a1a2e] mb-2 line-clamp-1 group-hover:text-emerald-700 transition-colors">
                           {getLocationName(trip)}
                         </h3>
 
-                        <div className="space-y-2 mb-3">
-                          <div className="flex items-center text-xs sm:text-sm text-gray-600">
-                            <FaMapMarkerAlt className="mr-2 text-emerald-500 flex-shrink-0" size={12} />
+                        <div className="space-y-1.5 mb-3">
+                          <div className="flex items-center text-[12px] text-gray-500">
+                            <FaMapMarkerAlt className="mr-2 text-emerald-600 flex-shrink-0" size={10} />
                             <span className="truncate">{trip.userSelection?.country || 'Adventure'}</span>
                           </div>
-                          
-                          <div className="flex items-center text-xs sm:text-sm text-gray-600">
-                            <FaCalendarAlt className="mr-2 text-emerald-500 flex-shrink-0" size={12} />
+                          <div className="flex items-center text-[12px] text-gray-500">
+                            <FaCalendarAlt className="mr-2 text-emerald-600 flex-shrink-0" size={10} />
                             <span>{formatDate(trip.createdAt)}</span>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between">
-                          <div className="flex flex-wrap gap-1 sm:gap-2">
-                            <span className="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded-md font-medium">
-                              {trip.userSelection?.travelType || 'Adventure'}
-                            </span>
-                          </div>
-                          <FaChevronRight className="text-gray-400 group-hover:text-emerald-600 transition-colors" size={14} />
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                          <span className="text-[11px] uppercase tracking-[0.1em] text-gray-400 font-medium">
+                            {trip.userSelection?.duration || '?'} days
+                          </span>
+                          <span className="text-[11px] uppercase tracking-[0.1em] text-emerald-600 font-medium group-hover:text-emerald-700">
+                            View Trip →
+                          </span>
                         </div>
                       </div>
                     </Link>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             )}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

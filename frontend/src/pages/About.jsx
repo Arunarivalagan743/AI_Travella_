@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { FaMapMarkedAlt, FaRobot, FaPlaneDeparture, FaRegLightbulb, FaStar } from 'react-icons/fa';
+import { FaMapMarkedAlt, FaRobot, FaPlaneDeparture, FaRegLightbulb, FaArrowRight } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const About = () => {
-  // Animation controls for scroll reveal effects
   const controls = {
     title: useAnimation(),
     image: useAnimation(),
@@ -13,13 +13,11 @@ const About = () => {
     video: useAnimation()
   };
   
-  // Intersection observers
   const [titleRef, titleInView] = useInView({ threshold: 0.3, triggerOnce: true });
   const [aboutRef, aboutInView] = useInView({ threshold: 0.3, triggerOnce: true });
   const [howRef, howInView] = useInView({ threshold: 0.3, triggerOnce: true });
   const [experienceRef, experienceInView] = useInView({ threshold: 0.3, triggerOnce: true });
 
-  // Trigger animations when sections come into view
   useEffect(() => {
     if (titleInView) {
       controls.title.start({ opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } });
@@ -36,222 +34,161 @@ const About = () => {
     }
   }, [titleInView, aboutInView, howInView, experienceInView, controls]);
 
-  // Card animation for staggered reveal
   const cardVariants = {
     hidden: { opacity: 0, y: 40 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
   };
 
   return (
-    <div className="bg-gradient-to-b from-emerald-50 to-white min-h-screen text-gray-800 font-sans">
+    <div className="bg-white min-h-screen text-gray-900">
       
-      {/* Hero Section with Animated Logo */}
-      <section ref={titleRef} className="relative overflow-hidden py-24 px-4">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-100 to-teal-50" style={{ zIndex: "-1" }}></div>
-        <motion.div className="absolute opacity-30 right-10 top-20 w-64 h-64 rounded-full bg-teal-200"
-          animate={{ 
-            scale: [1, 1.2, 1],
-            x: [0, -30, 0],
-            y: [0, 20, 0]
-          }} 
-          transition={{ 
-            duration: 20,
-            repeat: Infinity,
-            repeatType: "reverse"
-          }} 
-          style={{ filter: "blur(60px)" }}
-        />
-        <motion.div className="absolute opacity-20 left-10 bottom-10 w-48 h-48 rounded-full bg-emerald-300"
-          animate={{ 
-            scale: [1, 1.4, 1],
-            x: [0, 40, 0],
-            y: [0, -20, 0]
-          }} 
-          transition={{ 
-            duration: 15,
-            repeat: Infinity,
-            repeatType: "reverse"
-          }} 
-          style={{ filter: "blur(50px)" }}
-        />
-
-        <div className="max-w-6xl mx-auto text-center relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={controls.title}
-          >
-            <div className="flex items-center justify-center mb-6">
-              <motion.div
-                className="relative h-14 w-14 mr-3"
-                animate={{ 
-                  rotate: [0, 5, 0, -5, 0],
-                }}
-                transition={{ 
-                  duration: 6, 
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-600 to-teal-400 flex items-center justify-center">
-                  <FaStar className="text-white text-2xl" />
-                </div>
-                <motion.div 
-                  className="absolute -inset-2 rounded-full border-2 border-emerald-400 border-opacity-50"
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    opacity: [0.7, 0.3, 0.7]
-                  }}
-                  transition={{ 
-                    duration: 3, 
-                    repeat: Infinity 
-                  }}
-                />
-              </motion.div>
-              <h1 className="text-5xl md:text-6xl font-bold">
-                <span className="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-600 bg-clip-text text-transparent">
-                  AI Travella
-                </span>
+      {/* Hero Section — LP editorial style */}
+      <section ref={titleRef} className="relative overflow-hidden">
+        <div 
+          className="relative h-[70vh] min-h-[500px] bg-cover bg-center"
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=2000&q=80")' }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/60 to-transparent" />
+          
+          <div className="absolute inset-0 flex items-end">
+            <motion.div 
+              className="max-w-4xl mx-auto w-full px-6 pb-16"
+              initial={{ opacity: 0, y: 30 }}
+              animate={controls.title}
+            >
+              <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-400 font-medium mb-4">
+                ABOUT TRAVELLA AI
+              </p>
+              <h1 className="font-serif text-5xl md:text-7xl text-white leading-[1.05] mb-6">
+                Where Intelligence<br />Meets Adventure
               </h1>
-            </div>
-            <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-700 leading-relaxed">
-              Reimagine your journey with intelligent travel planning powered by cutting-edge AI and curated experiences.
-            </p>
-          </motion.div>
+              <p className="text-lg text-white/80 max-w-xl leading-relaxed tracking-wide">
+                Reimagine your journey with intelligent travel planning powered by cutting-edge AI and curated experiences.
+              </p>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* About Section */}
+      {/* About Section — clean editorial */}
       <section ref={aboutRef} className="py-20 px-6 md:px-16 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center gap-12">
+        <div className="flex flex-col md:flex-row items-start gap-16">
           <motion.div 
             className="md:w-1/2"
-            initial={{ opacity: 0, x: -80 }}
+            initial={{ opacity: 0, x: -60 }}
             animate={controls.image}
           >
             <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-xl opacity-20 blur-lg"></div>
               <img
                 src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
                 alt="Scenic destination beach"
-                className="rounded-xl shadow-xl relative z-10 w-full object-cover aspect-4/3"
+                className="w-full object-cover aspect-[4/3]"
               />
-              <div className="absolute -bottom-3 -right-3 w-20 h-20 bg-white rounded-lg shadow-lg flex items-center justify-center">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                >
-                  <FaRobot className="text-3xl text-emerald-600" />
-                </motion.div>
+              <div className="absolute bottom-0 left-0 bg-emerald-600 px-4 py-2">
+                <span className="text-[11px] uppercase tracking-[0.2em] text-white font-medium">AI-POWERED</span>
               </div>
             </div>
           </motion.div>
           
           <motion.div 
             className="md:w-1/2"
-            initial={{ opacity: 0, x: 80 }}
+            initial={{ opacity: 0, x: 60 }}
             animate={controls.content}
           >
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent mb-6">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-600 font-medium mb-4">OUR MISSION</p>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1a2e] mb-6 leading-tight">
               Intelligent Travel Planning
             </h2>
-            <p className="text-gray-700 leading-relaxed mb-5">
+            <div className="w-12 h-[2px] bg-emerald-600 mb-6" />
+            <p className="text-gray-600 leading-relaxed mb-5 tracking-wide">
               AI Travella uses advanced artificial intelligence to transform how you plan your travels. Our platform creates personalized itineraries by analyzing your preferences alongside real-time data on weather, local events, and travel conditions.
             </p>
-            <p className="text-gray-700 leading-relaxed mb-6">
+            <p className="text-gray-600 leading-relaxed mb-8 tracking-wide">
               From hidden local gems to efficient route planning, we handle the complex details so you can focus on making memories. Whether you're seeking relaxation, adventure, or cultural immersion, AI Travella crafts journeys tailored to your unique travel style.
             </p>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-                <div className="flex items-center text-emerald-700 font-semibold mb-1">
-                  <motion.div 
-                    animate={{ rotate: [0, 10, 0, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                    className="mr-2"
-                  >
-                    <FaMapMarkedAlt />
-                  </motion.div>
-                  <span>Smart Destinations</span>
+              <div className="border border-gray-200 p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <FaMapMarkedAlt className="text-emerald-600" />
+                  <span className="text-[12px] uppercase tracking-[0.15em] font-semibold text-[#1a1a2e]">Smart Destinations</span>
                 </div>
-                <p className="text-sm text-gray-600">AI-curated locations based on your interests</p>
+                <p className="text-sm text-gray-500 leading-relaxed">AI-curated locations based on your interests</p>
               </div>
-              <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-                <div className="flex items-center text-emerald-700 font-semibold mb-1">
-                  <motion.div 
-                    animate={{ y: [0, -3, 0, 3, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="mr-2"
-                  >
-                    <FaPlaneDeparture />
-                  </motion.div>
-                  <span>Effortless Planning</span>
+              <div className="border border-gray-200 p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <FaPlaneDeparture className="text-emerald-600" />
+                  <span className="text-[12px] uppercase tracking-[0.15em] font-semibold text-[#1a1a2e]">Effortless Planning</span>
                 </div>
-                <p className="text-sm text-gray-600">Complete itineraries in seconds, not hours</p>
+                <p className="text-sm text-gray-500 leading-relaxed">Complete itineraries in seconds, not hours</p>
               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section ref={howRef} className="py-20 px-6 bg-white">
+      {/* How It Works — LP card style */}
+      <section ref={howRef} className="py-20 px-6 bg-[#f5f0eb]">
         <div className="max-w-6xl mx-auto">
           <motion.div 
-            className="text-center mb-16"
+            className="mb-16"
             initial={{ opacity: 0, y: 30 }}
             animate={controls.cards}
           >
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent mb-3">
-              How AI Travella Works
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-1 h-[1px] bg-[#1a1a2e]/20" />
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#1a1a2e]/60 font-medium">HOW IT WORKS</p>
+              <div className="flex-1 h-[1px] bg-[#1a1a2e]/20" />
+            </div>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1a2e] text-center">
+              Your Journey in Four Steps
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Our intelligent platform simplifies your journey from inspiration to destination
-            </p>
           </motion.div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 icon: <FaMapMarkedAlt />,
+                step: "01",
                 title: "Choose Location",
-                description: "Select your dream destination or let our AI suggest personalized options based on your travel style",
-                color: "from-emerald-500 to-emerald-700"
+                description: "Select your dream destination or let our AI suggest personalized options based on your travel style"
               },
               {
                 icon: <FaRobot />,
+                step: "02",
                 title: "AI Analysis",
-                description: "Our algorithm processes thousands of data points including weather, events, and traveler insights",
-                color: "from-teal-400 to-teal-600"
+                description: "Our algorithm processes thousands of data points including weather, events, and traveler insights"
               },
               {
                 icon: <FaPlaneDeparture />,
+                step: "03",
                 title: "Custom Itinerary",
-                description: "Receive a complete day-by-day plan with accommodations, activities, and transit options",
-                color: "from-emerald-400 to-teal-500"
+                description: "Receive a complete day-by-day plan with accommodations, activities, and transit options"
               },
               {
                 icon: <FaRegLightbulb />,
+                step: "04",
                 title: "Smart Insights",
-                description: "Get local tips, packing suggestions, and cultural guidance to enhance your experience",
-                color: "from-teal-500 to-emerald-600"
+                description: "Get local tips, packing suggestions, and cultural guidance to enhance your experience"
               }
             ].map((card, index) => (
               <motion.div 
                 key={index}
-                className="bg-white rounded-xl overflow-hidden shadow-lg transform transition-all hover:-translate-y-1 hover:shadow-xl"
+                className="bg-white overflow-hidden hover:-translate-y-1 transition-all duration-300 group"
                 variants={cardVariants}
                 initial="hidden"
                 animate={controls.cards}
               >
-                <div className={`h-2 bg-gradient-to-r ${card.color}`}></div>
+                <div className="h-[3px] bg-emerald-600 w-0 group-hover:w-full transition-all duration-500" />
                 <div className="p-7">
-                  <div className="mb-5 bg-emerald-50 w-14 h-14 rounded-full flex items-center justify-center text-2xl text-emerald-600">
-                    {card.icon}
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-emerald-600 font-semibold">STEP {card.step}</span>
+                    <span className="text-emerald-600 text-xl">{card.icon}</span>
                   </div>
-                  <h3 className="font-semibold text-xl text-gray-800 mb-2">
+                  <h3 className="text-[13px] uppercase tracking-[0.15em] font-bold text-[#1a1a2e] mb-3">
                     {card.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-sm text-gray-500 leading-relaxed">
                     {card.description}
                   </p>
                 </div>
@@ -261,23 +198,35 @@ const About = () => {
         </div>
       </section>
 
-      {/* Experience Section */}
-      <section ref={experienceRef} className="py-20 px-6 bg-gradient-to-b from-white to-emerald-50">
-        <div className="max-w-5xl mx-auto">
+      {/* CTA Section — LP editorial style */}
+      <section ref={experienceRef} className="py-24 px-6 bg-[#1a1a2e]">
+        <div className="max-w-4xl mx-auto text-center">
           <motion.div 
             initial={{ opacity: 0, y: 40 }}
             animate={controls.video}
-            className="text-center mb-10"
           >
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent mb-4">
-              Experience AI Travella
+            <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-400 font-medium mb-6">START YOUR ADVENTURE</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-white mb-6 leading-tight">
+              Ready to Experience<br />AI-Powered Travel?
             </h2>
-            <p className="text-gray-700 max-w-2xl mx-auto mb-8">
-              Watch how our intelligent platform transforms your travel planning experience
+            <p className="text-white/60 max-w-xl mx-auto mb-10 leading-relaxed tracking-wide">
+              Let our intelligent platform transform your travel planning. Create your first AI-generated trip in minutes.
             </p>
+            <div className="flex items-center justify-center gap-4">
+              <Link 
+                to="/create-trip"
+                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 text-[12px] uppercase tracking-[0.15em] font-semibold transition-colors"
+              >
+                PLAN YOUR TRIP <FaArrowRight size={12} />
+              </Link>
+              <Link 
+                to="/explore"
+                className="inline-flex items-center gap-2 border border-white/30 hover:border-white text-white px-8 py-3 text-[12px] uppercase tracking-[0.15em] font-semibold transition-colors"
+              >
+                EXPLORE STORIES
+              </Link>
+            </div>
           </motion.div>
-          
-      
         </div>
       </section>
     </div>

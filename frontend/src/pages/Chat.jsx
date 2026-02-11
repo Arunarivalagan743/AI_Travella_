@@ -50,15 +50,16 @@ const Chat = () => {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-[70vh]">
-        <div className="bg-white shadow-md rounded-xl p-8 text-center max-w-md">
-          <div className="text-6xl mb-6 text-emerald-500">💬</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Sign in to chat</h2>
-          <p className="text-gray-600 mb-6">
+        <div className="bg-white border border-gray-200 p-10 text-center max-w-md">
+          <div className="text-4xl mb-5 text-[#1a1a2e]">💬</div>
+          <h2 className="font-serif text-2xl text-[#1a1a2e] mb-2">Sign in to chat</h2>
+          <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-4"></div>
+          <p className="text-gray-500 text-sm tracking-wide mb-6">
             Please sign in to chat with your followers and share trips.
           </p>
           <button 
             onClick={() => window.location.href = '/'}
-            className="px-6 py-3 bg-emerald-600 text-white rounded-lg shadow-md hover:bg-emerald-700 transition-colors"
+            className="px-6 py-3 bg-[#1a1a2e] hover:bg-[#2a2a4e] text-white text-[11px] uppercase tracking-[0.2em] font-medium transition-colors"
           >
             Back to Home
           </button>
@@ -68,64 +69,64 @@ const Chat = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Sidebar Navigation */}
-        <div className="md:w-64 bg-white shadow-md rounded-xl p-4 h-fit">
-          <h2 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3">
-            Social Hub
-          </h2>
+    <div>
+      {/* Dark banner header */}
+      <div className="bg-[#1a1a2e] py-8 sm:py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <span className="text-[11px] uppercase tracking-[0.25em] text-white/50 font-medium">Community</span>
+          <h1 className="font-serif text-2xl sm:text-3xl text-white mt-1">Social Hub</h1>
+          <div className="w-12 h-[2px] bg-emerald-600 mt-3"></div>
           
-          <div className="flex flex-col gap-2">
+          {/* LP-style tabs */}
+          <div className="flex items-center gap-8 mt-6 border-t border-white/10 pt-4">
             <button
               onClick={() => setView('chat')}
-              className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 text-[12px] uppercase tracking-[0.2em] font-medium pb-2 transition-colors border-b-2 ${
                 view === 'chat' 
-                ? 'bg-emerald-50 text-emerald-700' 
-                : 'hover:bg-gray-100 text-gray-700'
+                  ? 'text-white border-emerald-600' 
+                  : 'text-white/50 border-transparent hover:text-white/80'
               }`}
             >
-              <FaComment size={18} />
-              <span className="font-medium">Messages</span>
+              <FaComment size={11} />
+              <span>Messages</span>
             </button>
             
             <button
               onClick={() => setView('followers')}
-              className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 text-[12px] uppercase tracking-[0.2em] font-medium pb-2 transition-colors border-b-2 ${
                 view === 'followers' 
-                ? 'bg-emerald-50 text-emerald-700' 
-                : 'hover:bg-gray-100 text-gray-700'
+                  ? 'text-white border-emerald-600' 
+                  : 'text-white/50 border-transparent hover:text-white/80'
               }`}
             >
-              <FaUsers size={18} />
-              <span className="font-medium">Followers</span>
+              <FaUsers size={11} />
+              <span>Followers</span>
             </button>
           </div>
         </div>
-        
-        {/* Main Content */}
-        <div className="flex-1">
-          <div className="bg-white shadow-md rounded-xl overflow-hidden min-h-[70vh]">
-            {view === 'chat' ? (
-              <div className="h-full">
-                <ChatInterface 
-                  isOpen={true} 
-                  onClose={() => {}} 
-                  selectedUserId={selectedUser}
-                  sharedTrip={sharedTrip}
-                  embedded={true}
-                />
-              </div>
-            ) : (
-              <div className="p-6">
-                <FollowersList 
-                  onClose={() => setView('chat')}
-                  showBackButton={false}
-                  onChatStart={handleSelectUser}
-                />
-              </div>
-            )}
-          </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="bg-white border border-gray-200 overflow-hidden min-h-[70vh]">
+          {view === 'chat' ? (
+            <div className="h-full">
+              <ChatInterface 
+                isOpen={true} 
+                onClose={() => {}} 
+                selectedUserId={selectedUser}
+                sharedTrip={sharedTrip}
+                embedded={true}
+              />
+            </div>
+          ) : (
+            <div className="p-6">
+              <FollowersList 
+                onClose={() => setView('chat')}
+                showBackButton={false}
+                onChatStart={handleSelectUser}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -38,7 +38,7 @@ Current Trip Details (if the user is asking about modifying this specific trip):
 Location: ${tripData.location || tripData.userSelection?.location}
 Duration: ${tripData.duration || tripData.userSelection?.duration}
 Trip Type: ${tripData.travelType || tripData.userSelection?.travelType}
-Budget: ${tripData.budgetType || tripData.userSelection?.budgetType}
+Budget: ₹{tripData.budgetType || tripData.userSelection?.budgetType}
 
 Current Itinerary (if relevant):
 ${JSON.stringify(tripData.itinerary || {}, null, 2)}

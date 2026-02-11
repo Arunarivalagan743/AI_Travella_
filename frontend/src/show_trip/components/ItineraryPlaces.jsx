@@ -788,23 +788,28 @@ const SimpleItinerary = ({ itineraryData }) => {
     return (
       <div className="max-w-7xl mx-auto py-6 sm:py-8 text-center px-3 sm:px-4">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-6"></div>
+          <div className="h-8 bg-gray-200 w-1/2 mb-4"></div>
+          <div className="h-4 bg-gray-200 w-3/4 mb-6"></div>
           <div className="flex gap-2 mb-6">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-10 bg-gray-200 rounded-full w-16"></div>
+              <div key={i} className="h-10 bg-gray-200 w-16"></div>
             ))}
           </div>
-          <div className="h-48 bg-gray-200 rounded-lg w-full mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-5/6 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-4/6 mb-2"></div>
+          <div className="h-48 bg-gray-200 w-full mb-4"></div>
+          <div className="h-4 bg-gray-200 w-5/6 mb-2"></div>
+          <div className="h-4 bg-gray-200 w-4/6 mb-2"></div>
         </div>
       </div>
     );
   }
 
   if (!processedData || processedData.length === 0) {
-    return <div className="text-gray-500 text-center py-8">No itinerary data available</div>;
+    return (
+      <div className="text-center py-12 bg-[#f5f0eb]">
+        <p className="font-serif text-lg text-[#1a1a2e] mb-1">No Itinerary</p>
+        <p className="text-[12px] text-gray-400 tracking-wide">No itinerary data available</p>
+      </div>
+    );
   }
 
   const currentDayData = processedData.find(day => day.day === selectedDay);
@@ -818,21 +823,26 @@ const SimpleItinerary = ({ itineraryData }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4">
-      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-emerald-700 flex items-center gap-2">
-        <FaMapMarkerAlt className="text-emerald-500" /> Trip Itinerary
-      </h2>
+      <div className="mb-6">
+        <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-600 font-medium mb-2">Day by Day</p>
+        <h2 className="font-serif text-2xl sm:text-3xl text-[#1a1a2e]">
+          Trip Itinerary
+        </h2>
+        <div className="w-12 h-[2px] bg-emerald-600 mt-3"></div>
+      </div>
       
-      {/* Day selection - with horizontal scrolling for many days */}
-      <div className="overflow-x-auto pb-2 mb-4">
-        <div className="flex gap-2 min-w-max\">
+      {/* Day selection - LP style */}
+      <div className="overflow-x-auto pb-2 mb-6">
+        <div className="flex gap-2 min-w-max">
           {processedData.map(day => (
             <button
               key={day.day}
               onClick={() => setSelectedDay(day.day)}
-              className={`px-4 py-2 rounded-full font-medium transition-all duration-200 shadow-sm
-                ${selectedDay === day.day
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-emerald-100'}`}
+              className={`px-4 py-2 text-[11px] uppercase tracking-[0.15em] font-medium transition-all duration-200 ${
+                selectedDay === day.day
+                  ? 'bg-[#1a1a2e] text-white'
+                  : 'border border-gray-200 text-gray-500 hover:border-[#1a1a2e] hover:text-[#1a1a2e]'
+              }`}
             >
               Day {day.day}
             </button>
@@ -843,66 +853,68 @@ const SimpleItinerary = ({ itineraryData }) => {
       {/* Activities for selected day */}
       <div>
         {activities.length === 0 ? (
-          <div className="text-gray-400 text-center py-8">No activities for this day</div>
+          <div className="text-center py-12 bg-[#f5f0eb]">
+            <p className="font-serif text-lg text-[#1a1a2e] mb-1">No Activities</p>
+            <p className="text-sm text-gray-400">No activities planned for this day</p>
+          </div>
         ) : (
           activities.map((activity, index) => {
             const imageKey = `${selectedDay}-${activity.placeName}`;
             return (
               <div
                 key={index}
-                className="mb-8 rounded-xl shadow border border-gray-100 bg-white overflow-hidden"
+                className="mb-6 border border-gray-200 bg-white overflow-hidden"
               >
                 <img
                   src={placeImages[imageKey] || 'https://via.placeholder.com/400x200?text=Loading...'}
                   alt={activity.placeName}
                   className="w-full h-48 object-cover"
                 />
-                <div className="p-4">
+                <div className="p-4 sm:p-5">
                   <div className="flex items-center gap-2 mb-2">
-                    <FaMapMarkerAlt className="text-emerald-500" />
-                    <h3 className="text-lg font-semibold">{activity.placeName}</h3>
-                    {/* Map/search icon button */}
+                    <FaMapMarkerAlt className="text-emerald-600" />
+                    <h3 className="font-serif text-lg text-[#1a1a2e]">{activity.placeName}</h3>
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.placeName)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-2 text-emerald-600 hover:text-emerald-800 transition-colors duration-200"
+                      className="ml-2 text-emerald-600 hover:text-emerald-800 transition-colors"
                       title="Search on Google Maps"
                     >
-                      <FaSearchLocation className="text-lg" />
+                      <FaSearchLocation className="text-base" />
                     </a>
                     {activity.rating && (
-                      <span className="flex items-center ml-2 text-yellow-500 text-sm">
+                      <span className="flex items-center ml-2 text-amber-500 text-sm">
                         <FaStar className="mr-1" /> {activity.rating}
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-600 mb-2">{activity.description}</p>
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-700">
+                  <p className="text-gray-600 text-sm mb-3">{activity.description}</p>
+                  <div className="flex flex-wrap gap-3 text-sm text-gray-500">
                     {activity.bestTimeToVisit && (
-                      <span className="flex items-center gap-1">
-                        <FaSun className="text-orange-400" /> {activity.bestTimeToVisit}
+                      <span className="flex items-center gap-1 text-[12px]">
+                        <FaSun className="text-emerald-600" /> {activity.bestTimeToVisit}
                       </span>
                     )}
                     {(activity.openingTime || activity.closingTime) && (
-                      <span className="flex items-center gap-1">
-                        <FaClock className="text-blue-400" />
+                      <span className="flex items-center gap-1 text-[12px]">
+                        <FaClock className="text-emerald-600" />
                         {activity.openingTime || 'N/A'} - {activity.closingTime || 'N/A'}
                       </span>
                     )}
-                    <span className="flex items-center gap-1">
-                      <FaRupeeSign className="text-green-500" />
+                    <span className="flex items-center gap-1 text-[12px]">
+                      <FaRupeeSign className="text-emerald-600" />
                       {activity.entryTicketPrice || 'Not specified'}
                     </span>
                     {activity.placeType && (
-                      <span className="flex items-center gap-1">
-                        <FaTag className="text-pink-400" /> {activity.placeType}
+                      <span className="flex items-center gap-1 text-[12px]">
+                        <FaTag className="text-emerald-600" /> {activity.placeType}
                       </span>
                     )}
                   </div>
                   {activity.additionalInfo && (
-                    <div className="mt-2 text-xs text-gray-500">
-                      <strong>Note:</strong> {activity.additionalInfo}
+                    <div className="mt-3 pt-3 border-t border-gray-100 text-[12px] text-gray-400">
+                      <strong className="text-[11px] uppercase tracking-[0.1em]">Note:</strong> {activity.additionalInfo}
                     </div>
                   )}
                 </div>

@@ -196,55 +196,32 @@ function MyTrips() {
     return "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1121&q=80";
   };
 
-  // If not logged in, show sign in required message with animation
+  // If not logged in, show sign in required message
   if (!user) {
     return (
       <motion.div
-        className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center "
-        initial={{ opacity: 0, scale: 0.95, y: 40 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <motion.div
-          className="bg-white rounded-xl shadow-lg px-8 py-10 flex flex-col items-center max-w-md w-full"
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.4, type: "spring" }}
-        >
-          <motion.div
-            className="mb-4"
-            initial={{ rotate: -10, scale: 0.8 }}
-            animate={{ rotate: 0, scale: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 12 }}
-          >
-            <FaSuitcase className="text-emerald-600 text-5xl" />
-          </motion.div>
-          <motion.div
-            className="text-2xl font-bold text-emerald-700 mb-2"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            Sign in Required
-          </motion.div>
-          <motion.div
-            className="text-gray-600 mb-6 text-center"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
+        <div className="bg-white border border-gray-200 px-10 py-12 flex flex-col items-center max-w-md w-full">
+          <FaSuitcase className="text-[#1a1a2e] text-4xl mb-5" />
+          <h2 className="font-serif text-2xl text-[#1a1a2e] mb-2">Sign In Required</h2>
+          <div className="w-10 h-[2px] bg-emerald-600 mb-4"></div>
+          <p className="text-gray-500 text-sm tracking-wide mb-6">
             Please sign in to view your trips and access your saved journeys.
-          </motion.div>
-      
-        </motion.div>
+          </p>
+        </div>
       </motion.div>
     );
   }
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
+        <div className="w-[1px] h-10 bg-emerald-600 animate-pulse"></div>
+        <span className="text-[11px] uppercase tracking-[0.25em] text-gray-400 font-medium">Loading trips</span>
       </div>
     );
   }
@@ -252,11 +229,12 @@ function MyTrips() {
   if (errorMessage) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center">
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-lg max-w-md">
-          <h2 className="text-xl font-bold mb-2">Authentication Required</h2>
-          <p className="mb-4">{errorMessage}</p>
-          <Link to="/" className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md">
-            Go to Home Page
+        <div className="bg-[#f5f0eb] border border-gray-200 px-8 py-6 max-w-md">
+          <h2 className="font-serif text-xl text-[#1a1a2e] mb-2">Authentication Required</h2>
+          <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm mb-5">{errorMessage}</p>
+          <Link to="/" className="inline-block bg-[#1a1a2e] hover:bg-[#2a2a4e] text-white text-[11px] uppercase tracking-[0.2em] font-medium px-6 py-3 transition-colors">
+            GO TO HOME
           </Link>
         </div>
       </div>
@@ -264,70 +242,79 @@ function MyTrips() {
   }
 
   return (
-    <div className="container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 max-w-7xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">My Trips</h1>
-        
-        <div className="flex flex-wrap items-center gap-3">
-          {/* View mode toggle */}
-          <div className="bg-gray-100 rounded-lg p-1 flex">
+    <div>
+      {/* Dark banner header */}
+      <div className="bg-[#1a1a2e] py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+            <div>
+              <span className="text-[11px] uppercase tracking-[0.25em] text-white/50 font-medium">Your Collection</span>
+              <h1 className="font-serif text-3xl sm:text-4xl text-white mt-2">My Trips</h1>
+              <div className="w-12 h-[2px] bg-emerald-600 mt-3"></div>
+            </div>
+            <Link 
+              to="/create-trip" 
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] uppercase tracking-[0.2em] font-medium px-6 py-3 transition-colors"
+            >
+              <FaPlus size={10} />
+              <span>NEW TRIP</span>
+            </Link>
+          </div>
+          
+          {/* LP-style tabs */}
+          <div className="flex items-center gap-8 mt-8 border-t border-white/10 pt-4">
             <button
               onClick={() => setViewMode('all')}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              className={`text-[12px] uppercase tracking-[0.2em] font-medium pb-2 transition-colors border-b-2 ${
                 viewMode === 'all' 
-                  ? 'bg-white shadow-sm text-emerald-700' 
-                  : 'text-gray-600 hover:bg-gray-200'
+                  ? 'text-white border-emerald-600' 
+                  : 'text-white/50 border-transparent hover:text-white/80'
               }`}
             >
               All Trips
             </button>
             <button
               onClick={() => setViewMode('favorites')}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${
+              className={`text-[12px] uppercase tracking-[0.2em] font-medium pb-2 transition-colors border-b-2 flex items-center gap-2 ${
                 viewMode === 'favorites'
-                  ? 'bg-white shadow-sm text-emerald-700'
-                  : 'text-gray-600 hover:bg-gray-200'
+                  ? 'text-white border-emerald-600'
+                  : 'text-white/50 border-transparent hover:text-white/80'
               }`}
             >
-              <FaHeart className="text-xs" />
+              <FaHeart size={10} />
               Favorites
             </button>
           </div>
-          
-          <Link 
-            to="/create-trip" 
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg"
-          >
-            <FaPlus />
-            <span>Create New Trip</span>
-          </Link>
         </div>
       </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
       {trips.length === 0 ? (
-        <div className="bg-gray-50 rounded-xl p-12 text-center shadow-sm">
-          <FaSuitcase className="mx-auto text-gray-300 text-5xl mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+        <div className="bg-[#f5f0eb] p-16 text-center">
+          <FaSuitcase className="mx-auto text-[#1a1a2e]/20 text-4xl mb-5" />
+          <h2 className="font-serif text-2xl text-[#1a1a2e] mb-2">
             {viewMode === 'favorites' ? "No favorite trips yet" : "No trips yet"}
           </h2>
-          <p className="text-gray-500 mb-6">
+          <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-4"></div>
+          <p className="text-gray-500 text-sm tracking-wide mb-8 max-w-sm mx-auto">
             {viewMode === 'favorites' 
-              ? "Add trips to your favorites to see them here!" 
-              : "Start planning your next adventure today!"}
+              ? "Add trips to your favorites to see them here." 
+              : "Start planning your next adventure today."}
           </p>
           {viewMode === 'favorites' ? (
             <button 
               onClick={() => setViewMode('all')}
-              className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-all shadow-md hover:shadow-lg"
+              className="inline-block bg-[#1a1a2e] hover:bg-[#2a2a4e] text-white text-[11px] uppercase tracking-[0.2em] font-medium px-8 py-3 transition-colors"
             >
-              View All Trips
+              VIEW ALL TRIPS
             </button>
           ) : (
             <Link 
               to="/" 
-              className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-all shadow-md hover:shadow-lg"
+              className="inline-block bg-[#1a1a2e] hover:bg-[#2a2a4e] text-white text-[11px] uppercase tracking-[0.2em] font-medium px-8 py-3 transition-colors"
             >
-              Create Your First Trip
+              CREATE YOUR FIRST TRIP
             </Link>
           )}
         </div>
@@ -341,106 +328,92 @@ function MyTrips() {
             return (
               <motion.div
                 key={trip.id}
-                className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-100 relative"
-                whileHover={{ y: -5 }}
+                className="bg-white border border-gray-200 overflow-hidden relative group"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
                 {/* Favorite Button */}
-                <motion.button
-                  className="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-md"
+                <button
+                  className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm p-2 transition-colors hover:bg-white"
                   onClick={(e) => {
                     e.preventDefault(); 
                     e.stopPropagation();
                     toggleFavorite(trip.id, trip.isFavorite);
                   }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
                 >
                   {trip.isFavorite ? (
-                    <FaHeart className="text-red-500" size={16} />
+                    <FaHeart className="text-red-500" size={14} />
                   ) : (
-                    <FaRegHeart className="text-gray-600 hover:text-red-500" size={16} />
+                    <FaRegHeart className="text-gray-600 hover:text-red-500" size={14} />
                   )}
-                </motion.button>
+                </button>
                 
-                <div className="h-48 relative overflow-hidden">
+                <div className="h-52 relative overflow-hidden">
                   {/* Loading indicator for images */}
                   {loadingImages[trip.id] && (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 z-10">
-                      <div className="flex flex-col items-center">
-                        <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-1"></div>
-                        <span className="text-xs text-gray-500">Loading image...</span>
-                      </div>
+                      <div className="w-[1px] h-6 bg-emerald-600 animate-pulse"></div>
                     </div>
                   )}
                   
                   {/* Place API badge */}
                   {placeImages[trip.id] && (
-                    <div className="absolute top-3 left-3 z-10 bg-emerald-700/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-md flex items-center gap-1">
-                      <FaImage size={10} />
-                      <span>Live Photo</span>
+                    <div className="absolute top-3 left-3 z-10 bg-[#1a1a2e]/80 backdrop-blur-sm text-white text-[10px] uppercase tracking-[0.15em] px-2 py-1 flex items-center gap-1">
+                      <FaImage size={8} />
+                      <span>Live</span>
                     </div>
                   )}
                   
                   <img 
                     src={tripImage} 
                     alt={location}
-                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     onError={(e) => {
-                      // Fallback if image fails to load
                       e.target.onerror = null;
                       e.target.src = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1121&q=80";
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <span className="bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1">
-                      <FaSuitcase className="text-white/90" size={10} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                  <div className="absolute bottom-3 left-3">
+                    <span className="bg-[#1a1a2e] text-white text-[10px] uppercase tracking-[0.15em] font-medium px-3 py-1.5 inline-flex items-center gap-1.5">
+                      <FaSuitcase size={8} />
                       {formatTravelType(travelType)}
                     </span>
                   </div>
                 </div>
                 
                 <div className="p-5">
-                  <h3 className="font-bold text-xl mb-2 text-gray-800 line-clamp-1">{location}</h3>
+                  <h3 className="font-serif text-xl text-[#1a1a2e] mb-3 line-clamp-1">{location}</h3>
                   
-                  <div className="flex flex-col gap-2 text-sm text-gray-600 mb-4">
+                  <div className="flex flex-col gap-2 text-sm text-gray-500 mb-4">
                     <div className="flex items-center gap-2">
-                      <FaCalendarAlt className="text-emerald-600" />
+                      <FaCalendarAlt className="text-emerald-600" size={12} />
                       <span>{trip.userSelection?.duration || 0} {trip.userSelection?.duration === 1 ? 'Day' : 'Days'}</span>
                     </div>
                     
                     <div className="flex items-center gap-2">
-                      <FaUser className="text-emerald-600" />
+                      <FaUser className="text-emerald-600" size={12} />
                       <span>{trip.userSelection?.travelers || 1} {trip.userSelection?.travelers === 1 ? 'Traveler' : 'Travelers'}</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <FaMapMarkerAlt className="text-emerald-600" />
-                      <span className="line-clamp-1">{location}</span>
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">{formatDate(trip.createdAt)}</span>
+                  <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
+                    <span className="text-[10px] uppercase tracking-[0.15em] text-gray-400">{formatDate(trip.createdAt)}</span>
                     <div className="flex gap-2">
-                      {/* Delete button */}
                       <button 
                         onClick={() => setShowDeleteConfirm(trip.id)}
-                        className="inline-flex items-center bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 p-2 rounded-lg text-sm transition-colors"
+                        className="inline-flex items-center text-gray-400 hover:text-red-500 p-2 transition-colors"
                         aria-label="Delete trip"
                       >
-                        <FaTrash size={14} />
+                        <FaTrash size={13} />
                       </button>
                       
-                      {/* View button */}
                       <Link 
                         to={`/show-trip/${trip.id}`}
-                        className="inline-block bg-gray-100 hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        className="inline-block bg-[#1a1a2e] hover:bg-[#2a2a4e] text-white text-[11px] uppercase tracking-[0.15em] font-medium px-4 py-2 transition-colors"
                       >
-                        View Trip
+                        View
                       </Link>
                     </div>
                   </div>
@@ -462,43 +435,44 @@ function MyTrips() {
             onClick={() => !isDeleting && setShowDeleteConfirm(null)}
           >
             <motion.div 
-              className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0 }}
+              className="bg-white p-8 max-w-md w-full"
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              exit={{ scale: 0.95, opacity: 0 }}
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 text-red-600 mb-4">
-                <FaExclamationTriangle size={20} />
-                <h3 className="text-lg font-bold">Delete Trip</h3>
+              <div className="flex items-center gap-3 text-red-600 mb-2">
+                <FaExclamationTriangle size={18} />
+                <h3 className="font-serif text-lg text-[#1a1a2e]">Delete Trip</h3>
               </div>
+              <div className="w-10 h-[2px] bg-red-500 mb-4"></div>
               
-              <p className="mb-6 text-gray-700">
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed">
                 Are you sure you want to delete this trip? This action cannot be undone.
               </p>
               
               <div className="flex gap-3 justify-end">
                 <button
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium disabled:opacity-50"
+                  className="px-5 py-2.5 text-[11px] uppercase tracking-[0.15em] font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-50"
                   onClick={() => !isDeleting && setShowDeleteConfirm(null)}
                   disabled={isDeleting}
                 >
                   Cancel
                 </button>
                 <button
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium flex items-center gap-2 disabled:opacity-50"
+                  className="px-5 py-2.5 text-[11px] uppercase tracking-[0.15em] font-medium bg-red-600 hover:bg-red-700 text-white transition-colors flex items-center gap-2 disabled:opacity-50"
                   onClick={() => deleteTrip(showDeleteConfirm)}
                   disabled={isDeleting}
                 >
                   {isDeleting ? (
                     <>
-                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Deleting...
+                      <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Deleting
                     </>
                   ) : (
                     <>
-                      <FaTrash size={14} />
-                      Delete Trip
+                      <FaTrash size={11} />
+                      Delete
                     </>
                   )}
                 </button>
@@ -507,6 +481,7 @@ function MyTrips() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 }

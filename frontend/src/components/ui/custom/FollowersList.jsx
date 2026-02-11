@@ -158,13 +158,13 @@ const FollowersList = ({ userId = null, onClose, showBackButton = true, onChatSt
     return (
       <motion.div
         key={email}
-        className="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between"
+        className="bg-white border border-gray-200 p-4 flex items-center justify-between"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full overflow-hidden bg-emerald-100">
+          <div className="w-12 h-12 overflow-hidden bg-[#f5f0eb]">
             {profile.photoURL ? (
               <img 
                 src={profile.photoURL} 
@@ -172,18 +172,18 @@ const FollowersList = ({ userId = null, onClose, showBackButton = true, onChatSt
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-emerald-500 text-white">
-                <FaUserCircle size={24} />
+              <div className="w-full h-full flex items-center justify-center bg-[#1a1a2e] text-white">
+                <span className="font-serif">{(profile.displayName || '?').charAt(0).toUpperCase()}</span>
               </div>
             )}
           </div>
           
           <div>
-            <Link to={`/user-profile/${email}`} className="font-medium text-gray-800 hover:text-emerald-600">
+            <Link to={`/user-profile/${email}`} className="text-[13px] font-medium text-[#1a1a2e] hover:text-emerald-600 tracking-wide">
               {profile.displayName}
             </Link>
-            <div className="text-sm text-gray-500 flex items-center gap-1">
-              <FaEnvelope size={12} className="opacity-70" />
+            <div className="text-[11px] text-gray-400 flex items-center gap-1 tracking-wide">
+              <FaEnvelope size={10} className="opacity-70" />
               <span>{email}</span>
             </div>
           </div>
@@ -194,28 +194,28 @@ const FollowersList = ({ userId = null, onClose, showBackButton = true, onChatSt
             <>
               <button
                 onClick={() => handleStartChat(profile)}
-                className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                className="p-2 text-[#1a1a2e] hover:bg-[#f5f0eb] transition-colors"
                 title="Start chat"
               >
-                <FaComment size={16} />
+                <FaComment size={14} />
               </button>
               
               <button
                 onClick={() => handleFollow(email)}
-                className={`px-3 py-1.5 rounded-lg flex items-center gap-1 text-sm ${
+                className={`px-3 py-1.5 flex items-center gap-1 text-[11px] uppercase tracking-[0.1em] font-medium ${
                   isFollowing(email)
-                    ? 'bg-emerald-50 text-emerald-700 hover:bg-red-50 hover:text-red-700'
-                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                }`}
+                    ? 'bg-[#f5f0eb] text-[#1a1a2e] hover:bg-red-50 hover:text-red-600'
+                    : 'bg-[#1a1a2e] text-white hover:bg-[#2a2a4e]'
+                } transition-colors`}
               >
                 {isFollowing(email) ? (
                   <>
-                    <FaUserCheck size={12} />
+                    <FaUserCheck size={10} />
                     <span className="hidden sm:inline">Following</span>
                   </>
                 ) : (
                   <>
-                    <FaUserPlus size={12} />
+                    <FaUserPlus size={10} />
                     <span className="hidden sm:inline">Follow</span>
                   </>
                 )}
@@ -228,47 +228,50 @@ const FollowersList = ({ userId = null, onClose, showBackButton = true, onChatSt
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl">
+    <div className="bg-white border border-gray-200 p-6 w-full max-w-2xl">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           {showBackButton && (
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-[#f5f0eb] transition-colors"
             >
-              <FaChevronLeft size={16} className="text-gray-600" />
+              <FaChevronLeft size={14} className="text-gray-500" />
             </button>
           )}
-          <h2 className="text-xl font-bold text-gray-800">
-            {targetUserId === user?.email ? 'Your Network' : `${profiles[targetUserId]?.displayName || 'User'}'s Network`}
-          </h2>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-medium">Network</p>
+            <h2 className="font-serif text-xl text-[#1a1a2e]">
+              {targetUserId === user?.email ? 'Your Network' : `${profiles[targetUserId]?.displayName || 'User'}'s Network`}
+            </h2>
+          </div>
         </div>
         
         <button
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-700"
+          className="text-gray-400 hover:text-gray-600"
         >
-          <FaTimesCircle size={20} />
+          <FaTimesCircle size={18} />
         </button>
       </div>
 
       <div className="border-b border-gray-200 mb-6">
         <div className="flex space-x-8">
           <button
-            className={`pb-3 px-2 font-medium ${
+            className={`pb-3 px-2 text-[11px] uppercase tracking-[0.15em] font-medium transition-colors ${
               activeTab === 'followers'
-                ? 'border-b-2 border-emerald-500 text-emerald-600'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'border-b-2 border-emerald-600 text-[#1a1a2e]'
+                : 'text-gray-400 hover:text-gray-600'
             }`}
             onClick={() => setActiveTab('followers')}
           >
             Followers
           </button>
           <button
-            className={`pb-3 px-2 font-medium ${
+            className={`pb-3 px-2 text-[11px] uppercase tracking-[0.15em] font-medium transition-colors ${
               activeTab === 'following'
-                ? 'border-b-2 border-emerald-500 text-emerald-600'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'border-b-2 border-emerald-600 text-[#1a1a2e]'
+                : 'text-gray-400 hover:text-gray-600'
             }`}
             onClick={() => setActiveTab('following')}
           >
@@ -278,15 +281,15 @@ const FollowersList = ({ userId = null, onClose, showBackButton = true, onChatSt
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-60">
-          <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+        <div className="flex flex-col items-center justify-center h-60 gap-3">
+          <div className="w-[1px] h-10 bg-emerald-600 animate-pulse"></div>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400">Loading</p>
         </div>
       ) : activeTab === 'followers' ? (
         followers.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <div className="text-gray-400 text-5xl mb-4">👥</div>
-            <p className="text-gray-600">No followers yet</p>
-            <p className="text-gray-500 text-sm mt-2">
+          <div className="text-center py-12 bg-[#f5f0eb]">
+            <p className="font-serif text-lg text-[#1a1a2e] mb-1">No Followers</p>
+            <p className="text-[12px] text-gray-400 tracking-wide">
               {targetUserId === user?.email 
                 ? "When people follow you, they'll appear here" 
                 : "This user doesn't have any followers yet"}
@@ -299,10 +302,9 @@ const FollowersList = ({ userId = null, onClose, showBackButton = true, onChatSt
         )
       ) : (
         following.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <div className="text-gray-400 text-5xl mb-4">👤</div>
-            <p className="text-gray-600">Not following anyone yet</p>
-            <p className="text-gray-500 text-sm mt-2">
+          <div className="text-center py-12 bg-[#f5f0eb]">
+            <p className="font-serif text-lg text-[#1a1a2e] mb-1">Not Following Anyone</p>
+            <p className="text-[12px] text-gray-400 tracking-wide">
               {targetUserId === user?.email 
                 ? "When you follow people, they'll appear here" 
                 : "This user isn't following anyone yet"}

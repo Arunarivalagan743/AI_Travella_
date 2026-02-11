@@ -27,7 +27,7 @@
 //         icon: <Explore />,
 //         peopleMax: "6",
 //         features: ["Hiking", "Camping", "Extreme sports"],
-//         priceRange: "$200 - $500 per day",
+//         priceRange: "₹200 - ₹500 per day",
 //     },
 //     {
 //         id: "luxury",
@@ -36,7 +36,7 @@
 //         icon: <Diamond />,
 //         peopleMax: "4",
 //         features: ["5-star stays", "VIP access", "Premium services"],
-//         priceRange: "$750 - $2000 per day",
+//         priceRange: "₹750 - ₹2000 per day",
 //     },
 //     {
 //         id: "cultural",
@@ -45,7 +45,7 @@
 //         icon: <Museum />,
 //         peopleMax: "8",
 //         features: ["Historical sites", "Local cuisine", "Cultural performances"],
-//         priceRange: "$250 - $600 per day",
+//         priceRange: "₹250 - ₹600 per day",
 //     },
 //     {
 //         id: "romantic",
@@ -54,7 +54,7 @@
 //         icon: <Favorite />,
 //         peopleMax: "2",
 //         features: ["Private dinners", "Couple's activities", "Scenic views"],
-//         priceRange: "$300 - $800 per day",
+//         priceRange: "₹300 - ₹800 per day",
 //     },
 //     {
 //         id: "family",
@@ -63,7 +63,7 @@
 //         icon: <FamilyRestroom />,
 //         peopleMax: "10",
 //         features: ["Kid-friendly", "Educational experiences", "Family accommodations"],
-//         priceRange: "$350 - $700 per day",
+//         priceRange: "₹350 - ₹700 per day",
 //     },
 //     {
 //         id: "beach",
@@ -72,7 +72,7 @@
 //         icon: <BeachAccess />,
 //         peopleMax: "8",
 //         features: ["Oceanfront stays", "Water sports", "Sunbathing"],
-//         priceRange: "$250 - $650 per day",
+//         priceRange: "₹250 - ₹650 per day",
 //     },
 //     {
 //         id: "wellness",
@@ -81,7 +81,7 @@
 //         icon: <Spa />,
 //         peopleMax: "4",
 //         features: ["Spa treatments", "Yoga", "Mindfulness activities"],
-//         priceRange: "$400 - $1000 per day",
+//         priceRange: "₹400 - ₹1000 per day",
 //     },
 //     {
 //         id: "food",

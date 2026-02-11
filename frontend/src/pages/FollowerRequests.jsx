@@ -158,97 +158,104 @@ function FollowerRequests() {
   if (!user) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
-        <p className="text-gray-600">Please sign in to view follower requests</p>
+        <div className="text-center">
+          <p className="font-serif text-xl text-[#1a1a2e] mb-2">Sign In Required</p>
+          <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-3"></div>
+          <p className="text-gray-500 text-sm tracking-wide">Please sign in to view follower requests</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-8">
-      <div className="mb-8 flex items-center gap-4">
-        <Link to="/">
-          <motion.button
-            className="flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition-colors"
-            whileHover={{ x: -3 }}
-          >
-            <FaArrowLeft size={14} />
+    <div>
+      {/* Dark banner header */}
+      <div className="bg-[#1a1a2e] py-12 sm:py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <Link to="/" className="inline-flex items-center gap-2 text-white/50 hover:text-white text-[11px] uppercase tracking-[0.2em] font-medium transition-colors mb-6">
+            <FaArrowLeft size={10} />
             <span>Back</span>
-          </motion.button>
-        </Link>
-        <h1 className="text-3xl font-bold text-gray-800">Follower Requests</h1>
-      </div>
+          </Link>
+          <span className="block text-[11px] uppercase tracking-[0.25em] text-white/50 font-medium">Connections</span>
+          <h1 className="font-serif text-3xl sm:text-4xl text-white mt-2">Follower Requests</h1>
+          <div className="w-12 h-[2px] bg-emerald-600 mt-3"></div>
 
-      {/* Tab navigation */}
-      <div className="border-b border-gray-200 mb-6">
-        <div className="flex space-x-8">
-          <button
-            className={`pb-3 px-2 font-medium text-sm ${
-              activeTab === 'received'
-                ? 'border-b-2 border-emerald-500 text-emerald-600'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-            onClick={() => setActiveTab('received')}
-          >
-            Requests Received
-          </button>
-          <button
-            className={`pb-3 px-2 font-medium text-sm ${
-              activeTab === 'sent'
-                ? 'border-b-2 border-emerald-500 text-emerald-600'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-            onClick={() => setActiveTab('sent')}
-          >
-            Requests Sent
-          </button>
+          {/* LP-style tabs */}
+          <div className="flex items-center gap-8 mt-8 border-t border-white/10 pt-4">
+            <button
+              className={`text-[12px] uppercase tracking-[0.2em] font-medium pb-2 transition-colors border-b-2 ${
+                activeTab === 'received'
+                  ? 'text-white border-emerald-600'
+                  : 'text-white/50 border-transparent hover:text-white/80'
+              }`}
+              onClick={() => setActiveTab('received')}
+            >
+              Received
+            </button>
+            <button
+              className={`text-[12px] uppercase tracking-[0.2em] font-medium pb-2 transition-colors border-b-2 ${
+                activeTab === 'sent'
+                  ? 'text-white border-emerald-600'
+                  : 'text-white/50 border-transparent hover:text-white/80'
+              }`}
+              onClick={() => setActiveTab('sent')}
+            >
+              Sent
+            </button>
+          </div>
         </div>
       </div>
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-10 w-10 border-4 border-emerald-500 border-t-transparent"></div>
+        <div className="flex flex-col items-center justify-center py-16 gap-4">
+          <div className="w-[1px] h-10 bg-emerald-600 animate-pulse"></div>
+          <span className="text-[11px] uppercase tracking-[0.25em] text-gray-400 font-medium">Loading requests</span>
         </div>
       ) : activeTab === 'received' ? (
         <div>
           {receivedRequests.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-600">No pending follow requests</p>
+            <div className="text-center py-16 bg-[#f5f0eb]">
+              <p className="font-serif text-xl text-[#1a1a2e] mb-2">No pending requests</p>
+              <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-3"></div>
+              <p className="text-gray-500 text-sm tracking-wide">You have no follow requests at this time.</p>
             </div>
           ) : (
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               {receivedRequests.map((email) => {
                 const profile = userProfiles[email] || { displayName: email.split('@')[0], photoURL: null };
                 
                 return (
-                  <li key={email} className="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
+                  <li key={email} className="bg-white border border-gray-200 p-4 sm:p-5 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
+                      <div className="w-11 h-11 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
                         {profile.photoURL ? (
                           <img src={profile.photoURL} alt={profile.displayName} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <FaUserCircle size={30} />
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg font-serif">
+                            {(profile.displayName || '?')[0].toUpperCase()}
                           </div>
                         )}
                       </div>
                       <div>
-                        <p className="font-medium">{profile.displayName}</p>
-                        <p className="text-sm text-gray-500">{email}</p>
+                        <p className="font-medium text-[#1a1a2e] text-sm">{profile.displayName}</p>
+                        <p className="text-[11px] uppercase tracking-[0.1em] text-gray-400">{email}</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => acceptRequest(email)}
-                        className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors flex items-center gap-1"
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] uppercase tracking-[0.15em] font-medium transition-colors flex items-center gap-1.5"
                       >
-                        <FaUserCheck size={14} />
+                        <FaUserCheck size={11} />
                         <span>Accept</span>
                       </button>
                       <button
                         onClick={() => rejectRequest(email)}
-                        className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-1"
+                        className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 text-[11px] uppercase tracking-[0.15em] font-medium transition-colors flex items-center gap-1.5"
                       >
-                        <FaTimesCircle size={14} />
+                        <FaTimesCircle size={11} />
                         <span>Reject</span>
                       </button>
                     </div>
@@ -261,39 +268,41 @@ function FollowerRequests() {
       ) : (
         <div>
           {sentRequests.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-600">No pending requests sent</p>
+            <div className="text-center py-16 bg-[#f5f0eb]">
+              <p className="font-serif text-xl text-[#1a1a2e] mb-2">No sent requests</p>
+              <div className="w-10 h-[2px] bg-emerald-600 mx-auto mb-3"></div>
+              <p className="text-gray-500 text-sm tracking-wide">You haven't sent any follow requests.</p>
             </div>
           ) : (
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               {sentRequests.map((email) => {
                 const profile = userProfiles[email] || { displayName: email.split('@')[0], photoURL: null };
                 
                 return (
-                  <li key={email} className="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
+                  <li key={email} className="bg-white border border-gray-200 p-4 sm:p-5 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
+                      <div className="w-11 h-11 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
                         {profile.photoURL ? (
                           <img src={profile.photoURL} alt={profile.displayName} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <FaUserCircle size={30} />
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg font-serif">
+                            {(profile.displayName || '?')[0].toUpperCase()}
                           </div>
                         )}
                       </div>
                       <div>
-                        <p className="font-medium">{profile.displayName}</p>
-                        <p className="text-sm text-gray-500">{email}</p>
+                        <p className="font-medium text-[#1a1a2e] text-sm">{profile.displayName}</p>
+                        <p className="text-[11px] uppercase tracking-[0.1em] text-gray-400">{email}</p>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <div className="flex items-center gap-1.5 text-yellow-600 text-sm">
-                        <FaHourglassHalf size={14} />
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.1em] text-amber-600 font-medium">
+                        <FaHourglassHalf size={10} />
                         <span>Pending</span>
                       </div>
                       <button
                         onClick={() => cancelRequest(email)}
-                        className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                        className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 text-[11px] uppercase tracking-[0.15em] font-medium transition-colors"
                       >
                         Withdraw
                       </button>
@@ -305,6 +314,7 @@ function FollowerRequests() {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }

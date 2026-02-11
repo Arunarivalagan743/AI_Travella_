@@ -104,19 +104,22 @@ const ShareOptions = ({ tripId, creatorEmail, isOpen, onClose, followers = [] })
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <motion.div 
         ref={modalRef}
-        className="bg-white rounded-xl shadow-xl max-w-md w-full p-6"
+        className="bg-white border border-gray-200 max-w-md w-full p-6"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Share this trip</h2>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-medium">Share</p>
+            <h2 className="font-serif text-xl text-[#1a1a2e]">Share This Trip</h2>
+          </div>
           <button 
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-400 hover:text-gray-600"
           >
-            <FaTimes size={20} />
+            <FaTimes size={18} />
           </button>
         </div>
 
@@ -129,48 +132,48 @@ const ShareOptions = ({ tripId, creatorEmail, isOpen, onClose, followers = [] })
               exit={{ opacity: 0 }}
               className="mt-4"
             >
-              <h3 className="font-semibold text-gray-700 mb-2">Share with your followers</h3>
+              <h3 className="text-[11px] uppercase tracking-[0.15em] font-medium text-[#1a1a2e] mb-2">Share with your followers</h3>
               
               {followers.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">You don't have any followers yet</p>
+                <p className="text-gray-400 text-center py-4 text-[12px] tracking-wide">You don't have any followers yet</p>
               ) : (
                 <div className="max-h-60 overflow-y-auto">
                   {followers.map((follower) => (
                     <div 
                       key={follower.id}
-                      className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                      className="flex items-center p-2 hover:bg-[#f5f0eb] cursor-pointer transition-colors"
                       onClick={() => toggleFollowerSelection(follower.id)}
                     >
                       <input 
                         type="checkbox" 
-                        className="mr-3 h-4 w-4 text-emerald-600" 
+                        className="mr-3 h-4 w-4 accent-emerald-600" 
                         checked={selectedFollowers.includes(follower.id)}
                         readOnly
                       />
-                      <div className="w-8 h-8 rounded-full overflow-hidden bg-emerald-100 mr-3">
+                      <div className="w-8 h-8 overflow-hidden bg-[#f5f0eb] mr-3">
                         {follower.photoURL ? (
                           <img src={follower.photoURL} alt={follower.displayName} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-emerald-500 text-white text-sm font-bold">
+                          <div className="w-full h-full flex items-center justify-center bg-[#1a1a2e] text-white text-sm font-serif">
                             {follower.displayName?.charAt(0).toUpperCase()}
                           </div>
                         )}
                       </div>
-                      <span className="font-medium text-gray-700">{follower.displayName}</span>
+                      <span className="text-[13px] font-medium text-[#1a1a2e]">{follower.displayName}</span>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div className="flex justify-between mt-4 pt-4 border-t">
+              <div className="flex justify-between mt-4 pt-4 border-t border-gray-200">
                 <button 
-                  className="text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100"
+                  className="text-gray-500 px-4 py-2 hover:bg-[#f5f0eb] text-[12px] uppercase tracking-[0.1em] font-medium transition-colors"
                   onClick={() => setShowFollowersList(false)}
                 >
                   Back
                 </button>
                 <button 
-                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+                  className="bg-[#1a1a2e] text-white px-4 py-2 hover:bg-[#2a2a4e] disabled:opacity-50 text-[12px] uppercase tracking-[0.1em] font-medium transition-colors"
                   onClick={handleShareToFollowers}
                   disabled={selectedFollowers.length === 0 || followers.length === 0}
                 >
@@ -187,72 +190,72 @@ const ShareOptions = ({ tripId, creatorEmail, isOpen, onClose, followers = [] })
             >
               <div className="grid grid-cols-3 gap-4 mt-4">
                 <button 
-                  className="flex flex-col items-center p-3 rounded-lg hover:bg-blue-50"
+                  className="flex flex-col items-center p-3 hover:bg-[#f5f0eb] transition-colors"
                   onClick={() => handleShareViaSocial('twitter')}
                 >
-                  <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mb-2">
+                  <div className="w-12 h-12 bg-blue-500 flex items-center justify-center mb-2">
                     <FaTwitter size={24} className="text-white" />
                   </div>
-                  <span className="text-sm">Twitter</span>
+                  <span className="text-[11px] tracking-wide">Twitter</span>
                 </button>
                 
                 <button 
-                  className="flex flex-col items-center p-3 rounded-lg hover:bg-blue-50"
+                  className="flex flex-col items-center p-3 hover:bg-[#f5f0eb] transition-colors"
                   onClick={() => handleShareViaSocial('facebook')}
                 >
-                  <div className="w-12 h-12 rounded-full bg-blue-700 flex items-center justify-center mb-2">
+                  <div className="w-12 h-12 bg-blue-700 flex items-center justify-center mb-2">
                     <FaFacebookF size={24} className="text-white" />
                   </div>
-                  <span className="text-sm">Facebook</span>
+                  <span className="text-[11px] tracking-wide">Facebook</span>
                 </button>
                 
                 <button 
-                  className="flex flex-col items-center p-3 rounded-lg hover:bg-green-50"
+                  className="flex flex-col items-center p-3 hover:bg-[#f5f0eb] transition-colors"
                   onClick={() => handleShareViaSocial('whatsapp')}
                 >
-                  <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mb-2">
+                  <div className="w-12 h-12 bg-green-500 flex items-center justify-center mb-2">
                     <FaWhatsapp size={24} className="text-white" />
                   </div>
-                  <span className="text-sm">WhatsApp</span>
+                  <span className="text-[11px] tracking-wide">WhatsApp</span>
                 </button>
                 
                 <button 
-                  className="flex flex-col items-center p-3 rounded-lg hover:bg-blue-50"
+                  className="flex flex-col items-center p-3 hover:bg-[#f5f0eb] transition-colors"
                   onClick={() => handleShareViaSocial('telegram')}
                 >
-                  <div className="w-12 h-12 rounded-full bg-blue-400 flex items-center justify-center mb-2">
+                  <div className="w-12 h-12 bg-blue-400 flex items-center justify-center mb-2">
                     <FaTelegramPlane size={24} className="text-white" />
                   </div>
-                  <span className="text-sm">Telegram</span>
+                  <span className="text-[11px] tracking-wide">Telegram</span>
                 </button>
                 
                 <button 
-                  className="flex flex-col items-center p-3 rounded-lg hover:bg-red-50"
+                  className="flex flex-col items-center p-3 hover:bg-[#f5f0eb] transition-colors"
                   onClick={() => handleShareViaSocial('email')}
                 >
-                  <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center mb-2">
+                  <div className="w-12 h-12 bg-red-500 flex items-center justify-center mb-2">
                     <FaEnvelope size={20} className="text-white" />
                   </div>
-                  <span className="text-sm">Email</span>
+                  <span className="text-[11px] tracking-wide">Email</span>
                 </button>
                 
                 <button 
-                  className="flex flex-col items-center p-3 rounded-lg hover:bg-gray-50"
+                  className="flex flex-col items-center p-3 hover:bg-[#f5f0eb] transition-colors"
                   onClick={handleCopyLink}
                 >
-                  <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center mb-2">
+                  <div className="w-12 h-12 bg-[#1a1a2e] flex items-center justify-center mb-2">
                     <FaLink size={20} className="text-white" />
                   </div>
-                  <span className="text-sm">Copy Link</span>
+                  <span className="text-[11px] tracking-wide">Copy Link</span>
                 </button>
               </div>
 
-              <div className="mt-6 pt-4 border-t">
+              <div className="mt-6 pt-4 border-t border-gray-200">
                 <button 
-                  className="w-full py-2 flex items-center justify-center gap-2 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors"
+                  className="w-full py-2 flex items-center justify-center gap-2 bg-[#f5f0eb] text-[#1a1a2e] hover:bg-gray-200 transition-colors text-[12px] uppercase tracking-[0.1em] font-medium"
                   onClick={() => setShowFollowersList(true)}
                 >
-                  <FaUsers size={16} />
+                  <FaUsers size={14} />
                   <span>Share with followers</span>
                 </button>
               </div>

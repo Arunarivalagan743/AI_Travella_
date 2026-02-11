@@ -111,30 +111,31 @@ function HotelList({ hotels }) {
 
   return (
     <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl mx-auto">
-      <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 text-gray-800">
-        <span className="flex items-center">
-          <FaHotel className="text-emerald-600 mr-2 text-lg sm:text-xl lg:text-2xl" />
+      <div className="mb-6 sm:mb-8">
+        <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-600 font-medium mb-2">Accommodation</p>
+        <h2 className="font-serif text-2xl sm:text-3xl text-[#1a1a2e]">
           Recommended Hotels
-        </span>
-      </h2>
+        </h2>
+        <div className="w-12 h-[2px] bg-emerald-600 mt-3"></div>
+      </div>
 
       {hotels.length > 0 ? (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:space-y-5">
           {hotels.map((hotel, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition-all duration-300"
+              className="bg-white border border-gray-200 overflow-hidden hover:border-emerald-600/30 transition-colors"
             >
-              <div className="p-3 sm:p-4 lg:p-5">
-                {/* Header section - responsive layout */}
+              <div className="p-4 sm:p-5 lg:p-6">
+                {/* Header section */}
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <div>
-                        <h3 className="font-bold text-base sm:text-lg lg:text-xl text-gray-800 line-clamp-2">
+                        <h3 className="font-serif text-lg sm:text-xl text-[#1a1a2e] line-clamp-2">
                           {hotelDetails[hotel.hotelName]?.displayName || hotel.hotelName}
                         </h3>
-                        <p className="text-gray-500 text-xs sm:text-sm lg:text-base break-words">
+                        <p className="text-[12px] text-gray-400 break-words mt-1">
                           {hotel.hotelAddress}
                         </p>
                       </div>
@@ -144,7 +145,7 @@ function HotelList({ hotels }) {
                         )}${hotelDetails[hotel.hotelName]?.placeId ? `&query_place_id=${hotelDetails[hotel.hotelName].placeId}` : ''}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="ml-2 text-emerald-600 hover:text-emerald-800 transition-colors duration-200"
+                        className="ml-2 text-emerald-600 hover:text-emerald-800 transition-colors"
                         title="View on map"
                       >
                         <FaMapMarkerAlt className="text-lg" />
@@ -152,35 +153,35 @@ function HotelList({ hotels }) {
                     </div>
                   </div>
                   
-                  {/* Price and rating section */}
+                  {/* Price and rating */}
                   <div className="flex sm:flex-col items-start sm:items-end justify-between sm:justify-start gap-2 sm:gap-1 shrink-0">
-                    <p className="font-bold text-emerald-600 text-sm sm:text-base lg:text-lg whitespace-nowrap">
+                    <p className="font-serif text-lg text-emerald-600 whitespace-nowrap">
                       {hotel.pricePerNight}
                     </p>
-                    <div className="flex justify-end text-sm sm:text-base">
+                    <div className="flex justify-end text-sm">
                       {renderStars(hotel.starRating)}
                     </div>
                   </div>
                 </div>
 
                 {/* Review summary */}
-                <p className="text-gray-600 mt-3 text-sm sm:text-base leading-relaxed">
+                <p className="text-gray-600 mt-3 text-sm leading-relaxed">
                   {hotel.reviewSummary}
                 </p>
 
                 {/* Amenities section */}
                 {hotel.amenities && hotel.amenities.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                    <p className="text-[11px] uppercase tracking-[0.15em] text-gray-400 font-medium mb-2">
                       Amenities
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {hotel.amenities.map((amenity, i) => (
                         <div
                           key={i}
-                          className="flex items-center bg-gray-100 text-gray-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded text-xs sm:text-sm"
+                          className="flex items-center bg-[#f5f0eb] text-gray-700 px-2 sm:px-3 py-1 sm:py-1.5 text-xs"
                         >
-                          <span className="text-xs sm:text-sm mr-1">
+                          <span className="text-xs mr-1">
                             {getAmenityIcon(amenity)}
                           </span>
                           <span className="truncate max-w-24 sm:max-w-none">{amenity}</span>
@@ -197,7 +198,7 @@ function HotelList({ hotels }) {
                   }`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block mt-4 rounded-lg overflow-hidden h-32 sm:h-40 lg:h-48 transform transition duration-300 hover:scale-[1.02] hover:shadow-lg"
+                  className="block mt-4 overflow-hidden h-32 sm:h-40 lg:h-48 transform transition duration-300 hover:opacity-90"
                   title="View on map"
                 >
                   <img
@@ -222,11 +223,10 @@ function HotelList({ hotels }) {
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 sm:py-12">
-          <FaHotel className="mx-auto text-4xl sm:text-5xl text-gray-300 mb-4" />
-          <p className="text-gray-500 text-sm sm:text-base">
-            No hotel recommendations available.
-          </p>
+        <div className="text-center py-12 bg-[#f5f0eb]">
+          <FaHotel className="mx-auto text-3xl text-gray-400 mb-4" />
+          <p className="font-serif text-lg text-[#1a1a2e] mb-1">No Hotels Available</p>
+          <p className="text-sm text-gray-400">No hotel recommendations available for this trip.</p>
         </div>
       )}
     </div>

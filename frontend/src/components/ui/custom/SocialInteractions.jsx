@@ -376,68 +376,68 @@ const SocialInteractions = ({
         <button 
           onClick={handleToggleLike}
           disabled={isProcessing.like}
-          className="flex items-center gap-1.5 hover:scale-110 active:scale-95 transition-transform"
+          className="flex items-center gap-1.5 hover:opacity-70 active:scale-95 transition-all"
         >
           {isLiked 
             ? <FaHeart className="text-red-500" size={iconSize} /> 
-            : <FaRegHeart className="text-gray-700" size={iconSize} />
+            : <FaRegHeart className="text-gray-600" size={iconSize} />
           }
-          <span className="text-sm font-medium">{likeCount}</span>
+          <span className="text-[12px] tracking-wide font-medium">{likeCount}</span>
         </button>
 
         {/* Comment */}
         <button 
           onClick={onCommentClick}
-          className="flex items-center gap-1.5 hover:scale-110 active:scale-95 transition-transform"
+          className="flex items-center gap-1.5 hover:opacity-70 active:scale-95 transition-all"
         >
-          <FaRegCommentAlt className="text-gray-700" size={iconSize} />
-          <span className="text-sm">{liveCommentsCount}</span>
+          <FaRegCommentAlt className="text-gray-600" size={iconSize} />
+          <span className="text-[12px] tracking-wide">{liveCommentsCount}</span>
         </button>
 
         {/* Share */}
         <button
           onClick={handleShare}
           disabled={isProcessing.share}
-          className="flex items-center gap-1.5 hover:scale-110 active:scale-95 transition-transform"
+          className="flex items-center gap-1.5 hover:opacity-70 active:scale-95 transition-all"
         >
-          <FaShare className="text-gray-700" size={iconSize} />
-          <span className="text-sm">Share</span>
+          <FaShare className="text-gray-600" size={iconSize} />
+          <span className="text-[12px] tracking-wide uppercase">Share</span>
         </button>
 
         {/* Follow button with request system */}
         {user && creatorEmail && user.email !== creatorEmail && (
         <button
           onClick={handleToggleFollow}
-          className={`flex items-center gap-1.5 transition-colors px-3 py-1 rounded-full ${
+          className={`flex items-center gap-0.5 transition-colors px-1.5 py-0.5 text-[8px] uppercase tracking-[0.01em] font-medium rounded ${
             isUserFollowing
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+              ? 'bg-gray-100 text-gray-700 border border-gray-300'
               : followRequestStatus === 'requested'
-                ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+                ? 'bg-gray-100 text-gray-500 border border-gray-300'
                 : followRequestStatus === 'pending'
-                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                  : 'bg-emerald-600 text-white'
+                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                  : 'bg-[#1a1a2e] text-white'
           }`}
           disabled={isProcessing.follow}
         >
           {isUserFollowing ? (
             <>
-              <FaUserCheck size={iconSize - 4} />
-              <span className="text-xs">Following</span>
+              <FaUserCheck size={10} />
+              <span>Following</span>
             </>
           ) : followRequestStatus === 'requested' ? (
             <>
-              <FaHourglassHalf size={iconSize - 4} />
-              <span className="text-xs">Requested</span>
+              <FaHourglassHalf size={10} />
+              <span>Requested</span>
             </>
           ) : followRequestStatus === 'pending' ? (
             <>
-              <FaUserPlus size={iconSize - 4} />
-              <span className="text-xs">Accept Request</span>
+              <FaUserPlus size={10} />
+              <span>Accept</span>
             </>
           ) : (
             <>
-              <FaRegUserCircle size={iconSize - 4} />
-              <span className="text-xs">Follow</span>
+              <FaRegUserCircle size={10} />
+              <span>Follow</span>
             </>
           )}
         </button>

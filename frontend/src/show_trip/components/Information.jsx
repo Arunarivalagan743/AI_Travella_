@@ -204,175 +204,80 @@ function Information({ trip }) {
 
   return (
     <div className="relative pb-12">
-      {/* Hero Image Section with improved margin and animations */}
-   
-<motion.div 
-  className="relative w-full overflow-hidden mb-14 sm:mb-16 md:mb-20"
-  initial={{ y: -20, opacity: 0 }}
-  animate={{ y: 0, opacity: 1 }}
-  transition={{ duration: 0.8 }}
->
-  {/* Image container with responsive height and improved transitions */}
-  <motion.div 
-    className={`relative h-64 sm:h-80 md:h-96 bg-cover bg-center rounded-xl overflow-hidden`}
-    style={{ 
-      backgroundImage: `url(${backgroundImage})`,
-      backgroundPosition: 'center 25%',
-      boxShadow: '0 10px 30px -5px rgba(0,0,0,0.3)'
-    }}
-    variants={heroImageVariants}
-    initial="initial"
-    animate="animate"
-    whileHover="hover"
-  >
-    {/* Loading overlay - only show when actually loading from API */}
-    <AnimatePresence>
-      {isPhotoLoading && (
-        <motion.div 
-          className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-30 backdrop-blur-sm"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+      {/* Hero Image Section - LP Editorial */}
+      <div className="relative w-full overflow-hidden mb-8 sm:mb-10">
+        <div 
+          className="relative h-64 sm:h-80 md:h-96 bg-cover bg-center overflow-hidden"
+          style={{ 
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundPosition: 'center 25%'
+          }}
         >
-          <motion.div 
-            className="flex flex-col items-center"
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 mb-2 animate-spin"></div>
-            <span className="text-white text-sm font-medium">Loading destination image...</span>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          {/* Loading overlay */}
+          {isPhotoLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a2e]/50">
+              <div className="flex flex-col items-center">
+                <div className="w-[1px] h-8 bg-white animate-pulse mb-2"></div>
+                <span className="text-white text-[11px] uppercase tracking-[0.2em] font-medium">Loading image</span>
+              </div>
+            </div>
+          )}
 
-    {/* Success indicator for loaded API image */}
-    <AnimatePresence>
-      {!isPhotoLoading && placePhotoUrl && (
-        <motion.div 
-          className="absolute top-4 right-4 bg-emerald-500 text-white px-2 py-1 rounded-full text-xs"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 0.75, x: 0 }}
-          whileHover={{ opacity: 1, scale: 1.05 }}
-          transition={{ duration: 0.5 }}
-        >
-          Live Photo
-        </motion.div>
-      )}
-    </AnimatePresence>
+          {/* Live Photo badge */}
+          {!isPhotoLoading && placePhotoUrl && (
+            <div className="absolute top-4 right-4 bg-emerald-600 text-white px-3 py-1 text-[10px] uppercase tracking-[0.15em] font-medium">
+              Live Photo
+            </div>
+          )}
 
-    {/* Location overlay in top left */}
-    <motion.div
-      className="absolute top-4 left-4 z-10"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, delay: 0.2 }}
-    >
-      <motion.div 
-        className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg"
-        whileHover={{ scale: 1.05, backgroundColor: "rgba(0,0,0,0.6)" }}
-      >
-        <FaMapMarkerAlt className="text-red-400" />
-        <span className="text-white font-semibold text-lg tracking-wide text-shadow-sm">
-          {location}
-        </span>
-      </motion.div>
-    </motion.div>
-
-    {/* Weather display in bottom left corner */}
-    {weather?.weatherPrediction && (
-      <motion.div
-        className="absolute bottom-4 left-4 z-10"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-      >
-        <motion.div 
-          className="flex items-center gap-3 bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg"
-          whileHover={{ scale: 1.05, backgroundColor: "rgba(0,0,0,0.6)" }}
-        >
-          <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full">
-            {weatherCondition.toLowerCase().includes('sun') ? (
-              <FaSun className="text-yellow-300" />
-            ) : weatherCondition.toLowerCase().includes('cloud') ? (
-              <FaCloud className="text-gray-200" />
-            ) : weatherCondition.toLowerCase().includes('rain') ? (
-              <FaCloudRain className="text-blue-200" />
-            ) : (
-              <FaTemperatureHigh className="text-orange-300" />
-            )}
+          {/* Location overlay */}
+          <div className="absolute top-4 left-4 z-10">
+            <div className="flex items-center gap-2 bg-[#1a1a2e]/80 px-3 py-1.5">
+              <FaMapMarkerAlt className="text-emerald-400 text-sm" />
+              <span className="text-white font-medium text-sm tracking-wide">
+                {location}
+              </span>
+            </div>
           </div>
-          <div>
-            <div className="text-white font-bold text-lg">{temperature}</div>
-            <div className="text-white/80 text-xs">{weatherCondition}</div>
-          </div>
-        </motion.div>
-      </motion.div>
-    )}
 
-    {/* Animated gradient overlay with parallax effect */}
-    <motion.div 
-      className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/30 to-black/70"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1.2 }}
-      style={{ 
-        backgroundImage: "linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.3), rgba(0,0,0,0.7))" 
-      }}
-    ></motion.div>
-    
-    {/* Animated particles effect */}
-    <motion.div 
-      className="absolute inset-0 pointer-events-none"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0.6 }}
-      transition={{ duration: 2 }}
-    >
-      {Array.from({ length: 20 }).map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 rounded-full bg-white"
-          initial={{ 
-            x: Math.random() * 100 + "%", 
-            y: Math.random() * 100 + "%",
-            opacity: Math.random() * 0.5 + 0.3
-          }}
-          animate={{ 
-            y: [null, Math.random() * 20 - 10 + "%"],
-            opacity: [null, Math.random() * 0.3 + 0.1, Math.random() * 0.5 + 0.3]
-          }}
-          transition={{ 
-            duration: Math.random() * 5 + 5,
-            repeat: Infinity,
-            repeatType: "reverse"
-          }}
-        />
-      ))}
-    </motion.div>
-</motion.div>
-</motion.div>
+          {/* Weather display */}
+          {weather?.weatherPrediction && (
+            <div className="absolute bottom-4 left-4 z-10">
+              <div className="flex items-center gap-3 bg-[#1a1a2e]/80 px-3 py-2">
+                <div className="flex items-center justify-center w-7 h-7 bg-emerald-600">
+                  {weatherCondition.toLowerCase().includes('sun') ? (
+                    <FaSun className="text-yellow-300 text-sm" />
+                  ) : weatherCondition.toLowerCase().includes('cloud') ? (
+                    <FaCloud className="text-gray-200 text-sm" />
+                  ) : weatherCondition.toLowerCase().includes('rain') ? (
+                    <FaCloudRain className="text-blue-200 text-sm" />
+                  ) : (
+                    <FaTemperatureHigh className="text-orange-300 text-sm" />
+                  )}
+                </div>
+                <div>
+                  <div className="text-white font-serif text-lg">{temperature}</div>
+                  <div className="text-white/60 text-[11px] uppercase tracking-[0.1em]">{weatherCondition}</div>
+                </div>
+              </div>
+            </div>
+          )}
 
-{/* Welcome Message with name from AuthContext/localStorage */}
-<motion.div
-  className="relative w-full max-w-7xl mx-auto -mt-4 sm:-mt-6 mb-4 sm:mb-6 z-20 px-3 sm:px-4"
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.7, delay: 0.9 }}
->
-  <WelcomeMessage location={location} />
-</motion.div>
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/20 to-black/60"></div>
+        </div>
+      </div>
 
-{/* Navigation Tabs with improved positioning and styling */}
-<motion.div 
-  className="bg-white rounded-xl shadow-md mx-3 sm:mx-4 md:mx-auto max-w-7xl relative z-10 border border-gray-100"
-  initial={{ y: 20, opacity: 0 }}
-  animate={{ y: 0, opacity: 1 }}
-  transition={{ duration: 0.6, delay: 0.5 }}
->
+      {/* Welcome Message */}
+      <div className="relative w-full max-w-7xl mx-auto -mt-4 sm:-mt-6 mb-4 sm:mb-6 z-20 px-3 sm:px-4">
+        <WelcomeMessage location={location} />
+      </div>
+
+      {/* Navigation Tabs - LP Style */}
+      <div className="bg-white border border-gray-200 mx-3 sm:mx-4 md:mx-auto max-w-7xl relative z-10">
         <div className="flex overflow-x-auto scrollbar-hide relative" ref={tabsRef}>
           {tabs.map((tab) => (
-            <motion.button 
+            <button 
               key={tab.id}
               onClick={() => {
                 if (tab.id !== activeTab) {
@@ -381,90 +286,40 @@ function Information({ trip }) {
                   setActiveTab(tab.id);
                 }
               }}
-              className={`tab-${tab.id} flex-1 py-4 px-6 text-center font-medium transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-2 ${
+              className={`tab-${tab.id} flex-1 py-4 px-6 text-center transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-2 ${
                 activeTab === tab.id ? 
-                'text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50/50' : 
-                'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50/30'
+                'text-emerald-600 border-b-2 border-emerald-600' : 
+                'text-gray-400 hover:text-[#1a1a2e] border-b-2 border-transparent'
               }`}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <motion.span 
-                className={`${activeTab === tab.id ? 'text-emerald-600' : 'text-gray-400'} transition-colors duration-300`}
-                animate={{ 
-                  scale: activeTab === tab.id ? [1, 1.2, 1] : 1,
-                  rotate: activeTab === tab.id ? [0, -10, 10, 0] : 0
-                }}
-                transition={{ duration: 0.5 }}
-              >
+              <span className={`${activeTab === tab.id ? 'text-emerald-600' : 'text-gray-400'} transition-colors`}>
                 {tab.icon}
-              </motion.span>
-              <span>{tab.label}</span>
-            </motion.button>
+              </span>
+              <span className="text-[12px] uppercase tracking-[0.1em] font-medium">{tab.label}</span>
+            </button>
           ))}
         </div>
         
-        {/* Left & right navigation arrows */}
-        <motion.button
-          className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 p-1.5 rounded-r-lg shadow-sm border-r border-t border-b border-gray-100 text-gray-500 hover:text-emerald-600 hidden sm:flex"
+        {/* Navigation arrows */}
+        <button
+          className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 border-r border-gray-200 text-gray-400 hover:text-emerald-600 hidden sm:flex"
           onClick={prevTab}
           disabled={isTransitioning}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 0.7, x: 0 }}
-          whileHover={{ opacity: 1, x: 2 }}
         >
-          <FaChevronLeft size={16} />
-        </motion.button>
+          <FaChevronLeft size={14} />
+        </button>
         
-        <motion.button
-          className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 p-1.5 rounded-l-lg shadow-sm border-l border-t border-b border-gray-100 text-gray-500 hover:text-emerald-600 hidden sm:flex"
+        <button
+          className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 p-1.5 border-l border-gray-200 text-gray-400 hover:text-emerald-600 hidden sm:flex"
           onClick={nextTab}
           disabled={isTransitioning}
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 0.7, x: 0 }}
-          whileHover={{ opacity: 1, x: -2 }}
         >
-          <FaChevronRight size={16} />
-        </motion.button>
-      </motion.div>
+          <FaChevronRight size={14} />
+        </button>
+      </div>
       
-      {/* Content Section with improved animations */}
-      <motion.div 
-        className="bg-white rounded-b-xl p-4 sm:p-6 md:p-8 shadow-xl mx-3 sm:mx-4 md:mx-auto max-w-7xl relative z-10 min-h-[300px] sm:min-h-[400px] border-t-0 border border-gray-100 overflow-hidden"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-      >
-        {/* Swipe hint animation */}
-        <AnimatePresence>
-          {showSwipeHint && (
-            <motion.div 
-              className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none bg-black/10 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <motion.div 
-                className="bg-black/70 text-white px-4 py-2 rounded-full flex items-center gap-2"
-                animate={{ 
-                  x: [0, -30, 30, 0], 
-                  opacity: [0.9, 0.6, 0.6, 0.9] 
-                }}
-                transition={{ 
-                  repeat: 2, 
-                  duration: 2,
-                  repeatType: "reverse"  
-                }}
-              >
-                <FaHandPointer className="text-lg" />
-                <span className="text-sm font-medium">Swipe to explore tabs</span>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        
+      {/* Content Section - LP Style */}
+      <div className="bg-white border border-gray-200 border-t-0 p-4 sm:p-6 md:p-8 mx-3 sm:mx-4 md:mx-auto max-w-7xl relative z-10 min-h-[300px] sm:min-h-[400px] overflow-hidden">
         <AnimatePresence custom={swipeDirection} mode="wait">
           <motion.div
             key={activeTab}
@@ -556,45 +411,23 @@ function Information({ trip }) {
           </motion.div>
         </AnimatePresence>
 
-        {/* Pagination Dots - Enhanced */}
-        <div className="flex justify-center gap-2 mt-8">
+        {/* Tab step indicators */}
+        <div className="flex justify-center gap-3 mt-8">
           {tabs.map((tab, index) => (
-            <motion.button
+            <button
               key={index}
               onClick={() => {
                 setIsTransitioning(true);
                 setSwipeDirection(index > activeTabIndex ? 'left' : 'right');
                 setActiveTab(tab.id);
               }}
-              className="relative h-2 rounded-full transition-all"
-              animate={{ 
-                width: activeTab === tab.id ? "1.5rem" : "0.5rem",
-                backgroundColor: activeTab === tab.id ? "#10b981" : "#d1d5db" 
-              }}
-              transition={{ duration: 0.3 }}
-              whileHover={{ 
-                scale: 1.1,
-                backgroundColor: activeTab === tab.id ? "#10b981" : "#9ca3af"
-              }}
-            >
-              {activeTab === tab.id && (
-                <motion.div 
-                  className="absolute inset-0 rounded-full bg-emerald-300"
-                  initial={{ opacity: 0, scale: 1 }}
-                  animate={{ 
-                    opacity: [0, 0.5, 0],
-                    scale: [1, 1.5, 1.8],
-                  }}
-                  transition={{ 
-                    duration: 1.5, 
-                    repeat: Infinity,
-                  }}
-                />
-              )}
-            </motion.button>
+              className={`h-[2px] transition-all duration-300 ${
+                activeTab === tab.id ? 'w-8 bg-emerald-600' : 'w-3 bg-gray-300 hover:bg-gray-400'
+              }`}
+            />
           ))}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

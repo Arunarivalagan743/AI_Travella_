@@ -302,7 +302,7 @@ function ViewTrip() {
             
             // Add budget if available
             if (tripData.tripData?.budget) {
-                pdf.text(`Budget: ${tripData.tripData.budget}`, 10, 80);
+                pdf.text(`Budget: ₹${tripData.tripData.budget}`, 10, 80);
             }
             
             // Weather Section if available
@@ -476,7 +476,7 @@ function ViewTrip() {
                     // Price - handle different property names
                     const price = hotel.pricePerNight || hotel.price;
                     if (price) {
-                        pdf.text(`Price: ${price}`, 15, hotelYPosition);
+                        pdf.text(`Price: ₹${price}`, 15, hotelYPosition);
                         hotelYPosition += 7;
                     }
                     
@@ -538,384 +538,76 @@ function ViewTrip() {
        // If not logged in, show login required message with animation
     if (!user) {
         return (
-            <motion.div
-                className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
-                initial={{ opacity: 0, scale: 0.95, y: 40 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-                {/* Animated background shapes */}
-                <div className="absolute inset-0 overflow-hidden">
-                    {[...Array(8)].map((_, i) => (
-                        <motion.div
-                            key={i}
-                            className="absolute rounded-full bg-gradient-to-br"
-                            style={{
-                                width: Math.random() * 200 + 50,
-                                height: Math.random() * 200 + 50,
-                                left: `${Math.random() * 100}%`,
-                                top: `${Math.random() * 100}%`,
-                                background: `linear-gradient(to bottom right, ${
-                                    confettiColors[Math.floor(Math.random() * confettiColors.length)]
-                                }33, ${
-                                    confettiColors[Math.floor(Math.random() * confettiColors.length)]
-                                }22)`,
-                                filter: "blur(40px)",
-                                zIndex: 0
-                            }}
-                            animate={{
-                                x: [0, Math.random() * 50 - 25],
-                                y: [0, Math.random() * 50 - 25],
-                                opacity: [0.4, 0.2, 0.4],
-                            }}
-                            transition={{
-                                duration: 8 + Math.random() * 8,
-                                repeat: Infinity,
-                                repeatType: "reverse",
-                            }}
-                        />
-                    ))}
+            <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+                <div className="max-w-md w-11/12 border border-gray-200 p-10 text-center">
+                    <div className="w-12 h-[2px] bg-emerald-600 mx-auto mb-6"></div>
+                    <h2 className="font-serif text-2xl text-[#1a1a2e] mb-3">Sign In Required</h2>
+                    <p className="text-sm text-gray-500 mb-6">Please sign in to view this trip and access your saved journeys.</p>
+                    <Link to="/" className="inline-block px-8 py-3 bg-[#1a1a2e] text-white text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-[#2d2d4e] transition-colors">
+                        Go Home
+                    </Link>
                 </div>
-                
-                <motion.div
-                    className="bg-white/80 backdrop-blur-md rounded-xl shadow-xl px-8 py-10 flex flex-col items-center z-10 border border-white/40 max-w-md w-11/12"
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2, duration: 0.4, type: "spring" }}
-                >
-                    <motion.div
-                        className="mb-6"
-                        initial={{ rotate: -10, scale: 0.8 }}
-                        animate={{ rotate: 0, scale: 1 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 12 }}
-                    >
-                        <svg width="64" height="64" fill="none" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="12" fill="#6366F1" opacity="0.2"/>
-                            <path d="M12 13.5a2 2 0 100-4 2 2 0 000 4zm0 1.5c-2.21 0-4 1.12-4 2.5V19h8v-1.5c0-1.38-1.79-2.5-4-2.5z" fill="#6366F1"/>
-                        </svg>
-                    </motion.div>
-                    <motion.div
-                        className="text-2xl font-bold text-indigo-700 mb-2"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                    >
-                        Sign in Required
-                    </motion.div>
-                    <motion.div
-                        className="text-gray-600 mb-6 text-center"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                    >
-                        Please sign in to view this trip and access your saved journeys.
-                    </motion.div>
-                  
-                </motion.div>
-            </motion.div>
+            </div>
         );
     }
     
     if (loading) {
         return (
-            <motion.div 
-                className="flex flex-col justify-center items-center h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-            >
-                <motion.div 
-                    className="relative"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                >
-                    <div className="w-16 h-16 rounded-full border-t-4 border-b-4 border-indigo-500"></div>
-                    <div className="absolute top-0 left-0 w-16 h-16 rounded-full border-r-4 border-l-4 border-purple-400 rotate-45"></div>
-                </motion.div>
-                <motion.p 
-                    className="mt-6 text-indigo-700 font-medium"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                >
-                    Preparing your adventure...
-                </motion.p>
-            </motion.div>
+            <div className="flex flex-col justify-center items-center h-screen bg-white">
+                <div className="w-[1px] h-10 bg-emerald-600 animate-pulse mb-4"></div>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 font-medium">Preparing your adventure</p>
+            </div>
         );
     }
     
-      if (error) {
+    if (error) {
         return (
-            <motion.div 
-                className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-red-50 to-pink-50 p-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-            >
-                <motion.div 
-                    className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                >
-                    <div className="flex justify-center mb-6">
-                        <div className="rounded-full bg-red-100 p-4">
-                            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <h3 className="text-xl font-bold text-center text-gray-800 mb-2">Unable to Load Trip</h3>
-                    <p className="text-gray-600 text-center mb-6">{error}</p>
-                    <div className="flex justify-center">
-                        <motion.button 
-                            onClick={() => window.location.href = '/trips'}
-                            className="bg-gradient-to-r from-pink-500 to-red-500 text-white px-6 py-2 rounded-lg"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            Return to Trips
-                        </motion.button>
-                    </div>
-                </motion.div>
-            </motion.div>
+            <div className="flex flex-col items-center justify-center h-screen bg-white p-4">
+                <div className="border border-gray-200 p-10 max-w-md w-full text-center">
+                    <div className="w-12 h-[2px] bg-red-500 mx-auto mb-6"></div>
+                    <h3 className="font-serif text-xl text-[#1a1a2e] mb-2">Unable to Load Trip</h3>
+                    <p className="text-sm text-gray-500 mb-6">{error}</p>
+                    <button 
+                        onClick={() => window.location.href = '/trips'}
+                        className="px-8 py-3 bg-[#1a1a2e] text-white text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-[#2d2d4e] transition-colors"
+                    >
+                        Return to Trips
+                    </button>
+                </div>
+            </div>
         );
     }
 
 
     return (
-        <motion.div 
-            className="min-h-screen bg-gradient-to-br from-sky-50 via-indigo-50 to-purple-50 relative overflow-hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            ref={animationRef}
-        >
-            {/* Floating shapes in background */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                {[...Array(10)].map((_, i) => (
-                    <motion.div
-                        key={`shape-${i}`}
-                        className="absolute rounded-full bg-gradient-to-br"
-                        style={{
-                            width: Math.random() * 300 + 50,
-                            height: Math.random() * 300 + 50,
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            background: `linear-gradient(to bottom right, ${
-                                confettiColors[Math.floor(Math.random() * confettiColors.length)]
-                            }22, ${
-                                confettiColors[Math.floor(Math.random() * confettiColors.length)]
-                            }11)`,
-                            filter: "blur(60px)",
-                            zIndex: 0
-                        }}
-                        animate={{
-                            x: [0, Math.random() * 50 - 25],
-                            y: [0, Math.random() * 50 - 25],
-                            opacity: [0.3, 0.1, 0.3],
-                        }}
-                        transition={{
-                            duration: 15 + Math.random() * 15,
-                            repeat: Infinity,
-                            repeatType: "reverse",
-                        }}
-                    />
-                ))}
-            </div>
-            
-            {/* Enhanced Birthday Celebration at the top */}
-            <AnimatePresence>
-                {showCelebration && !loading && tripData && (
-                    <div className="fixed inset-x-0 top-0 z-50 pointer-events-none">
-                        {/* Confetti raining down */}
-                        {[...Array(80)].map((_, i) => (
-                            <motion.div
-                                key={`confetti-${i}`}
-                                className="fixed"
-                                style={{
-                                    width: Math.random() * 15 + 5,
-                                    height: Math.random() * 8 + 3,
-                                    borderRadius: Math.random() > 0.5 ? "3px" : "50%",
-                                    backgroundColor: confettiColors[Math.floor(Math.random() * confettiColors.length)],
-                                    top: "-5%",
-                                    left: `${Math.random() * 100}%`,
-                                    zIndex: 60,
-                                    boxShadow: `0 0 3px ${confettiColors[Math.floor(Math.random() * confettiColors.length)]}`,
-                                }}
-                                initial={{ 
-                                    y: -20,
-                                    opacity: 1,
-                                    rotate: Math.random() * 360
-                                }}
-                                animate={{
-                                    y: "110vh",
-                                    x: Math.random() * 300 - 150,
-                                    rotate: Math.random() * 1500,
-                                    opacity: [1, 1, 0.8, 0]
-                                }}
-                                transition={{
-                                    duration: Math.random() * 5 + 5,
-                                    ease: "easeOut",
-                                    delay: Math.random() * 8,
-                                    repeat: Infinity,
-                                    repeatDelay: Math.random() * 5,
-                                }}
-                            />
-                        ))}
-                        
-                        {/* Celebration Banner */}
-                        <motion.div 
-                            className="fixed top-4 left-1/2 transform -translate-x-1/2 z-60"
-                            initial={{ y: -100, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: -100, opacity: 0 }}
-                            transition={{ type: "spring", damping: 12 }}
-                        >
-                            <motion.div 
-                                className="bg-white/80 backdrop-blur-sm text-gray-700 px-6 py-3 rounded-full text-lg shadow-sm flex items-center gap-3 border border-white/60"
-                                animate={{
-                                    boxShadow: ["0 2px 6px rgba(0,0,0,0.08)", "0 4px 10px rgba(0,0,0,0.12)", "0 2px 6px rgba(0,0,0,0.08)"]
-                                }}
-                                transition={{ 
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    repeatType: "reverse" 
-                                }}
-                                whileHover={{ scale: 1.02 }}
-                            >
-                                <motion.span
-                                    animate={{ rotate: [0, 10, -10, 0] }}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                >
-                                    🎉
-                                </motion.span>
-                                <span className="font-normal">Let's Celebrate Your Adventure!</span>
-                                <motion.span
-                                    animate={{ rotate: [0, -10, 10, 0] }}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                >
-                                    🎊
-                                </motion.span>
-                            </motion.div>
-                        </motion.div>
-                        
-                        {/* Side fireworks/sparkles */}
-                        <div className="fixed top-0 left-0 w-full h-screen pointer-events-none">
-                            {/* Left side sparkles */}
-                            {[...Array(5)].map((_, i) => (
-                                <motion.div
-                                    key={`sparkle-left-${i}`}
-                                    className="absolute left-10"
-                                    style={{
-                                        top: `${10 + i * 18}%`,
-                                        zIndex: 55
-                                    }}
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    animate={{
-                                        scale: [0, 1.2, 0],
-                                        opacity: [0, 1, 0]
-                                    }}
-                                    transition={{
-                                        duration: 1.5,
-                                        delay: i * 0.8,
-                                        repeat: Infinity,
-                                        repeatDelay: 4 + i
-                                    }}
-                                >
-                                    <div className="text-4xl">✨</div>
-                                </motion.div>
-                            ))}
-                            
-                            {/* Right side sparkles */}
-                            {[...Array(5)].map((_, i) => (
-                                <motion.div
-                                    key={`sparkle-right-${i}`}
-                                    className="absolute right-10"
-                                    style={{
-                                        top: `${15 + i * 18}%`,
-                                        zIndex: 55
-                                    }}
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    animate={{
-                                        scale: [0, 1.2, 0],
-                                        opacity: [0, 1, 0]
-                                    }}
-                                    transition={{
-                                        duration: 1.5,
-                                        delay: i * 0.8 + 0.5,
-                                        repeat: Infinity,
-                                        repeatDelay: 4 + i
-                                    }}
-                                >
-                                    <div className="text-4xl">✨</div>
-                                </motion.div>
-                            ))}
-                        </div>
-                        
-                        {/* Balloons floating up */}
-                        {[...Array(8)].map((_, i) => (
-                            <motion.div
-                                key={`balloon-${i}`}
-                                className="fixed bottom-0 text-4xl sm:text-5xl"
-                                style={{
-                                    left: `${5 + i * 12}%`,
-                                    zIndex: 55
-                                }}
-                                initial={{ y: "100vh", opacity: 1 }}
-                                animate={{
-                                    y: "-120vh", 
-                                    x: Math.sin((i / 3) * Math.PI) * 100,
-                                    opacity: [1, 1, 0]
-                                }}
-                                transition={{
-                                    duration: 15 + Math.random() * 10,
-                                    delay: i * 3,
-                                    repeat: Infinity,
-                                    repeatDelay: 5
-                                }}
-                            >
-                                {["🎈",  "🎊", "🎉", "🎈",  "🎊"][i]}
-                            </motion.div>
-                        ))}
-                    </div>
+        <div className="min-h-screen bg-white relative">
+            {/* PDF Download Button */}
+            <button
+                onClick={downloadPDF}
+                disabled={downloadingPdf}
+                className="fixed right-4 top-1/2 transform -translate-y-1/2 z-50 flex items-center gap-2 bg-[#1a1a2e] text-white px-3 py-2 hover:bg-[#2d2d4e] transition-colors"
+            >
+                {downloadingPdf ? (
+                    <>
+                        <div className="w-[1px] h-4 bg-white animate-pulse"></div>
+                        <span className="text-[11px] uppercase tracking-[0.15em] font-medium">PDF...</span>
+                    </>
+                ) : (
+                    <>
+                        <FaFileDownload className="text-sm" />
+                        <span className="text-[11px] uppercase tracking-[0.15em] font-medium">PDF</span>
+                    </>
                 )}
-            </AnimatePresence>
+            </button>
             
-            
-            {/* Download PDF Button */}
-      {/* Small Download PDF Button at the bottom */}
-{/* Small Download PDF Button at the right center position with new aesthetic */}
-<motion.button
-    onClick={downloadPDF}
-    disabled={downloadingPdf}
-    className="fixed right-4 top-1/2 transform -translate-y-1/2 z-50 flex items-center gap-2 bg-gradient-to-r from-cyan-50 to-emerald-50 rounded-lg shadow-md border border-emerald-200 hover:shadow-lg transition-all duration-300 px-3 py-2"
-    initial={{ opacity: 0, x: 20 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ delay: 0.5 }}
-    whileHover={{ scale: 1.05, boxShadow: "0 8px 20px -5px rgba(16, 185, 129, 0.3)" }}
-    whileTap={{ scale: 0.95 }}
->
-    {downloadingPdf ? (
-        <>
-            <div className="animate-spin h-4 w-4 border-t-2 border-red-600 border-r-2 rounded-full"></div>
-            <span className="text-red-700 text-sm font-medium">PDF...</span>
-        </>
-    ) : (
-        <>
-            <FaFileDownload className="text-black-600 text-sm" />
-            <span className="text-black-700 text-sm font-medium">PDF</span>
-        </>
-    )}
-</motion.button>
-            
-            <div className="container mx-auto px-3 sm:px-4 md:px-6 py-4 z-10 relative max-w-7xl">
+            <div className="container mx-auto px-3 sm:px-4 md:px-6 py-0 z-10 relative max-w-7xl">
                 {tripData ? (
                     <>
-                        {/* Social Media Header */}
-                        <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
-                            <div className="p-4 flex items-center justify-between border-b border-gray-100">
+                        {/* Social Media Header - LP Editorial Style */}
+                        <div className="bg-white border-b border-gray-200 mb-6">
+                            <div className="p-4 sm:p-5 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                                    <div className="w-10 h-10 overflow-hidden bg-[#1a1a2e] flex-shrink-0">
                                         {tripData.userPicture ? (
                                             <img 
                                                 src={tripData.userPicture} 
@@ -923,19 +615,20 @@ function ViewTrip() {
                                                 className="w-full h-full object-cover" 
                                             />
                                         ) : (
-                                            <div className="w-full h-full bg-emerald-500 flex items-center justify-center text-white font-bold">
+                                            <div className="w-full h-full flex items-center justify-center text-white font-serif text-lg">
                                                 {(tripData.userName || "U").charAt(0).toUpperCase()}
                                             </div>
                                         )}
                                     </div>
                                     <div>
-                                        <Link to={`/user/${tripData.userEmail}`} className="hover:underline">
-                                            <h3 className="font-semibold">{tripData.userName || tripData.userEmail.split('@')[0]}</h3>
+                                        <Link to={`/user/${tripData.userEmail}`} className="hover:text-emerald-600 transition-colors">
+                                            <h3 className="font-medium text-[#1a1a2e] text-sm">{tripData.userName || tripData.userEmail.split('@')[0]}</h3>
                                         </Link>
-                                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                                            {new Date(tripData.createdAt).toLocaleDateString()} • 
-                                            <span className={`ml-1 flex items-center ${tripData.isPublic ? 'text-emerald-600' : 'text-amber-600'}`}>
-                                                {tripData.isPublic ? <FaGlobe size={10} /> : <FaLock size={10} />}
+                                        <p className="text-[11px] uppercase tracking-[0.1em] text-gray-400 flex items-center gap-1">
+                                            {new Date(tripData.createdAt).toLocaleDateString()} 
+                                            <span className="mx-1">·</span>
+                                            <span className={`flex items-center ${tripData.isPublic ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                                {tripData.isPublic ? <FaGlobe size={9} /> : <FaLock size={9} />}
                                                 <span className="ml-1">{tripData.isPublic ? 'Public' : 'Private'}</span>
                                             </span>
                                         </p>
@@ -943,28 +636,26 @@ function ViewTrip() {
                                 </div>
                                 
                                 <div className="flex items-center gap-2">
-                                    {/* Only show follow button if viewing someone else's trip */}
                                     {user && tripData.userEmail !== user.email && (
                                         <button
                                             onClick={toggleFollowUser}
-                                            className={`text-xs px-3 py-1 rounded-full transition-colors ${
+                                            className={`text-[11px] uppercase tracking-[0.1em] font-medium px-4 py-2 transition-colors ${
                                                 isCurrentUserFollowing
-                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                : 'bg-emerald-600 text-white'
+                                                ? 'border border-emerald-600 text-emerald-600 hover:bg-emerald-50'
+                                                : 'bg-emerald-600 text-white hover:bg-emerald-700'
                                             }`}
                                         >
                                             {isCurrentUserFollowing ? 'Following' : 'Follow'}
                                         </button>
                                     )}
                                     
-                                    {/* Only show public/private toggle for your own trips */}
                                     {user && tripData.userEmail === user.email && (
                                         <button
                                             onClick={togglePublicStatus}
-                                            className={`text-xs px-3 py-1 rounded-full transition-colors flex items-center gap-1 ${
+                                            className={`text-[11px] uppercase tracking-[0.1em] font-medium px-4 py-2 border transition-colors flex items-center gap-1.5 ${
                                                 tripData.isPublic
-                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                : 'bg-gray-100 text-gray-700 border border-gray-200'
+                                                ? 'border-emerald-600 text-emerald-600 hover:bg-emerald-50'
+                                                : 'border-gray-300 text-gray-600 hover:bg-gray-50'
                                             }`}
                                         >
                                             {tripData.isPublic ? (
@@ -984,7 +675,7 @@ function ViewTrip() {
                             </div>
                             
                             {/* Social Actions */}
-                            <div className="p-4">
+                            <div className="px-4 sm:px-5 pb-4">
                                 <SocialInteractions
                                     tripId={tripId}
                                     creatorEmail={tripData.userEmail}
@@ -1005,13 +696,12 @@ function ViewTrip() {
                         <Information trip={tripData} />
                     </>
                 ) : (
-                    <div className="text-center bg-white/80 backdrop-blur-sm p-8 rounded-lg shadow-lg">
-                        No trip data available
+                    <div className="text-center border border-gray-200 p-8 bg-white">
+                        <p className="text-sm text-gray-500">No trip data available</p>
                     </div>
                 )}
             </div>
             
-            {/* Small welcome toast notification */}
             {/* Chat Assistant */}
             <AnimatePresence>
                 {tripData && (
@@ -1024,73 +714,25 @@ function ViewTrip() {
                 )}
             </AnimatePresence>
             
-            {/* Chat Assistant Button with Tooltip */}
+            {/* Chat Assistant Button */}
             {!loading && tripData && !showChatAssistant && (
-                <motion.div className="fixed bottom-20 right-6 z-50">
-                    {/* Floating tooltip */}
-                    <motion.div
-                        className="absolute right-16 top-2 bg-white rounded-lg shadow-lg px-4 py-2 w-60 text-sm"
-                        initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                        animate={{ opacity: 1, scale: 1, x: 0 }}
-                        transition={{ delay: 2, duration: 0.3 }}
-                        exit={{ opacity: 0, scale: 0.8, x: -10 }}
-                    >
-                        <div className="text-gray-800 font-medium">New! AI Travel Assistant</div>
-                        <div className="text-gray-500 text-xs mt-1">Modify your trip, get destination advice, or explore new itineraries!</div>
-                        <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-l-8 border-transparent border-l-white"></div>
-                    </motion.div>
+                <div className="fixed bottom-20 right-6 z-50">
+                    <div className="absolute right-16 top-2 bg-white border border-gray-200 px-4 py-2 w-56 text-sm">
+                        <div className="text-[#1a1a2e] font-medium text-xs">AI Travel Assistant</div>
+                        <div className="text-gray-400 text-[11px] mt-1">Modify your trip, get destination advice, or explore new itineraries</div>
+                    </div>
                     
-                    <motion.button
+                    <button
                         onClick={() => setShowChatAssistant(true)}
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full p-4 shadow-lg"
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", delay: 1.5 }}
-                        whileHover={{ scale: 1.1, boxShadow: "0 10px 25px -5px rgba(16, 185, 129, 0.4)" }}
-                        whileTap={{ scale: 0.95 }}
+                        className="bg-[#1a1a2e] text-white p-4 hover:bg-[#2d2d4e] transition-colors relative"
                     >
-                        <motion.div
-                            animate={{ rotate: [0, 10, -10, 0] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        >
-                            <FaRobot size={24} />
-                        </motion.div>
-                        <span className="absolute -top-2 -right-2 bg-emerald-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        <FaRobot size={22} />
+                        <span className="absolute -top-1.5 -right-1.5 bg-emerald-600 text-white text-[9px] uppercase tracking-wider h-5 w-5 flex items-center justify-center font-medium">
                             AI
                         </span>
-                    </motion.button>
-                </motion.div>
+                    </button>
+                </div>
             )}
-            
-            <AnimatePresence>
-                {!loading && tripData && (
-                    <motion.div
-                        className="fixed bottom-4 right-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-4 flex items-center gap-3 max-w-xs z-40 border border-white/60"
-                        initial={{ x: 100, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: 100, opacity: 0 }}
-                        transition={{ type: "spring", damping: 20, stiffness: 300, delay: 1 }}
-                        whileHover={{ scale: 1.03, boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.3)" }}
-                    >
-                     
-                        <div>
-                         
-                        </div>
-                        <motion.div
-                            className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-200/20 to-purple-200/20 pointer-events-none"
-                            animate={{ 
-                                opacity: [0.5, 0.3, 0.5],
-                                background: [
-                                    "linear-gradient(to right, rgba(191, 219, 254, 0.2), rgba(199, 210, 254, 0.2))",
-                                    "linear-gradient(to right, rgba(147, 197, 253, 0.2), rgba(165, 180, 252, 0.2))",
-                                    "linear-gradient(to right, rgba(191, 219, 254, 0.2), rgba(199, 210, 254, 0.2))"
-                                ]
-                            }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
             
             {/* Comments Modal */}
             {tripId && (
@@ -1100,7 +742,7 @@ function ViewTrip() {
                     onClose={() => setCommentsOpen(false)}
                 />
             )}
-        </motion.div>
+        </div>
     )
 }
 export default ViewTrip;

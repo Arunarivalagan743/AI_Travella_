@@ -219,32 +219,36 @@ const Comments = ({ tripId, isOpen, onClose }) => {
           exit={{ opacity: 0 }}
         >
           <motion.div 
-            className="bg-white rounded-xl w-full max-w-md max-h-[80vh] flex flex-col"
+            className="bg-white w-full max-w-md max-h-[80vh] flex flex-col border border-gray-200"
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.9 }}
           >
             {/* Header */}
-            <div className="p-4 border-b flex items-center justify-between">
-              <h3 className="font-bold text-lg">Comments</h3>
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-medium">Discussion</p>
+                <h3 className="font-serif text-lg text-[#1a1a2e]">Comments</h3>
+              </div>
               <button 
-                className="rounded-full p-2 hover:bg-gray-100 transition-colors"
+                className="p-2 hover:bg-[#f5f0eb] transition-colors"
                 onClick={onClose}
               >
-                <FaTimes className="text-gray-700" />
+                <FaTimes className="text-gray-500" />
               </button>
             </div>
             
             {/* Comments */}
             <div className="overflow-y-auto flex-grow p-4">
               {loading ? (
-                <div className="flex justify-center items-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+                <div className="flex flex-col items-center justify-center h-32 gap-3">
+                  <div className="w-[1px] h-8 bg-emerald-600 animate-pulse"></div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400">Loading</p>
                 </div>
               ) : comments.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <p className="mb-2">No comments yet</p>
-                  <p className="text-sm">Be the first to comment!</p>
+                <div className="text-center py-12 bg-[#f5f0eb]">
+                  <p className="font-serif text-lg text-[#1a1a2e] mb-1">No Comments Yet</p>
+                  <p className="text-[12px] text-gray-400 tracking-wide">Be the first to share your thoughts</p>
                 </div>
               ) : (
                 <>
@@ -253,7 +257,7 @@ const Comments = ({ tripId, isOpen, onClose }) => {
                     return (
                       <div key={comment.id} className="mb-4">
                         <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                          <div className="w-8 h-8 overflow-hidden bg-gray-200 flex-shrink-0">
                             {userInfo.photo ? (
                               <img 
                                 src={userInfo.photo}
@@ -261,22 +265,22 @@ const Comments = ({ tripId, isOpen, onClose }) => {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <div className="w-full h-full bg-emerald-500 flex items-center justify-center text-white font-bold">
+                              <div className="w-full h-full bg-[#1a1a2e] flex items-center justify-center text-white text-[11px] font-serif">
                                 {userInfo.name.charAt(0).toUpperCase()}
                               </div>
                             )}
                           </div>
                           <div className="flex-grow">
-                            <div className="bg-gray-100 rounded-2xl px-4 py-2">
-                              <p className="font-semibold text-sm">{userInfo.name}</p>
-                              <p className="text-gray-800">{comment.text}</p>
+                            <div className="bg-[#f5f0eb] px-4 py-2">
+                              <p className="text-[11px] uppercase tracking-[0.1em] font-medium text-[#1a1a2e]">{userInfo.name}</p>
+                              <p className="text-gray-700 text-sm mt-1">{comment.text}</p>
                             </div>
-                            <div className="flex items-center mt-1 ml-1 text-xs text-gray-500">
+                            <div className="flex items-center mt-1 ml-1 text-[11px] text-gray-400 tracking-wide">
                               <FaRegClock className="mr-1" size={10} />
                               <span>{formatTime(comment.createdAt)}</span>
                               {user && comment.userEmail === user.email && (
                                 <button 
-                                  className="ml-2 text-red-500 hover:text-red-700"
+                                  className="ml-2 text-red-400 hover:text-red-600"
                                   onClick={() => handleDeleteComment(comment.id, comment.userEmail)}
                                 >
                                   <FaTrash size={10} />
@@ -294,31 +298,31 @@ const Comments = ({ tripId, isOpen, onClose }) => {
             </div>
             
             {/* Comment form */}
-            <div className="p-4 border-t">
+            <div className="p-4 border-t border-gray-200">
               {user ? (
                 <form onSubmit={handleSubmitComment} className="flex gap-2">
                   <input
                     ref={commentInputRef}
                     type="text"
                     placeholder="Add a comment..."
-                    className="flex-grow p-2 border rounded-lg"
+                    className="flex-grow p-2 border border-gray-200 text-sm focus:outline-none focus:border-[#1a1a2e] transition-colors"
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                   />
                   <button 
                     type="submit"
                     disabled={!newComment.trim() || submitting}
-                    className={`p-2 rounded-lg ${
+                    className={`p-2 ${
                       !newComment.trim() || submitting
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-emerald-500 text-white hover:bg-emerald-600'
-                    }`}
+                        ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                        : 'bg-[#1a1a2e] text-white hover:bg-[#2a2a4e]'
+                    } transition-colors`}
                   >
                     <FaPaperPlane />
                   </button>
                 </form>
               ) : (
-                <div className="text-center py-2 text-gray-500 text-sm">
+                <div className="text-center py-2 text-gray-400 text-[12px] uppercase tracking-[0.1em]">
                   Please sign in to comment
                 </div>
               )}
